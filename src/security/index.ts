@@ -745,7 +745,7 @@ export class AuditLogger {
       topUsers: Object.entries(userCounts)
         .map(([userId, count]) => ({ userId, count }))
         .sort((a, b) => b.count - a.count)
-        .slice(0: 10),
+        .slice(0, 10),
       riskDistribution: riskCounts
     };
   }

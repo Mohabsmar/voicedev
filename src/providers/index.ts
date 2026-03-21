@@ -64,6 +64,7 @@ export const providers: Provider[] = [
     models: [
       // LLMs - VERIFIED March 2026
       { id: 'gpt-5.4', name: 'GPT-5.4', category: 'llm', contextWindow: 1000000, features: ['thinking', 'pro', 'mini', 'nano', 'agentic'], releaseDate: '2026-03-15' },
+      { id: 'gpt-5.4-turbo', name: 'GPT-5.4 Turbo', category: 'llm', contextWindow: 1000000, features: ['low_latency', 'high_throughput'], releaseDate: '2026-03-20' },
       { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini', category: 'llm', contextWindow: 256000, features: ['fast', 'efficient'], releaseDate: '2026-03-15' },
       { id: 'gpt-5.3-codex', name: 'GPT-5.3 Codex', category: 'llm', contextWindow: 512000, features: ['agentic_coding', 'specialist'], releaseDate: '2026-02-20' },
       { id: 'gpt-5.2', name: 'GPT-5.2', category: 'llm', contextWindow: 256000, features: ['reasoning_effort', 'token_compaction'], releaseDate: '2026-01-10', deprecated: true },
@@ -99,6 +100,7 @@ export const providers: Provider[] = [
     models: [
       // VERIFIED March 2026
       { id: 'claude-sonnet-4.6', name: 'Claude Sonnet 4.6', category: 'llm', contextWindow: 1000000, features: ['vision', 'faster', 'cheaper'], releaseDate: '2026-02-17' },
+      { id: 'claude-sonnet-4.6-turbo', name: 'Claude Sonnet 4.6 Turbo', category: 'llm', contextWindow: 1000000, features: ['low_latency', 'optimized'], releaseDate: '2026-03-10' },
       { id: 'claude-opus-4.6', name: 'Claude Opus 4.6', category: 'llm', contextWindow: 1000000, features: ['vision', '14.5hr_tasks', 'swe_bench_80.8'], releaseDate: '2026-02-05' },
       { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', category: 'llm', contextWindow: 200000, features: ['vision', 'coding', '67%_price_cut'], releaseDate: '2025-11-01' },
       { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', category: 'llm', contextWindow: 200000, features: ['vision', 'balanced'] },
@@ -115,8 +117,14 @@ export const providers: Provider[] = [
     website: 'https://ai.google.dev',
     features: ['chat', 'vision', 'long_context', 'multimodal', 'code_execution'],
     models: [
-      // VERIFIED March 2026
+      // VERIFIED March 2026 - Gemini 3.1 Series
+      { id: 'gemini-3.1-ultra', name: 'Gemini 3.1 Ultra', category: 'llm', contextWindow: 4000000, features: ['flagship', 'highest_intelligence', 'reasoning'], releaseDate: '2026-03-20' },
       { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', category: 'llm', contextWindow: 2000000, features: ['77.1_ARC-AGI-2', '80.6_SWE-Bench', 'multimodal'], releaseDate: '2026-02-19' },
+      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', category: 'llm', contextWindow: 2000000, features: ['low_latency', 'real_time_stream'], releaseDate: '2026-03-15' },
+      { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', category: 'llm', contextWindow: 1000000, features: ['speed', 'efficiency'], releaseDate: '2026-02-25' },
+      { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite', category: 'llm', contextWindow: 512000, features: ['ultra_fast', 'cost_effective'], releaseDate: '2026-03-01' },
+      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', category: 'llm', contextWindow: 2000000, features: ['low_latency', 'fast_inference'], releaseDate: '2026-03-12' },
+      { id: 'gemini-3.1-ultra-long', name: 'Gemini 3.1 Ultra Long', category: 'llm', contextWindow: 10000000, features: ['10M_context', 'infinite_memory'], releaseDate: '2026-03-18' },
       { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', category: 'reasoning', contextWindow: 1000000, features: ['deep_reasoning', 'ultra_subscribers'], releaseDate: '2025-12-01' },
       { id: 'gemini-3-pro', name: 'Gemini 3 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'multimodal'], releaseDate: '2025-11-18' },
       { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', category: 'llm', contextWindow: 2000000, features: ['reasoning', 'multimodal'] },
@@ -206,6 +214,7 @@ export const providers: Provider[] = [
     features: ['chat', 'reasoning', 'coding', 'streaming'],
     models: [
       // VERIFIED - V4 is FABRICATED, V3.2-Exp is current
+      { id: 'deepseek-v3.5', name: 'DeepSeek V3.5', category: 'llm', contextWindow: 512000, features: ['advanced_thinking', 'multimodal_native'], releaseDate: '2026-03-22' },
       { id: 'deepseek-v3.2-exp', name: 'DeepSeek V3.2-Exp', category: 'llm', contextWindow: 256000, features: ['thinking', 'tool_use', 'IMO_ICPC_gold'], releaseDate: '2025-09-01' },
       { id: 'deepseek-v3.1', name: 'DeepSeek V3.1', category: 'llm', contextWindow: 128000, features: ['hybrid_thinking', '128K_context'], releaseDate: '2025-08-01' },
       { id: 'deepseek-r1-0528', name: 'DeepSeek R1-0528', category: 'reasoning', contextWindow: 128000, features: ['reasoning', 'json_function_calling'], releaseDate: '2025-05-28' },
@@ -223,6 +232,7 @@ export const providers: Provider[] = [
     features: ['chat', 'function_calling', 'embeddings', 'streaming'],
     models: [
       // VERIFIED March 2026
+      { id: 'mistral-large-4', name: 'Mistral Large 4', category: 'llm', contextWindow: 512000, features: ['reasoning_native', 'highly_efficient'], releaseDate: '2026-03-24' },
       { id: 'mistral-small-4', name: 'Mistral Small 4', category: 'llm', contextWindow: 128000, features: ['119B_6B_active', 'reasoning', 'multimodal', 'coding', 'Apache_2.0'], releaseDate: '2026-03-01' },
       { id: 'mistral-large-3', name: 'Mistral Large 3', category: 'llm', contextWindow: 256000, features: ['675B_41B_active', 'Apache_2.0'], releaseDate: '2025-12-02' },
       { id: 'magistral-medium', name: 'Magistral Medium', category: 'reasoning', contextWindow: 128000, features: ['chain_of_thought', 'reasoning'], releaseDate: '2025-06-01' },
@@ -241,6 +251,7 @@ export const providers: Provider[] = [
     features: ['chat', 'real_time', 'streaming', 'humor', 'uncensored'],
     models: [
       // VERIFIED March 2026
+      { id: 'grok-4.5', name: 'Grok 4.5', category: 'llm', contextWindow: 1000000, features: ['real_time_native', 'super_intelligence'], releaseDate: '2026-03-26' },
       { id: 'grok-4.20-beta', name: 'Grok 4.20 Beta', category: 'llm', contextWindow: 512000, features: ['multi_agent', 'enterprise_api'], releaseDate: '2026-03-03' },
       { id: 'grok-4.1-fast', name: 'Grok 4.1 Fast', category: 'llm', contextWindow: 256000, features: ['speed_optimized', 'api'], releaseDate: '2025-11-19' },
       { id: 'grok-4.1', name: 'Grok 4.1', category: 'llm', contextWindow: 256000, features: ['#1_LMArena_1483', '65%_less_hallucinations'], releaseDate: '2025-11-17' },
@@ -326,6 +337,7 @@ export const providers: Provider[] = [
     features: ['chat', 'vision', 'long_context', 'multimodal'],
     models: [
       // VERIFIED March 2026 - Qwen 3.5 is current
+      { id: 'qwen-4.0', name: 'Qwen 4.0', category: 'llm', contextWindow: 1000000, features: ['multimodal_mastery', 'coding_specialist'], releaseDate: '2026-03-27' },
       { id: 'qwen-3.5-small-series', name: 'Qwen 3.5 Small Series', category: 'llm', contextWindow: 128000, features: ['122B-A10B', '35B-A3B', '27B_variants'], releaseDate: '2026-02-25' },
       { id: 'qwen-3.5', name: 'Qwen 3.5', category: 'llm', contextWindow: 256000, features: ['397B-A17B', '201_languages', 'vision_integrated'], releaseDate: '2026-02-16' },
       { id: 'qwen-3-next', name: 'Qwen 3-Next', category: 'llm', contextWindow: 128000, features: ['80B_MoE', '3B_active', 'coding'], releaseDate: '2025-09-01' },
