@@ -50,3 +50,9 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+
+# Prisma
+prisma/db/
+
+# Tauri
+src-tauri/target/
