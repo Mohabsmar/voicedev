@@ -1,5 +1,6 @@
 /**
  * VoiceDev Ultimate - 250 Real Working Tools
+ * Cross-platform: Windows (PowerShell) + Linux/macOS (Bash)
  * All tools have actual implementations
  */
 
@@ -31,6 +32,181 @@ interface ToolResult<T = any> {
   error?: string;
   metadata?: Record<string, any>;
 }
+
+// ============================================
+// CROSS-PLATFORM UTILITIES
+// ============================================
+
+// Detect if running on Windows
+const isWindows = process.platform === 'win32';
+
+// Get temp directory cross-platform
+const getTempDir = () => os.tmpdir();
+
+// Get home directory cross-platform
+const getHomeDir = () => os.homedir();
+
+// Execute command cross-platform
+async function execCrossPlatform(command: string, options?: any): Promise<{ stdout: string; stderr: string }> {
+  const execOptions = {
+    ...options,
+    shell: isWindows ? 'powershell.exe' : '/bin/bash',
+    cwd: options?.cwd || process.cwd(),
+    env: { ...process.env, ...options?.env },
+    timeout: options?.timeout || 30000,
+    maxBuffer: 100 * 1024 * 1024
+  };
+  
+  return execAsync(command, execOptions);
+}
+
+// Cross-platform command wrappers
+const shellCommands = {
+  // File operations
+  deleteFile: (filePath: string) => isWindows 
+    ? `Remove-Item -Path "${filePath}" -Force` 
+    : `rm -f "${filePath}"`,
+  
+  deleteDir: (dirPath: string, force: boolean = false) => isWindows 
+    ? `Remove-Item -Path "${dirPath}" ${force ? '-Recurse -Force' : ''}` 
+    : `rm ${force ? '-rf' : '-r'} "${dirPath}"`,
+  
+  copyDir: (src: string, dest: string) => isWindows 
+    ? `Copy-Item -Path "${src}" -Destination "${dest}" -Recurse -Force` 
+    : `cp -r "${src}" "${dest}"`,
+  
+  listDir: (dirPath: string) => isWindows 
+    ? `Get-ChildItem -Path "${dirPath}" -Name` 
+    : `ls -1 "${dirPath}"`,
+  
+  findFiles: (dirPath: string, pattern: string) => isWindows 
+    ? `Get-ChildItem -Path "${dirPath}" -Filter "${pattern}" -Recurse | Select-Object -ExpandProperty FullName` 
+    : `find "${dirPath}" -name "${pattern}" 2>/dev/null`,
+  
+  grepContent: (dirPath: string, pattern: string) => isWindows 
+    ? `Select-String -Path "${dirPath}\\*" -Pattern "${pattern}" -Recurse | Select-Object -First 50` 
+    : `grep -r "${pattern}" "${dirPath}" 2>/dev/null | head -50`,
+  
+  // Directory tree
+  dirTree: (dirPath: string, maxDepth: number = 5) => isWindows 
+    ? `Get-ChildItem -Path "${dirPath}" -Recurse -Depth ${maxDepth} | Select-Object -First 100 | Select-Object FullName` 
+    : `find "${dirPath}" -maxdepth ${maxDepth} 2>/dev/null | head -100`,
+  
+  // Directory size
+  dirSize: (dirPath: string) => isWindows 
+    ? `(Get-ChildItem -Path "${dirPath}" -Recurse | Measure-Object -Property Length -Sum).Sum` 
+    : `du -sb "${dirPath}" 2>/dev/null | cut -f1`,
+  
+  // Archive operations
+  zipCreate: (source: string, dest: string) => isWindows 
+    ? `Compress-Archive -Path "${source}" -DestinationPath "${dest}" -Force` 
+    : `zip -r "${dest}" "${source}"`,
+  
+  zipExtract: (source: string, dest: string) => isWindows 
+    ? `Expand-Archive -Path "${source}" -DestinationPath "${dest}" -Force` 
+    : `unzip -o "${source}" -d "${dest}"`,
+  
+  // File head/tail
+  head: (filePath: string, lines: number) => isWindows 
+    ? `Get-Content -Path "${filePath}" -TotalCount ${lines}` 
+    : `head -n ${lines} "${filePath}"`,
+  
+  tail: (filePath: string, lines: number) => isWindows 
+    ? `Get-Content -Path "${filePath}" -Tail ${lines}` 
+    : `tail -n ${lines} "${filePath}"`,
+  
+  // Line count
+  countLines: (filePath: string) => isWindows 
+    ? `(Get-Content -Path "${filePath}").Count` 
+    : `wc -l "${filePath}"`,
+  
+  // Sort
+  sort: (filePath: string, reverse: boolean = false) => isWindows 
+    ? `Get-Content -Path "${filePath}" | Sort-Object ${reverse ? '-Descending' : ''}` 
+    : `sort ${reverse ? '-r' : ''} "${filePath}"`,
+  
+  // Unique
+  unique: (filePath: string) => isWindows 
+    ? `Get-Content -Path "${filePath}" | Sort-Object | Get-Unique` 
+    : `sort "${filePath}" | uniq`,
+  
+  // Process management
+  listProcesses: (filter?: string) => isWindows 
+    ? `Get-Process ${filter ? `| Where-Object { $_.ProcessName -like "*${filter}*" }` : ''} | Select-Object -First 50 Id, ProcessName, CPU, WorkingSet`
+    : `ps aux ${filter ? `| grep "${filter}"` : ''} | head -50`,
+  
+  topProcesses: (sortBy: string = 'cpu', count: number = 10) => isWindows 
+    ? `Get-Process | Sort-Object ${sortBy === 'cpu' ? 'CPU' : 'WorkingSet'} -Descending | Select-Object -First ${count}`
+    : `ps aux --sort=-${sortBy === 'cpu' ? '%cpu' : '%mem'} | head -${count}`,
+  
+  killProcess: (pid: number) => isWindows 
+    ? `Stop-Process -Id ${pid} -Force` 
+    : `kill -9 ${pid}`,
+  
+  // System info
+  uptime: () => isWindows 
+    ? `(Get-CimInstance Win32_OperatingSystem).LastBootUpTime` 
+    : `uptime`,
+  
+  diskUsage: (dirPath: string = '/') => isWindows 
+    ? `Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize` 
+    : `df -h ${dirPath}`,
+  
+  memoryUsage: () => isWindows 
+    ? `Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize, FreePhysicalMemory` 
+    : `free -h`,
+  
+  cpuInfo: () => isWindows 
+    ? `Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors` 
+    : `lscpu`,
+  
+  whoami: () => isWindows 
+    ? `$env:USERNAME` 
+    : `whoami`,
+  
+  // File diff
+  diff: (file1: string, file2: string) => isWindows 
+    ? `Compare-Object (Get-Content "${file1}") (Get-Content "${file2}")` 
+    : `diff "${file1}" "${file2}"`,
+  
+  // Environment variables
+  envGet: (name: string) => isWindows 
+    ? `$env:${name}` 
+    : `echo $${name}`,
+  
+  // Find empty directories
+  findEmptyDirs: (dirPath: string) => isWindows 
+    ? `Get-ChildItem -Path "${dirPath}" -Directory -Recurse | Where-Object { $_.GetFiles().Count -eq 0 } | Select-Object FullName` 
+    : `find "${dirPath}" -type d -empty 2>/dev/null`,
+  
+  // Service management (Windows)
+  serviceStatus: (service: string) => isWindows 
+    ? `Get-Service -Name "${service}" 2>$null | Select-Object Name, Status` 
+    : `systemctl status ${service} 2>/dev/null || echo "Service not found"`,
+  
+  serviceStart: (service: string) => isWindows 
+    ? `Start-Service -Name "${service}"` 
+    : `sudo systemctl start ${service}`,
+  
+  serviceStop: (service: string) => isWindows 
+    ? `Stop-Service -Name "${service}"` 
+    : `sudo systemctl stop ${service}`,
+  
+  // Scheduled tasks (Windows) / Cron (Linux)
+  scheduledTaskList: () => isWindows 
+    ? `Get-ScheduledTask | Select-Object TaskName, State` 
+    : `crontab -l 2>/dev/null || echo "No cron jobs"`,
+  
+  // Which command
+  which: (command: string) => isWindows 
+    ? `Get-Command ${command} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source` 
+    : `which ${command}`,
+  
+  // Symlink
+  createSymlink: (target: string, link: string) => isWindows 
+    ? `New-Item -ItemType SymbolicLink -Path "${link}" -Target "${target}"` 
+    : `ln -s "${target}" "${link}"`,
+};
 
 // Helper for generating tool definitions
 function createTool(name: string, description: string, params: Record<string, string>, execFn: Function) {
@@ -145,16 +321,22 @@ export const fileSystemTools: Record<string, any> = {
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  file_chmod: createTool('file_chmod', 'Change file permissions', { path: 'string', mode: 'string' },
+  file_chmod: createTool('file_chmod', 'Change file permissions (Unix only)', { path: 'string', mode: 'string' },
     async (p: { path: string; mode: string }) => {
+      if (isWindows) {
+        return { success: false, error: 'chmod is not available on Windows. Use icacls instead.' };
+      }
       try {
         await execAsync(`chmod ${p.mode} "${p.path}"`);
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  file_chown: createTool('file_chown', 'Change file owner', { path: 'string', owner: 'string', group: 'string' },
+  file_chown: createTool('file_chown', 'Change file owner (Unix only)', { path: 'string', owner: 'string', group: 'string' },
     async (p: { path: string; owner: string; group: string }) => {
+      if (isWindows) {
+        return { success: false, error: 'chown is not available on Windows. Use icacls instead.' };
+      }
       try {
         await execAsync(`chown ${p.owner}:${p.group} "${p.path}"`);
         return { success: true };
@@ -164,9 +346,9 @@ export const fileSystemTools: Record<string, any> = {
   file_diff: createTool('file_diff', 'Compare two files', { file1: 'string', file2: 'string' },
     async (p: { file1: string; file2: string }) => {
       try {
-        const { stdout } = await execAsync(`diff "${p.file1}" "${p.file2}"`);
+        const { stdout } = await execCrossPlatform(shellCommands.diff(p.file1, p.file2));
         return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message, data: e.stdout }; }
+      } catch (e: any) { return { success: false, error: e.message, data: e.stdout || '' }; }
     }),
 
   file_backup: createTool('file_backup', 'Create backup of file', { path: 'string' },
@@ -240,8 +422,16 @@ export const fileSystemTools: Record<string, any> = {
   dir_delete: createTool('dir_delete', 'Delete directory', { path: 'string', force: 'boolean?' },
     async (p: { path: string; force?: boolean }) => {
       try {
-        if (p.force) await execAsync(`rm -rf "${p.path}"`);
-        else await rmdirAsync(p.path);
+        if (p.force) {
+          // Cross-platform recursive delete
+          if (isWindows) {
+            await execCrossPlatform(shellCommands.deleteDir(p.path, true));
+          } else {
+            await execAsync(`rm -rf "${p.path}"`);
+          }
+        } else {
+          await rmdirAsync(p.path);
+        }
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -249,7 +439,7 @@ export const fileSystemTools: Record<string, any> = {
   dir_copy: createTool('dir_copy', 'Copy directory', { source: 'string', destination: 'string' },
     async (p: { source: string; destination: string }) => {
       try {
-        await execAsync(`cp -r "${p.source}" "${p.destination}"`);
+        await execCrossPlatform(shellCommands.copyDir(p.source, p.destination));
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -257,7 +447,7 @@ export const fileSystemTools: Record<string, any> = {
   dir_tree: createTool('dir_tree', 'Generate directory tree', { path: 'string', maxDepth: 'number?' },
     async (p: { path: string; maxDepth?: number }) => {
       try {
-        const { stdout } = await execAsync(`find "${p.path}" -maxdepth ${p.maxDepth || 5} | head -100`);
+        const { stdout } = await execCrossPlatform(shellCommands.dirTree(p.path, p.maxDepth || 5));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -265,23 +455,31 @@ export const fileSystemTools: Record<string, any> = {
   dir_size: createTool('dir_size', 'Calculate directory size', { path: 'string' },
     async (p: { path: string }) => {
       try {
-        const { stdout } = await execAsync(`du -sb "${p.path}" | cut -f1`);
-        return { success: true, data: parseInt(stdout.trim()) };
+        const { stdout } = await execCrossPlatform(shellCommands.dirSize(p.path));
+        const size = isWindows ? parseInt(stdout.trim()) : parseInt(stdout.trim().split('\t')[0]);
+        return { success: true, data: size };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   dir_find_empty: createTool('dir_find_empty', 'Find empty directories', { path: 'string' },
     async (p: { path: string }) => {
       try {
-        const { stdout } = await execAsync(`find "${p.path}" -type d -empty`);
+        const { stdout } = await execCrossPlatform(shellCommands.findEmptyDirs(p.path));
         return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   symlink_create: createTool('symlink_create', 'Create symbolic link', { target: 'string', link: 'string' },
     async (p: { target: string; link: string }) => {
-      try { await execAsync(`ln -s "${p.target}" "${p.link}"`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        if (isWindows) {
+          // Windows requires admin privileges for symlinks, or Developer Mode enabled
+          await execCrossPlatform(shellCommands.createSymlink(p.target, p.link));
+        } else {
+          await execAsync(`ln -s "${p.target}" "${p.link}"`);
+        }
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   symlink_read: createTool('symlink_read', 'Read symbolic link target', { path: 'string' },
@@ -295,7 +493,7 @@ export const fileSystemTools: Record<string, any> = {
   temp_create: createTool('temp_create', 'Create temporary file', { prefix: 'string?', suffix: 'string?' },
     async (p: { prefix?: string; suffix?: string }) => {
       try {
-        const tempPath = path.join('/tmp', `${p.prefix || 'voicedev-'}${Date.now()}${p.suffix || '.tmp'}`);
+        const tempPath = path.join(getTempDir(), `${p.prefix || 'voicedev-'}${Date.now()}${p.suffix || '.tmp'}`);
         await writeFileAsync(tempPath, '');
         return { success: true, data: tempPath };
       } catch (e: any) { return { success: false, error: e.message }; }
@@ -304,7 +502,7 @@ export const fileSystemTools: Record<string, any> = {
   temp_dir: createTool('temp_dir', 'Create temporary directory', { prefix: 'string?' },
     async (p: { prefix?: string }) => {
       try {
-        const tempPath = path.join('/tmp', `${p.prefix || 'voicedev-'}${Date.now()}`);
+        const tempPath = path.join(getTempDir(), `${p.prefix || 'voicedev-'}${Date.now()}`);
         await mkdirAsync(tempPath, { recursive: true });
         return { success: true, data: tempPath };
       } catch (e: any) { return { success: false, error: e.message }; }
@@ -312,21 +510,34 @@ export const fileSystemTools: Record<string, any> = {
 
   zip_create: createTool('zip_create', 'Create ZIP archive', { source: 'string', destination: 'string' },
     async (p: { source: string; destination: string }) => {
-      try { await execAsync(`zip -r "${p.destination}" "${p.source}"`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        await execCrossPlatform(shellCommands.zipCreate(p.source, p.destination));
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   zip_extract: createTool('zip_extract', 'Extract ZIP archive', { source: 'string', destination: 'string' },
     async (p: { source: string; destination: string }) => {
       try {
         await mkdirAsync(p.destination, { recursive: true });
-        await execAsync(`unzip -o "${p.source}" -d "${p.destination}"`);
+        await execCrossPlatform(shellCommands.zipExtract(p.source, p.destination));
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   tar_create: createTool('tar_create', 'Create TAR archive', { source: 'string', destination: 'string', gzip: 'boolean?' },
     async (p: { source: string; destination: string; gzip?: boolean }) => {
+      if (isWindows) {
+        // Windows doesn't have native tar in older versions, use PowerShell
+        try {
+          if (p.gzip) {
+            await execCrossPlatform(`Compress-Archive -Path "${p.source}" -DestinationPath "${p.destination}" -Force`);
+          } else {
+            await execCrossPlatform(`tar -cf "${p.destination}" "${p.source}"`);
+          }
+          return { success: true };
+        } catch (e: any) { return { success: false, error: e.message }; }
+      }
       try {
         await execAsync(`tar -${p.gzip ? 'czf' : 'cf'} "${p.destination}" "${p.source}"`);
         return { success: true };
@@ -337,27 +548,49 @@ export const fileSystemTools: Record<string, any> = {
     async (p: { source: string; destination: string }) => {
       try {
         await mkdirAsync(p.destination, { recursive: true });
-        await execAsync(`tar -xf "${p.source}" -C "${p.destination}"`);
+        if (isWindows) {
+          // Windows 10+ has built-in tar
+          await execCrossPlatform(`tar -xf "${p.source}" -C "${p.destination}"`);
+        } else {
+          await execAsync(`tar -xf "${p.source}" -C "${p.destination}"`);
+        }
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   gzip_compress: createTool('gzip_compress', 'Compress file with gzip', { path: 'string' },
     async (p: { path: string }) => {
-      try { await execAsync(`gzip "${p.path}"`); return { success: true, data: `${p.path}.gz` }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      if (isWindows) {
+        try {
+          // Use PowerShell to compress
+          await execCrossPlatform(`Compress-Archive -Path "${p.path}" -DestinationPath "${p.path}.gz" -Force`);
+          return { success: true, data: `${p.path}.gz` };
+        } catch (e: any) { return { success: false, error: e.message }; }
+      }
+      try {
+        await execAsync(`gzip "${p.path}"`);
+        return { success: true, data: `${p.path}.gz` };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   gzip_decompress: createTool('gzip_decompress', 'Decompress gzip file', { path: 'string' },
     async (p: { path: string }) => {
-      try { await execAsync(`gunzip "${p.path}"`); return { success: true, data: p.path.replace('.gz', '') }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      if (isWindows) {
+        try {
+          await execCrossPlatform(`Expand-Archive -Path "${p.path}" -DestinationPath "${p.path.replace('.gz', '')}" -Force`);
+          return { success: true, data: p.path.replace('.gz', '') };
+        } catch (e: any) { return { success: false, error: e.message }; }
+      }
+      try {
+        await execAsync(`gunzip "${p.path}"`);
+        return { success: true, data: p.path.replace('.gz', '') };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   file_search: createTool('file_search', 'Search files by pattern', { path: 'string', pattern: 'string' },
     async (p: { path: string; pattern: string }) => {
       try {
-        const { stdout } = await execAsync(`find "${p.path}" -name "${p.pattern}" 2>/dev/null | head -100`);
+        const { stdout } = await execCrossPlatform(shellCommands.findFiles(p.path, p.pattern));
         return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -365,7 +598,7 @@ export const fileSystemTools: Record<string, any> = {
   file_grep: createTool('file_grep', 'Search content in files', { path: 'string', pattern: 'string' },
     async (p: { path: string; pattern: string }) => {
       try {
-        const { stdout } = await execAsync(`grep -r "${p.pattern}" "${p.path}" 2>/dev/null | head -50`);
+        const { stdout } = await execCrossPlatform(shellCommands.grepContent(p.path, p.pattern));
         return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -383,7 +616,7 @@ export const fileSystemTools: Record<string, any> = {
   file_head: createTool('file_head', 'Read first lines of file', { path: 'string', lines: 'number?' },
     async (p: { path: string; lines?: number }) => {
       try {
-        const { stdout } = await execAsync(`head -n ${p.lines || 10} "${p.path}"`);
+        const { stdout } = await execCrossPlatform(shellCommands.head(p.path, p.lines || 10));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -391,7 +624,7 @@ export const fileSystemTools: Record<string, any> = {
   file_tail: createTool('file_tail', 'Read last lines of file', { path: 'string', lines: 'number?' },
     async (p: { path: string; lines?: number }) => {
       try {
-        const { stdout } = await execAsync(`tail -n ${p.lines || 10} "${p.path}"`);
+        const { stdout } = await execCrossPlatform(shellCommands.tail(p.path, p.lines || 10));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -399,15 +632,16 @@ export const fileSystemTools: Record<string, any> = {
   file_count_lines: createTool('file_count_lines', 'Count lines in file', { path: 'string' },
     async (p: { path: string }) => {
       try {
-        const { stdout } = await execAsync(`wc -l "${p.path}"`);
-        return { success: true, data: parseInt(stdout.trim().split(' ')[0]) };
+        const { stdout } = await execCrossPlatform(shellCommands.countLines(p.path));
+        const count = isWindows ? parseInt(stdout.trim()) : parseInt(stdout.trim().split(' ')[0]);
+        return { success: true, data: count };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   file_sort: createTool('file_sort', 'Sort file contents', { path: 'string', reverse: 'boolean?' },
     async (p: { path: string; reverse?: boolean }) => {
       try {
-        const { stdout } = await execAsync(`sort ${p.reverse ? '-r' : ''} "${p.path}"`);
+        const { stdout } = await execCrossPlatform(shellCommands.sort(p.path, p.reverse));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -415,7 +649,7 @@ export const fileSystemTools: Record<string, any> = {
   file_unique: createTool('file_unique', 'Get unique lines from file', { path: 'string' },
     async (p: { path: string }) => {
       try {
-        const { stdout } = await execAsync(`sort "${p.path}" | uniq`);
+        const { stdout } = await execCrossPlatform(shellCommands.unique(p.path));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -446,13 +680,13 @@ export const fileSystemTools: Record<string, any> = {
 };
 
 // ============================================
-// SHELL TOOLS (40 tools)
+// SHELL TOOLS (40 tools) - Cross-platform
 // ============================================
 export const shellTools: Record<string, any> = {
-  shell_exec: createTool('shell_exec', 'Execute shell command', { command: 'string', cwd: 'string?', timeout: 'number?' },
+  shell_exec: createTool('shell_exec', 'Execute shell command (cross-platform)', { command: 'string', cwd: 'string?', timeout: 'number?' },
     async (p: { command: string; cwd?: string; timeout?: number }) => {
       try {
-        const { stdout, stderr } = await execAsync(p.command, { cwd: p.cwd, timeout: p.timeout || 30000 });
+        const { stdout, stderr } = await execCrossPlatform(p.command, { cwd: p.cwd, timeout: p.timeout || 30000 });
         return { success: true, data: { stdout, stderr } };
       } catch (e: any) { return { success: false, error: e.message, data: { stdout: e.stdout || '', stderr: e.stderr || '' } }; }
     }),
@@ -460,7 +694,8 @@ export const shellTools: Record<string, any> = {
   shell_pipe: createTool('shell_pipe', 'Execute piped commands', { commands: 'array' },
     async (p: { commands: string[] }) => {
       try {
-        const { stdout } = await execAsync(p.commands.join(' | '));
+        const pipeChar = isWindows ? ' | ' : ' | ';
+        const { stdout } = await execCrossPlatform(p.commands.join(pipeChar));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -468,7 +703,8 @@ export const shellTools: Record<string, any> = {
   shell_background: createTool('shell_background', 'Run command in background', { command: 'string', cwd: 'string?' },
     async (p: { command: string; cwd?: string }) => {
       try {
-        const child = spawn(p.command, [], { cwd: p.cwd, shell: true, detached: true, stdio: 'ignore' });
+        const shell = isWindows ? 'powershell.exe' : '/bin/bash';
+        const child = spawn(p.command, [], { cwd: p.cwd || process.cwd(), shell, detached: true, stdio: 'ignore' });
         child.unref();
         return { success: true, data: child.pid };
       } catch (e: any) { return { success: false, error: e.message }; }
@@ -476,14 +712,20 @@ export const shellTools: Record<string, any> = {
 
   shell_kill: createTool('shell_kill', 'Kill process', { pid: 'number', signal: 'string?' },
     async (p: { pid: number; signal?: string }) => {
-      try { process.kill(p.pid, (p.signal || 'SIGTERM') as any); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        if (isWindows) {
+          await execCrossPlatform(`Stop-Process -Id ${p.pid} -Force`);
+        } else {
+          process.kill(p.pid, (p.signal || 'SIGTERM') as any);
+        }
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   shell_list_processes: createTool('shell_list_processes', 'List running processes', { filter: 'string?' },
     async (p: { filter?: string }) => {
       try {
-        const { stdout } = await execAsync(`ps aux ${p.filter ? `| grep "${p.filter}"` : ''} | head -50`);
+        const { stdout } = await execCrossPlatform(shellCommands.listProcesses(p.filter));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -491,7 +733,7 @@ export const shellTools: Record<string, any> = {
   shell_top: createTool('shell_top', 'Get top processes by resource usage', { sortBy: 'string?', count: 'number?' },
     async (p: { sortBy?: string; count?: number }) => {
       try {
-        const { stdout } = await execAsync(`ps aux --sort=-${p.sortBy || '%cpu'} | head -${p.count || 10}`);
+        const { stdout } = await execCrossPlatform(shellCommands.topProcesses(p.sortBy || 'cpu', p.count || 10));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -521,7 +763,9 @@ export const shellTools: Record<string, any> = {
   python_exec: createTool('python_exec', 'Execute Python code', { code: 'string' },
     async (p: { code: string }) => {
       try {
-        const { stdout, stderr } = await execAsync(`python3 -c "${p.code.replace(/"/g, '\\"')}"`);
+        const pythonCmd = isWindows ? 'python' : 'python3';
+        const escapedCode = p.code.replace(/"/g, '\\"');
+        const { stdout, stderr } = await execCrossPlatform(`${pythonCmd} -c "${escapedCode}"`);
         return { success: true, data: stdout || stderr };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -529,7 +773,8 @@ export const shellTools: Record<string, any> = {
   python_script: createTool('python_script', 'Execute Python script file', { path: 'string', args: 'array?' },
     async (p: { path: string; args?: string[] }) => {
       try {
-        const { stdout, stderr } = await execAsync(`python3 "${p.path}" ${(p.args || []).join(' ')}`);
+        const pythonCmd = isWindows ? 'python' : 'python3';
+        const { stdout, stderr } = await execCrossPlatform(`${pythonCmd} "${p.path}" ${(p.args || []).join(' ')}`);
         return { success: true, data: { stdout, stderr } };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -537,7 +782,8 @@ export const shellTools: Record<string, any> = {
   node_exec: createTool('node_exec', 'Execute Node.js code', { code: 'string' },
     async (p: { code: string }) => {
       try {
-        const { stdout, stderr } = await execAsync(`node -e "${p.code.replace(/"/g, '\\"')}"`);
+        const escapedCode = p.code.replace(/"/g, '\\"');
+        const { stdout, stderr } = await execCrossPlatform(`node -e "${escapedCode}"`);
         return { success: true, data: stdout || stderr };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -545,23 +791,52 @@ export const shellTools: Record<string, any> = {
   node_script: createTool('node_script', 'Execute Node.js script file', { path: 'string', args: 'array?' },
     async (p: { path: string; args?: string[] }) => {
       try {
-        const { stdout, stderr } = await execAsync(`node "${p.path}" ${(p.args || []).join(' ')}`);
+        const { stdout, stderr } = await execCrossPlatform(`node "${p.path}" ${(p.args || []).join(' ')}`);
         return { success: true, data: { stdout, stderr } };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  bash_exec: createTool('bash_exec', 'Execute bash command', { command: 'string' },
+  bash_exec: createTool('bash_exec', 'Execute bash command (Unix only)', { command: 'string' },
     async (p: { command: string }) => {
+      if (isWindows) {
+        return { success: false, error: 'bash_exec is not available on Windows. Use shell_exec instead or enable WSL.' };
+      }
       try {
         const { stdout } = await execAsync(`bash -c "${p.command.replace(/"/g, '\\"')}"`);
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  bash_script: createTool('bash_script', 'Execute bash script file', { path: 'string', args: 'array?' },
+  bash_script: createTool('bash_script', 'Execute bash script file (Unix only)', { path: 'string', args: 'array?' },
     async (p: { path: string; args?: string[] }) => {
+      if (isWindows) {
+        return { success: false, error: 'bash_script is not available on Windows. Use shell_exec instead or enable WSL.' };
+      }
       try {
         const { stdout, stderr } = await execAsync(`bash "${p.path}" ${(p.args || []).join(' ')}`);
+        return { success: true, data: { stdout, stderr } };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  powershell_exec: createTool('powershell_exec', 'Execute PowerShell command', { command: 'string' },
+    async (p: { command: string }) => {
+      try {
+        if (isWindows) {
+          const { stdout, stderr } = await execAsync(p.command, { shell: 'powershell.exe' });
+          return { success: true, data: stdout || stderr };
+        } else {
+          // Try pwsh (PowerShell Core) on Unix
+          const { stdout, stderr } = await execAsync(p.command, { shell: 'pwsh' });
+          return { success: true, data: stdout || stderr };
+        }
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  powershell_script: createTool('powershell_script', 'Execute PowerShell script file', { path: 'string', args: 'array?' },
+    async (p: { path: string; args?: string[] }) => {
+      try {
+        const shell = isWindows ? 'powershell.exe' : 'pwsh';
+        const { stdout, stderr } = await execAsync(`& "${p.path}" ${(p.args || []).join(' ')}`, { shell });
         return { success: true, data: { stdout, stderr } };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -569,7 +844,8 @@ export const shellTools: Record<string, any> = {
   ruby_exec: createTool('ruby_exec', 'Execute Ruby code', { code: 'string' },
     async (p: { code: string }) => {
       try {
-        const { stdout, stderr } = await execAsync(`ruby -e "${p.code.replace(/"/g, '\\"')}"`);
+        const escapedCode = p.code.replace(/"/g, '\\"');
+        const { stdout, stderr } = await execCrossPlatform(`ruby -e "${escapedCode}"`);
         return { success: true, data: stdout || stderr };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -577,67 +853,92 @@ export const shellTools: Record<string, any> = {
   perl_exec: createTool('perl_exec', 'Execute Perl code', { code: 'string' },
     async (p: { code: string }) => {
       try {
-        const { stdout, stderr } = await execAsync(`perl -e "${p.code.replace(/"/g, '\\"')}"`);
+        const escapedCode = p.code.replace(/"/g, '\\"');
+        const { stdout, stderr } = await execCrossPlatform(`perl -e "${escapedCode}"`);
         return { success: true, data: stdout || stderr };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  cron_add: createTool('cron_add', 'Add cron job', { schedule: 'string', command: 'string' },
-    async (p: { schedule: string; command: string }) => {
+  task_schedule: createTool('task_schedule', 'Schedule a task (cross-platform)', { name: 'string', command: 'string', schedule: 'string' },
+    async (p: { name: string; command: string; schedule: string }) => {
       try {
-        await execAsync(`(crontab -l 2>/dev/null; echo "${p.schedule} ${p.command}") | crontab -`);
+        if (isWindows) {
+          // Windows Task Scheduler
+          await execCrossPlatform(`
+            $action = New-ScheduledTaskAction -Execute "${p.command}"
+            $trigger = New-ScheduledTaskTrigger -Once -At "${p.schedule}"
+            Register-ScheduledTask -TaskName "${p.name}" -Action $action -Trigger $trigger
+          `);
+        } else {
+          // Unix cron
+          await execAsync(`(crontab -l 2>/dev/null; echo "${p.schedule} ${p.command}") | crontab -`);
+        }
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  cron_list: createTool('cron_list', 'List cron jobs', {},
+  task_list: createTool('task_list', 'List scheduled tasks', {},
     async () => {
       try {
-        const { stdout } = await execAsync('crontab -l 2>/dev/null || echo "No cron jobs"');
+        const { stdout } = await execCrossPlatform(shellCommands.scheduledTaskList());
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  cron_remove: createTool('cron_remove', 'Remove cron job', { pattern: 'string' },
-    async (p: { pattern: string }) => {
+  task_remove: createTool('task_remove', 'Remove scheduled task', { name: 'string' },
+    async (p: { name: string }) => {
       try {
-        const { stdout } = await execAsync('crontab -l 2>/dev/null');
-        const lines = stdout.split('\n').filter(l => !l.includes(p.pattern));
-        await execAsync(`echo "${lines.join('\n')}" | crontab -`);
+        if (isWindows) {
+          await execCrossPlatform(`Unregister-ScheduledTask -TaskName "${p.name}" -Confirm:$false`);
+        } else {
+          const { stdout } = await execAsync('crontab -l 2>/dev/null');
+          const lines = stdout.split('\n').filter(l => !l.includes(p.name));
+          await execAsync(`echo "${lines.join('\n')}" | crontab -`);
+        }
         return { success: true };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  systemctl_status: createTool('systemctl_status', 'Get service status', { service: 'string' },
+  service_status: createTool('service_status', 'Get service status', { service: 'string' },
     async (p: { service: string }) => {
       try {
-        const { stdout } = await execAsync(`systemctl status ${p.service} 2>/dev/null || echo "Service not found"`);
+        const { stdout } = await execCrossPlatform(shellCommands.serviceStatus(p.service));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  systemctl_start: createTool('systemctl_start', 'Start service', { service: 'string' },
+  service_start: createTool('service_start', 'Start service', { service: 'string' },
     async (p: { service: string }) => {
-      try { await execAsync(`sudo systemctl start ${p.service}`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        await execCrossPlatform(shellCommands.serviceStart(p.service));
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  systemctl_stop: createTool('systemctl_stop', 'Stop service', { service: 'string' },
+  service_stop: createTool('service_stop', 'Stop service', { service: 'string' },
     async (p: { service: string }) => {
-      try { await execAsync(`sudo systemctl stop ${p.service}`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        await execCrossPlatform(shellCommands.serviceStop(p.service));
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  systemctl_restart: createTool('systemctl_restart', 'Restart service', { service: 'string' },
+  service_restart: createTool('service_restart', 'Restart service', { service: 'string' },
     async (p: { service: string }) => {
-      try { await execAsync(`sudo systemctl restart ${p.service}`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        if (isWindows) {
+          await execCrossPlatform(`Restart-Service -Name "${p.service}"`);
+        } else {
+          await execAsync(`sudo systemctl restart ${p.service}`);
+        }
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   docker_ps: createTool('docker_ps', 'List Docker containers', { all: 'boolean?' },
     async (p: { all?: boolean }) => {
       try {
-        const { stdout } = await execAsync(`docker ps ${p.all ? '-a' : ''}`);
+        const { stdout } = await execCrossPlatform(`docker ps ${p.all ? '-a' : ''}`);
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -645,7 +946,7 @@ export const shellTools: Record<string, any> = {
   docker_images: createTool('docker_images', 'List Docker images', {},
     async () => {
       try {
-        const { stdout } = await execAsync('docker images');
+        const { stdout } = await execCrossPlatform('docker images');
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -656,27 +957,31 @@ export const shellTools: Record<string, any> = {
         const nameFlag = p.name ? `--name ${p.name}` : '';
         const portFlags = (p.ports || []).map(port => `-p ${port}`).join(' ');
         const envFlags = Object.entries(p.env || {}).map(([k, v]) => `-e ${k}=${v}`).join(' ');
-        const { stdout } = await execAsync(`docker run -d ${nameFlag} ${portFlags} ${envFlags} ${p.image}`);
+        const { stdout } = await execCrossPlatform(`docker run -d ${nameFlag} ${portFlags} ${envFlags} ${p.image}`);
         return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   docker_stop: createTool('docker_stop', 'Stop Docker container', { container: 'string' },
     async (p: { container: string }) => {
-      try { await execAsync(`docker stop ${p.container}`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        await execCrossPlatform(`docker stop ${p.container}`);
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   docker_rm: createTool('docker_rm', 'Remove Docker container', { container: 'string' },
     async (p: { container: string }) => {
-      try { await execAsync(`docker rm ${p.container}`); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+      try {
+        await execCrossPlatform(`docker rm ${p.container}`);
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   docker_exec: createTool('docker_exec', 'Execute command in Docker container', { container: 'string', command: 'string' },
     async (p: { container: string; command: string }) => {
       try {
-        const { stdout } = await execAsync(`docker exec ${p.container} ${p.command}`);
+        const { stdout } = await execCrossPlatform(`docker exec ${p.container} ${p.command}`);
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -684,7 +989,7 @@ export const shellTools: Record<string, any> = {
   docker_logs: createTool('docker_logs', 'Get Docker container logs', { container: 'string', tail: 'number?' },
     async (p: { container: string; tail?: number }) => {
       try {
-        const { stdout } = await execAsync(`docker logs --tail ${p.tail || 100} ${p.container}`);
+        const { stdout } = await execCrossPlatform(`docker logs --tail ${p.tail || 100} ${p.container}`);
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -692,7 +997,7 @@ export const shellTools: Record<string, any> = {
   which: createTool('which', 'Find command location', { command: 'string' },
     async (p: { command: string }) => {
       try {
-        const { stdout } = await execAsync(`which ${p.command}`);
+        const { stdout } = await execCrossPlatform(shellCommands.which(p.command));
         return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -700,7 +1005,7 @@ export const shellTools: Record<string, any> = {
   uptime: createTool('uptime', 'Get system uptime', {},
     async () => {
       try {
-        const { stdout } = await execAsync('uptime');
+        const { stdout } = await execCrossPlatform(shellCommands.uptime());
         return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -708,7 +1013,7 @@ export const shellTools: Record<string, any> = {
   disk_usage: createTool('disk_usage', 'Get disk usage', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync(`df -h ${p.path || '/'}`);
+        const { stdout } = await execCrossPlatform(shellCommands.diskUsage(p.path || (isWindows ? '' : '/')));
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -716,7 +1021,7 @@ export const shellTools: Record<string, any> = {
   memory_usage: createTool('memory_usage', 'Get memory usage', {},
     async () => {
       try {
-        const { stdout } = await execAsync('free -h');
+        const { stdout } = await execCrossPlatform(shellCommands.memoryUsage());
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -724,7 +1029,7 @@ export const shellTools: Record<string, any> = {
   cpu_info: createTool('cpu_info', 'Get CPU information', {},
     async () => {
       try {
-        const { stdout } = await execAsync('lscpu');
+        const { stdout } = await execCrossPlatform(shellCommands.cpuInfo());
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -737,9 +1042,31 @@ export const shellTools: Record<string, any> = {
   whoami: createTool('whoami', 'Get current user', {},
     async () => {
       try {
-        const { stdout } = await execAsync('whoami');
+        const { stdout } = await execCrossPlatform(shellCommands.whoami());
         return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  os_info: createTool('os_info', 'Get operating system information', {},
+    async () => {
+      return {
+        success: true,
+        data: {
+          platform: process.platform,
+          arch: process.arch,
+          type: os.type(),
+          release: os.release(),
+          version: os.version ? os.version() : 'N/A',
+          hostname: os.hostname(),
+          homedir: os.homedir(),
+          tmpdir: os.tmpdir(),
+          cpus: os.cpus().length,
+          totalMemory: os.totalmem(),
+          freeMemory: os.freemem(),
+          isWindows,
+          shell: isWindows ? 'powershell' : 'bash'
+        }
+      };
     }),
 };
 
@@ -874,94 +1201,180 @@ export const webTools: Record<string, any> = {
       });
     }),
 
-  http_options: createTool('http_options', 'HTTP OPTIONS request', { url: 'string' },
-    async (p: { url: string }) => {
-      return new Promise((resolve) => {
-        try {
-          const urlObj = new URL(p.url);
-          const lib = urlObj.protocol === 'https:' ? https : http;
-          const options = { hostname: urlObj.hostname, port: 443, path: urlObj.pathname, method: 'OPTIONS' };
+  curl: createTool('curl', 'Execute curl-like request (cross-platform)', { url: 'string', method: 'string?', headers: 'object?', body: 'any?', timeout: 'number?' },
+    async (p: { url: string; method?: string; headers?: Record<string, string>; body?: any; timeout?: number }) => {
+      try {
+        const urlObj = new URL(p.url);
+        const lib = urlObj.protocol === 'https:' ? https : http;
+        const bodyData = p.body ? (typeof p.body === 'string' ? p.body : JSON.stringify(p.body)) : '';
+        
+        return new Promise((resolve) => {
+          const options = {
+            hostname: urlObj.hostname,
+            port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
+            path: urlObj.pathname + urlObj.search,
+            method: p.method || 'GET',
+            headers: p.headers || {}
+          };
+          
           const req = lib.request(options, (res) => {
-            resolve({ success: true, data: { allow: res.headers['allow'], headers: res.headers } });
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve({ 
+              success: true, 
+              data, 
+              metadata: { 
+                statusCode: res.statusCode, 
+                headers: res.headers 
+              } 
+            }));
           });
+          
           req.on('error', (e) => resolve({ success: false, error: e.message }));
+          req.setTimeout(p.timeout || 30000, () => { req.destroy(); resolve({ success: false, error: 'Timeout' }); });
+          
+          if (bodyData) req.write(bodyData);
           req.end();
-        } catch (e: any) { resolve({ success: false, error: e.message }); }
-      });
-    }),
-
-  url_parse: createTool('url_parse', 'Parse URL components', { url: 'string' },
-    async (p: { url: string }) => {
-      try {
-        const parsed = new URL(p.url);
-        return { success: true, data: { protocol: parsed.protocol, hostname: parsed.hostname, port: parsed.port, pathname: parsed.pathname, search: parsed.search, hash: parsed.hash, origin: parsed.origin } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  url_encode: createTool('url_encode', 'URL encode string', { string: 'string' },
-    async (p: { string: string }) => {
-      return { success: true, data: encodeURIComponent(p.string) };
-    }),
-
-  url_decode: createTool('url_decode', 'URL decode string', { string: 'string' },
-    async (p: { string: string }) => {
-      try { return { success: true, data: decodeURIComponent(p.string) }; }
-      catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  url_build: createTool('url_build', 'Build URL from components', { base: 'string', path: 'string?', query: 'object?' },
-    async (p: { base: string; path?: string; query?: Record<string, string> }) => {
-      try {
-        const url = new URL(p.base);
-        if (p.path) url.pathname = p.path;
-        if (p.query) Object.entries(p.query).forEach(([k, v]) => url.searchParams.append(k, v));
-        return { success: true, data: url.toString() };
+        });
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
   dns_lookup: createTool('dns_lookup', 'DNS lookup', { hostname: 'string' },
     async (p: { hostname: string }) => {
+      const dns = require('dns');
+      return new Promise((resolve) => {
+        dns.lookup(p.hostname, (err: any, address: string, family: number) => {
+          if (err) resolve({ success: false, error: err.message });
+          else resolve({ success: true, data: { address, family } });
+        });
+      });
+    }),
+
+  dns_resolve: createTool('dns_resolve', 'Resolve DNS records', { hostname: 'string', recordType: 'string?' },
+    async (p: { hostname: string; recordType?: string }) => {
+      const dns = require('dns');
+      const resolver = new dns.promises.Resolver();
       try {
-        const dns = require('dns').promises;
-        const addresses = await dns.resolve4(p.hostname);
-        return { success: true, data: addresses };
+        const rtype = p.recordType?.toUpperCase() || 'A';
+        const records = await resolver.resolve(p.hostname, rtype);
+        return { success: true, data: records };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  dns_reverse: createTool('dns_reverse', 'Reverse DNS lookup', { ip: 'string' },
-    async (p: { ip: string }) => {
+  url_parse: createTool('url_parse', 'Parse URL into components', { url: 'string' },
+    async (p: { url: string }) => {
       try {
-        const dns = require('dns').promises;
-        const hostnames = await dns.reverse(p.ip);
-        return { success: true, data: hostnames };
+        const urlObj = new URL(p.url);
+        return {
+          success: true,
+          data: {
+            href: urlObj.href,
+            origin: urlObj.origin,
+            protocol: urlObj.protocol,
+            username: urlObj.username,
+            password: urlObj.password,
+            host: urlObj.host,
+            hostname: urlObj.hostname,
+            port: urlObj.port,
+            pathname: urlObj.pathname,
+            search: urlObj.search,
+            searchParams: Object.fromEntries(urlObj.searchParams),
+            hash: urlObj.hash
+          }
+        };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  ping: createTool('ping', 'Ping host', { host: 'string', count: 'number?' },
-    async (p: { host: string; count?: number }) => {
+  url_build: createTool('url_build', 'Build URL from components', { components: 'object' },
+    async (p: { components: { protocol?: string; hostname?: string; port?: string; pathname?: string; query?: Record<string, string>; hash?: string } }) => {
       try {
-        const { stdout } = await execAsync(`ping -c ${p.count || 4} ${p.host}`);
-        return { success: true, data: stdout };
+        const { protocol = 'https:', hostname = 'localhost', port, pathname = '/', query = {}, hash } = p.components;
+        const url = new URL(`${protocol}//${hostname}${port ? `:${port}` : ''}${pathname}`);
+        Object.entries(query).forEach(([k, v]) => url.searchParams.set(k, v));
+        if (hash) url.hash = hash;
+        return { success: true, data: url.href };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  curl: createTool('curl', 'Execute curl command', { url: 'string', method: 'string?', headers: 'object?', data: 'string?' },
-    async (p: { url: string; method?: string; headers?: Record<string, string>; data?: string }) => {
-      try {
-        const method = p.method ? `-X ${p.method}` : '';
-        const headers = Object.entries(p.headers || {}).map(([k, v]) => `-H "${k}: ${v}"`).join(' ');
-        const data = p.data ? `-d '${p.data}'` : '';
-        const { stdout } = await execAsync(`curl -s ${method} ${headers} ${data} "${p.url}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
+  webhook_test: createTool('webhook_test', 'Test webhook endpoint', { url: 'string', payload: 'any', method: 'string?' },
+    async (p: { url: string; payload: any; method?: string }) => {
+      return new Promise((resolve) => {
+        try {
+          const urlObj = new URL(p.url);
+          const lib = urlObj.protocol === 'https:' ? https : http;
+          const bodyData = typeof p.payload === 'string' ? p.payload : JSON.stringify(p.payload);
+          const options = {
+            hostname: urlObj.hostname,
+            port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
+            path: urlObj.pathname + urlObj.search,
+            method: p.method || 'POST',
+            headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyData) }
+          };
+          const startTime = Date.now();
+          const req = lib.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve({
+              success: true,
+              data: { response: data, statusCode: res.statusCode, duration: Date.now() - startTime }
+            }));
+          });
+          req.on('error', (e) => resolve({ success: false, error: e.message }));
+          req.write(bodyData);
+          req.end();
+        } catch (e: any) { resolve({ success: false, error: e.message }); }
+      });
     }),
 
-  wget: createTool('wget', 'Download file with wget', { url: 'string', destination: 'string' },
-    async (p: { url: string; destination: string }) => {
-      try {
-        await execAsync(`wget -q -O "${p.destination}" "${p.url}"`);
-        return { success: true };
-      } catch (e: any) { return { success: false, error: e.message }; }
+  health_check: createTool('health_check', 'Check health of a URL', { url: 'string', timeout: 'number?' },
+    async (p: { url: string; timeout?: number }) => {
+      return new Promise((resolve) => {
+        try {
+          const urlObj = new URL(p.url);
+          const lib = urlObj.protocol === 'https:' ? https : http;
+          const startTime = Date.now();
+          const options = { hostname: urlObj.hostname, port: urlObj.port || 443, path: urlObj.pathname, method: 'HEAD', timeout: p.timeout || 5000 };
+          const req = lib.request(options, (res) => {
+            resolve({
+              success: true,
+              data: {
+                healthy: res.statusCode && res.statusCode < 400,
+                statusCode: res.statusCode,
+                responseTime: Date.now() - startTime,
+                headers: res.headers
+              }
+            });
+          });
+          req.on('error', (e) => resolve({ success: false, data: { healthy: false, error: e.message }, error: e.message }));
+          req.on('timeout', () => { req.destroy(); resolve({ success: false, data: { healthy: false, error: 'Timeout' }, error: 'Timeout' }); });
+          req.end();
+        } catch (e: any) { resolve({ success: false, error: e.message }); }
+      });
+    }),
+
+  json_fetch: createTool('json_fetch', 'Fetch JSON from URL', { url: 'string', headers: 'object?' },
+    async (p: { url: string; headers?: Record<string, string> }) => {
+      return new Promise((resolve) => {
+        try {
+          const urlObj = new URL(p.url);
+          const lib = urlObj.protocol === 'https:' ? https : http;
+          const options = { hostname: urlObj.hostname, port: urlObj.port || 443, path: urlObj.pathname + urlObj.search, method: 'GET', headers: { 'Accept': 'application/json', ...p.headers } };
+          const req = lib.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+              try {
+                const json = JSON.parse(data);
+                resolve({ success: true, data: json, metadata: { statusCode: res.statusCode } });
+              } catch (e: any) {
+                resolve({ success: false, error: 'Invalid JSON response', data });
+              }
+            });
+          });
+          req.on('error', (e) => resolve({ success: false, error: e.message }));
+          req.end();
+        } catch (e: any) { resolve({ success: false, error: e.message }); }
+      });
     }),
 
   download_file: createTool('download_file', 'Download file from URL', { url: 'string', destination: 'string' },
@@ -971,246 +1384,82 @@ export const webTools: Record<string, any> = {
           const urlObj = new URL(p.url);
           const lib = urlObj.protocol === 'https:' ? https : http;
           const file = fs.createWriteStream(p.destination);
-          lib.get(p.url, (response) => {
-            response.pipe(file);
-            file.on('finish', () => { file.close(); resolve({ success: true }); });
-          }).on('error', (e) => { fs.unlinkSync(p.destination); resolve({ success: false, error: e.message }); });
+          lib.get(urlObj.href, (res) => {
+            if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+              file.close();
+              fs.unlinkSync(p.destination);
+              resolve({ success: false, error: `Redirect to ${res.headers.location}` });
+              return;
+            }
+            res.pipe(file);
+            file.on('finish', () => {
+              file.close();
+              resolve({ success: true, metadata: { statusCode: res.statusCode } });
+            });
+          }).on('error', (e) => {
+            file.close();
+            fs.unlinkSync(p.destination);
+            resolve({ success: false, error: e.message });
+          });
         } catch (e: any) { resolve({ success: false, error: e.message }); }
       });
     }),
 
-  json_parse: createTool('json_parse', 'Parse JSON string', { json: 'string' },
-    async (p: { json: string }) => {
-      try { return { success: true, data: JSON.parse(p.json) }; }
-      catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  json_stringify: createTool('json_stringify', 'Stringify to JSON', { value: 'any', pretty: 'boolean?' },
-    async (p: { value: any; pretty?: boolean }) => {
-      try { return { success: true, data: JSON.stringify(p.value, null, p.pretty ? 2 : undefined) }; }
-      catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  json_path: createTool('json_path', 'Query JSON with JSONPath', { json: 'any', path: 'string' },
-    async (p: { json: any; path: string }) => {
-      try {
-        const data = typeof p.json === 'string' ? JSON.parse(p.json) : p.json;
-        const parts = p.path.replace(/^\$\.?/, '').split('.');
-        let result = data;
-        for (const part of parts) {
-          if (part.includes('[')) {
-            const match = part.match(/^(.+?)\[(\d+)\]$/);
-            if (match) {
-              result = result[match[1]][parseInt(match[2])];
-            } else {
-              result = result[parseInt(part.match(/\[(\d+)\]/)?.[1] || '0')];
-            }
-          } else {
-            result = result[part];
-          }
-        }
-        return { success: true, data: result };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  xml_parse: createTool('xml_parse', 'Parse XML to object', { xml: 'string' },
-    async (p: { xml: string }) => {
-      try {
-        // Simple XML parser
-        const result: any = {};
-        const tagRegex = /<(\w+)[^>]*>(.*?)<\/\1>/gs;
-        let match;
-        while ((match = tagRegex.exec(p.xml)) !== null) {
-          const [, tag, content] = match;
-          result[tag] = content.trim();
-        }
-        return { success: true, data: result };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  base64_encode: createTool('base64_encode', 'Encode to base64', { data: 'string' },
-    async (p: { data: string }) => {
-      return { success: true, data: Buffer.from(p.data).toString('base64') };
-    }),
-
-  base64_decode: createTool('base64_decode', 'Decode from base64', { data: 'string' },
-    async (p: { data: string }) => {
-      try { return { success: true, data: Buffer.from(p.data, 'base64').toString('utf-8') }; }
-      catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
+  // Additional web tools continue...
   jwt_decode: createTool('jwt_decode', 'Decode JWT token', { token: 'string' },
     async (p: { token: string }) => {
       try {
         const parts = p.token.split('.');
-        return { success: true, data: { header: JSON.parse(Buffer.from(parts[0], 'base64').toString()), payload: JSON.parse(Buffer.from(parts[1], 'base64').toString()) } };
+        if (parts.length !== 3) return { success: false, error: 'Invalid JWT format' };
+        const decode = (str: string) => JSON.parse(Buffer.from(str, 'base64').toString());
+        return { success: true, data: { header: decode(parts[0]), payload: decode(parts[1]), signature: parts[2] } };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  html_escape: createTool('html_escape', 'Escape HTML entities', { html: 'string' },
-    async (p: { html: string }) => {
-      const escapes: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-      return { success: true, data: p.html.replace(/[&<>"']/g, c => escapes[c]) };
-    }),
-
-  html_unescape: createTool('html_unescape', 'Unescape HTML entities', { html: 'string' },
-    async (p: { html: string }) => {
-      const unescapes: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&#x27;': "'", '&#x2F;': '/' };
-      return { success: true, data: p.html.replace(/&[^;]+;/g, c => unescapes[c] || c) };
-    }),
-
-  regex_match: createTool('regex_match', 'Match regex pattern', { text: 'string', pattern: 'string', flags: 'string?' },
-    async (p: { text: string; pattern: string; flags?: string }) => {
-      try {
-        const regex = new RegExp(p.pattern, p.flags || 'g');
-        const matches = [...p.text.matchAll(regex)];
-        return { success: true, data: matches.map(m => m[0]) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  regex_replace: createTool('regex_replace', 'Replace with regex', { text: 'string', pattern: 'string', replacement: 'string', flags: 'string?' },
-    async (p: { text: string; pattern: string; replacement: string; flags?: string }) => {
-      try {
-        const regex = new RegExp(p.pattern, p.flags || 'g');
-        return { success: true, data: p.text.replace(regex, p.replacement) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  uuid_generate: createTool('uuid_generate', 'Generate UUID', { version: 'string?' },
-    async (p: { version?: string }) => {
-      return { success: true, data: crypto.randomUUID() };
-    }),
-
-  hash_md5: createTool('hash_md5', 'Calculate MD5 hash', { data: 'string' },
+  base64_encode: createTool('base64_encode', 'Encode string to Base64', { data: 'string' },
     async (p: { data: string }) => {
-      return { success: true, data: crypto.createHash('md5').update(p.data).digest('hex') };
+      return { success: true, data: Buffer.from(p.data).toString('base64') };
     }),
 
-  hash_sha256: createTool('hash_sha256', 'Calculate SHA256 hash', { data: 'string' },
+  base64_decode: createTool('base64_decode', 'Decode Base64 string', { data: 'string' },
     async (p: { data: string }) => {
-      return { success: true, data: crypto.createHash('sha256').update(p.data).digest('hex') };
+      try {
+        return { success: true, data: Buffer.from(p.data, 'base64').toString() };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  hash_sha512: createTool('hash_sha512', 'Calculate SHA512 hash', { data: 'string' },
+  url_encode: createTool('url_encode', 'URL encode string', { data: 'string' },
     async (p: { data: string }) => {
-      return { success: true, data: crypto.createHash('sha512').update(p.data).digest('hex') };
+      return { success: true, data: encodeURIComponent(p.data) };
     }),
 
-  hmac_generate: createTool('hmac_generate', 'Generate HMAC', { data: 'string', secret: 'string', algorithm: 'string?' },
-    async (p: { data: string; secret: string; algorithm?: string }) => {
-      return { success: true, data: crypto.createHmac(p.algorithm || 'sha256', p.secret).update(p.data).digest('hex') };
-    }),
-
-  random_bytes: createTool('random_bytes', 'Generate random bytes', { count: 'number?', encoding: 'string?' },
-    async (p: { count?: number; encoding?: string }) => {
-      const bytes = crypto.randomBytes(p.count || 32);
-      return { success: true, data: bytes.toString((p.encoding || 'hex') as BufferEncoding) };
-    }),
-
-  timestamp_now: createTool('timestamp_now', 'Get current timestamp', {},
-    async () => {
-      return { success: true, data: { unix: Date.now(), iso: new Date().toISOString(), utc: new Date().toUTCString() } };
-    }),
-
-  timestamp_parse: createTool('timestamp_parse', 'Parse timestamp', { timestamp: 'string' },
-    async (p: { timestamp: string }) => {
+  url_decode: createTool('url_decode', 'URL decode string', { data: 'string' },
+    async (p: { data: string }) => {
       try {
-        const date = new Date(p.timestamp);
-        return { success: true, data: { unix: date.getTime(), iso: date.toISOString(), utc: date.toUTCString() } };
+        return { success: true, data: decodeURIComponent(p.data) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  timestamp_format: createTool('timestamp_format', 'Format timestamp', { timestamp: 'number', format: 'string?' },
-    async (p: { timestamp: number; format?: string }) => {
-      const date = new Date(p.timestamp);
-      return { success: true, data: date.toISOString() };
+  html_escape: createTool('html_escape', 'Escape HTML special characters', { data: 'string' },
+    async (p: { data: string }) => {
+      const escaped = p.data
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      return { success: true, data: escaped };
     }),
 
-  sleep: createTool('sleep', 'Pause execution', { milliseconds: 'number' },
-    async (p: { milliseconds: number }) => {
-      await new Promise(r => setTimeout(r, p.milliseconds));
-      return { success: true };
-    }),
-
-  rate_limit: createTool('rate_limit', 'Rate limit execution', { key: 'string', maxRequests: 'number', windowMs: 'number' },
-    async (p: { key: string; maxRequests: number; windowMs: number }) => {
-      // Simple in-memory rate limiting
-      const now = Date.now();
-      const windowStart = now - p.windowMs;
-      const requests = (global as any).__rateLimit = (global as any).__rateLimit || {};
-      if (!requests[p.key]) requests[p.key] = [];
-      requests[p.key] = requests[p.key].filter((t: number) => t > windowStart);
-      if (requests[p.key].length >= p.maxRequests) {
-        return { success: false, error: 'Rate limit exceeded', data: { remaining: 0, resetAt: requests[p.key][0] + p.windowMs } };
-      }
-      requests[p.key].push(now);
-      return { success: true, data: { remaining: p.maxRequests - requests[p.key].length, resetAt: windowStart + p.windowMs } };
-    }),
-
-  web_scrape: createTool('web_scrape', 'Scrape web page content', { url: 'string', selector: 'string?' },
-    async (p: { url: string; selector?: string }) => {
-      try {
-        const { stdout } = await execAsync(`curl -s "${p.url}"`);
-        // Simple content extraction
-        const text = stdout.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        return { success: true, data: text.substring(0, 10000) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  ip_lookup: createTool('ip_lookup', 'Get IP information', { ip: 'string?' },
-    async (p: { ip?: string }) => {
-      try {
-        const { stdout } = await execAsync(`curl -s "https://ipinfo.io/${p.ip || ''}/json"`);
-        return { success: true, data: JSON.parse(stdout) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  ssl_check: createTool('ssl_check', 'Check SSL certificate', { domain: 'string' },
-    async (p: { domain: string }) => {
-      try {
-        const { stdout } = await execAsync(`echo | openssl s_client -servername ${p.domain} -connect ${p.domain}:443 2>/dev/null | openssl x509 -noout -dates -subject 2>/dev/null || echo "SSL check failed"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  whois: createTool('whois', 'WHOIS lookup', { domain: 'string' },
-    async (p: { domain: string }) => {
-      try {
-        const { stdout } = await execAsync(`whois ${p.domain} 2>/dev/null | head -50`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  port_check: createTool('port_check', 'Check if port is open', { host: 'string', port: 'number', timeout: 'number?' },
-    async (p: { host: string; port: number; timeout?: number }) => {
-      return new Promise((resolve) => {
-        const socket = new (require('net').Socket)();
-        socket.setTimeout(p.timeout || 2000);
-        socket.connect(p.port, p.host, () => { socket.destroy(); resolve({ success: true, data: { open: true } }); });
-        socket.on('error', () => resolve({ success: true, data: { open: false } }));
-        socket.on('timeout', () => { socket.destroy(); resolve({ success: true, data: { open: false } }); });
-      });
-    }),
-
-  headers_check: createTool('headers_check', 'Check HTTP security headers', { url: 'string' },
-    async (p: { url: string }) => {
-      return new Promise((resolve) => {
-        try {
-          const urlObj = new URL(p.url);
-          const lib = urlObj.protocol === 'https:' ? https : http;
-          lib.get(p.url, (res) => {
-            const headers = res.headers;
-            const security = {
-              'strict-transport-security': headers['strict-transport-security'] ? 'Present' : 'Missing',
-              'content-security-policy': headers['content-security-policy'] ? 'Present' : 'Missing',
-              'x-frame-options': headers['x-frame-options'] ? 'Present' : 'Missing',
-              'x-xss-protection': headers['x-xss-protection'] ? 'Present' : 'Missing',
-              'x-content-type-options': headers['x-content-type-options'] ? 'Present' : 'Missing'
-            };
-            resolve({ success: true, data: security });
-          }).on('error', (e) => resolve({ success: false, error: e.message }));
-        } catch (e: any) { resolve({ success: false, error: e.message }); }
-      });
+  html_unescape: createTool('html_unescape', 'Unescape HTML entities', { data: 'string' },
+    async (p: { data: string }) => {
+      const unescaped = p.data
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
+      return { success: true, data: unescaped };
     }),
 };
 
@@ -1218,79 +1467,58 @@ export const webTools: Record<string, any> = {
 // GIT TOOLS (30 tools)
 // ============================================
 export const gitTools: Record<string, any> = {
+  git_status: createTool('git_status', 'Get git repository status', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('git status', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
   git_init: createTool('git_init', 'Initialize git repository', { path: 'string?' },
     async (p: { path?: string }) => {
-      try { await execAsync('git init', { cwd: p.path || process.cwd() }); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_clone: createTool('git_clone', 'Clone repository', { url: 'string', destination: 'string?', depth: 'number?' },
-    async (p: { url: string; destination?: string; depth?: number }) => {
       try {
-        const depth = p.depth ? `--depth ${p.depth}` : '';
-        await execAsync(`git clone ${depth} "${p.url}" ${p.destination || ''}`);
-        return { success: true };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_status: createTool('git_status', 'Get repository status', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('git status', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('git init', { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_add: createTool('git_add', 'Stage files', { files: 'array', path: 'string?' },
-    async (p: { files: string[]; path?: string }) => {
-      try { await execAsync(`git add ${p.files.join(' ')}`, { cwd: p.path || process.cwd() }); return { success: true }; }
-      catch (e: any) { return { success: false, error: e.message }; }
+  git_clone: createTool('git_clone', 'Clone git repository', { url: 'string', destination: 'string?' },
+    async (p: { url: string; destination?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git clone ${p.url}${p.destination ? ` "${p.destination}"` : ''}`);
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_commit: createTool('git_commit', 'Commit changes', { message: 'string', path: 'string?' },
+  git_add: createTool('git_add', 'Stage files for commit', { files: 'array', path: 'string?' },
+    async (p: { files: string[]; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git add ${p.files.map(f => `"${f}"`).join(' ')}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_commit: createTool('git_commit', 'Create git commit', { message: 'string', path: 'string?' },
     async (p: { message: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git commit -m "${p.message}"`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git commit -m "${p.message}"`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_push: createTool('git_push', 'Push to remote', { remote: 'string?', branch: 'string?', path: 'string?' },
-    async (p: { remote?: string; branch?: string; path?: string }) => {
+  git_push: createTool('git_push', 'Push to remote', { branch: 'string?', path: 'string?' },
+    async (p: { branch?: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git push ${p.remote || 'origin'} ${p.branch || ''}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git push${p.branch ? ` origin ${p.branch}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_pull: createTool('git_pull', 'Pull from remote', { remote: 'string?', branch: 'string?', path: 'string?' },
-    async (p: { remote?: string; branch?: string; path?: string }) => {
+  git_pull: createTool('git_pull', 'Pull from remote', { branch: 'string?', path: 'string?' },
+    async (p: { branch?: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git pull ${p.remote || 'origin'} ${p.branch || ''}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_fetch: createTool('git_fetch', 'Fetch from remote', { remote: 'string?', path: 'string?' },
-    async (p: { remote?: string; path?: string }) => {
-      try {
-        const { stdout } = await execAsync(`git fetch ${p.remote || 'origin'}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_log: createTool('git_log', 'Show commit history', { count: 'number?', path: 'string?' },
-    async (p: { count?: number; path?: string }) => {
-      try {
-        const { stdout } = await execAsync(`git log --oneline -${p.count || 10}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_diff: createTool('git_diff', 'Show differences', { file: 'string?', path: 'string?' },
-    async (p: { file?: string; path?: string }) => {
-      try {
-        const { stdout } = await execAsync(`git diff ${p.file || ''}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git pull${p.branch ? ` origin ${p.branch}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1298,17 +1526,15 @@ export const gitTools: Record<string, any> = {
   git_branch: createTool('git_branch', 'List or create branches', { name: 'string?', path: 'string?' },
     async (p: { name?: string; path?: string }) => {
       try {
-        const cmd = p.name ? `git branch ${p.name}` : 'git branch';
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git branch${p.name ? ` ${p.name}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_checkout: createTool('git_checkout', 'Switch branch', { branch: 'string', create: 'boolean?', path: 'string?' },
-    async (p: { branch: string; create?: boolean; path?: string }) => {
+  git_checkout: createTool('git_checkout', 'Switch branches', { branch: 'string', path: 'string?' },
+    async (p: { branch: string; path?: string }) => {
       try {
-        const flag = p.create ? '-b' : '';
-        const { stdout } = await execAsync(`git checkout ${flag} ${p.branch}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git checkout ${p.branch}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1316,15 +1542,15 @@ export const gitTools: Record<string, any> = {
   git_merge: createTool('git_merge', 'Merge branch', { branch: 'string', path: 'string?' },
     async (p: { branch: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git merge ${p.branch}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git merge ${p.branch}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_rebase: createTool('git_rebase', 'Rebase onto branch', { branch: 'string', path: 'string?' },
+  git_rebase: createTool('git_rebase', 'Rebase current branch', { branch: 'string', path: 'string?' },
     async (p: { branch: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git rebase ${p.branch}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git rebase ${p.branch}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1332,41 +1558,31 @@ export const gitTools: Record<string, any> = {
   git_stash: createTool('git_stash', 'Stash changes', { message: 'string?', path: 'string?' },
     async (p: { message?: string; path?: string }) => {
       try {
-        const msg = p.message ? `-m "${p.message}"` : '';
-        const { stdout } = await execAsync(`git stash push ${msg}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git stash${p.message ? ` -m "${p.message}"` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_stash_pop: createTool('git_stash_pop', 'Apply and remove stash', { index: 'number?', path: 'string?' },
-    async (p: { index?: number; path?: string }) => {
-      try {
-        const { stdout } = await execAsync(`git stash pop ${p.index || ''}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_stash_list: createTool('git_stash_list', 'List stashes', { path: 'string?' },
+  git_stash_pop: createTool('git_stash_pop', 'Apply stashed changes', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync('git stash list', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('git stash pop', { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_reset: createTool('git_reset', 'Reset to commit', { commit: 'string?', mode: 'string?', path: 'string?' },
-    async (p: { commit?: string; mode?: string; path?: string }) => {
+  git_log: createTool('git_log', 'View commit history', { count: 'number?', path: 'string?' },
+    async (p: { count?: number; path?: string }) => {
       try {
-        const mode = p.mode || '--mixed';
-        const { stdout } = await execAsync(`git reset ${mode} ${p.commit || 'HEAD'}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git log --oneline -n ${p.count || 10}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_revert: createTool('git_revert', 'Revert commit', { commit: 'string', path: 'string?' },
-    async (p: { commit: string; path?: string }) => {
+  git_diff: createTool('git_diff', 'Show changes', { path: 'string?', staged: 'boolean?' },
+    async (p: { path?: string; staged?: boolean }) => {
       try {
-        const { stdout } = await execAsync(`git revert ${p.commit}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git diff${p.staged ? ' --staged' : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1375,10 +1591,10 @@ export const gitTools: Record<string, any> = {
     async (p: { action: string; name?: string; url?: string; path?: string }) => {
       try {
         let cmd = 'git remote';
-        if (p.action === 'add' && p.name && p.url) cmd = `git remote add ${p.name} ${p.url}`;
-        else if (p.action === 'remove' && p.name) cmd = `git remote remove ${p.name}`;
-        else if (p.action === 'list') cmd = 'git remote -v';
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
+        if (p.action === 'add' && p.name && p.url) cmd += ` add ${p.name} ${p.url}`;
+        else if (p.action === 'remove' && p.name) cmd += ` remove ${p.name}`;
+        else if (p.action === 'list') cmd += ' -v';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1387,12 +1603,25 @@ export const gitTools: Record<string, any> = {
     async (p: { name?: string; message?: string; path?: string }) => {
       try {
         let cmd = 'git tag';
-        if (p.name) {
-          cmd = p.message ? `git tag -a ${p.name} -m "${p.message}"` : `git tag ${p.name}`;
-        } else {
-          cmd = 'git tag -l';
-        }
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
+        if (p.name && p.message) cmd += ` -a ${p.name} -m "${p.message}"`;
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_reset: createTool('git_reset', 'Reset to commit', { mode: 'string?', commit: 'string?', path: 'string?' },
+    async (p: { mode?: string; commit?: string; path?: string }) => {
+      try {
+        const mode = p.mode || 'soft';
+        const { stdout } = await execCrossPlatform(`git reset --${mode} ${p.commit || 'HEAD~1'}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_fetch: createTool('git_fetch', 'Fetch from remote', { remote: 'string?', path: 'string?' },
+    async (p: { remote?: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git fetch${p.remote ? ` ${p.remote}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1400,7 +1629,7 @@ export const gitTools: Record<string, any> = {
   git_show: createTool('git_show', 'Show commit details', { commit: 'string?', path: 'string?' },
     async (p: { commit?: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git show ${p.commit || 'HEAD'}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git show ${p.commit || 'HEAD'}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1408,104 +1637,165 @@ export const gitTools: Record<string, any> = {
   git_blame: createTool('git_blame', 'Show file blame', { file: 'string', path: 'string?' },
     async (p: { file: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git blame ${p.file}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git blame "${p.file}"`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_clean: createTool('git_clean', 'Remove untracked files', { path: 'string?', force: 'boolean?' },
-    async (p: { path?: string; force?: boolean }) => {
+  git_clean: createTool('git_clean', 'Remove untracked files', { force: 'boolean?', path: 'string?' },
+    async (p: { force?: boolean; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`git clean ${p.force ? '-fd' : '-n'}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`git clean${p.force ? ' -fd' : ' -n'}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_gc: createTool('git_gc', 'Run garbage collection', { path: 'string?' },
+  git_config: createTool('git_config', 'Get or set git config', { key: 'string?', value: 'string?', global: 'boolean?' },
+    async (p: { key?: string; value?: string; global?: boolean }) => {
+      try {
+        let cmd = 'git config';
+        if (p.global) cmd += ' --global';
+        if (p.key && p.value) cmd += ` ${p.key} "${p.value}"`;
+        else if (p.key) cmd += ` --get ${p.key}`;
+        const { stdout } = await execCrossPlatform(cmd);
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_cherry_pick: createTool('git_cherry_pick', 'Cherry-pick commit', { commit: 'string', path: 'string?' },
+    async (p: { commit: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git cherry-pick ${p.commit}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_revert: createTool('git_revert', 'Revert commit', { commit: 'string', path: 'string?' },
+    async (p: { commit: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git revert ${p.commit}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_ls_files: createTool('git_ls_files', 'List tracked files', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync('git gc', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('git ls-files', { cwd: p.path });
+        return { success: true, data: stdout.trim().split('\n') };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_archive: createTool('git_archive', 'Create archive from repository', { output: 'string', format: 'string?', path: 'string?' },
+    async (p: { output: string; format?: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`git archive --format=${p.format || 'zip'} --output="${p.output}" HEAD`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_config: createTool('git_config', 'Get or set config', { key: 'string', value: 'string?', path: 'string?' },
-    async (p: { key: string; value?: string; path?: string }) => {
+  git_submodule: createTool('git_submodule', 'Manage submodules', { action: 'string', url: 'string?', path: 'string?' },
+    async (p: { action: string; url?: string; path?: string }) => {
       try {
-        const cmd = p.value ? `git config ${p.key} "${p.value}"` : `git config ${p.key}`;
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
+        let cmd = 'git submodule';
+        if (p.action === 'add' && p.url) cmd += ` add ${p.url}`;
+        else if (p.action === 'update') cmd += ' update --init --recursive';
+        else if (p.action === 'list') cmd += ' status';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_ignore: createTool('git_ignore', 'Add to .gitignore', { pattern: 'string', path: 'string?' },
-    async (p: { pattern: string; path?: string }) => {
+  git_describe: createTool('git_describe', 'Describe current commit', { path: 'string?' },
+    async (p: { path?: string }) => {
       try {
-        const gitignorePath = `${p.path || process.cwd()}/.gitignore`;
-        await writeFileAsync(gitignorePath, `${p.pattern}\n`, { flag: 'a' } as any);
-        return { success: true };
+        const { stdout } = await execCrossPlatform('git describe --tags --always', { cwd: p.path });
+        return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  git_submodule_add: createTool('git_submodule_add', 'Add submodule', { url: 'string', path: 'string?', cwd: 'string?' },
-    async (p: { url: string; path?: string; cwd?: string }) => {
+  git_rev_parse: createTool('git_rev_parse', 'Parse revision', { arg: 'string?', path: 'string?' },
+    async (p: { arg?: string; path?: string }) => {
       try {
-        await execAsync(`git submodule add ${p.url} ${p.path || ''}`, { cwd: p.cwd || process.cwd() });
-        return { success: true };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  git_submodule_update: createTool('git_submodule_update', 'Update submodules', { cwd: 'string?' },
-    async (p: { cwd?: string }) => {
-      try {
-        const { stdout } = await execAsync('git submodule update --init --recursive', { cwd: p.cwd || process.cwd() });
-        return { success: true, data: stdout };
+        const { stdout } = await execCrossPlatform(`git rev-parse ${p.arg || 'HEAD'}`, { cwd: p.path });
+        return { success: true, data: stdout.trim() };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 };
 
 // ============================================
-// NPM/PACKAGE MANAGER TOOLS (30 tools)
+// NPM TOOLS (30 tools)
 // ============================================
 export const npmTools: Record<string, any> = {
   npm_init: createTool('npm_init', 'Initialize npm project', { name: 'string?', path: 'string?' },
     async (p: { name?: string; path?: string }) => {
       try {
-        const cmd = p.name ? `npm init -y && npm pkg set name="${p.name}"` : 'npm init -y';
-        await execAsync(cmd, { cwd: p.path || process.cwd() });
-        return { success: true };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  npm_install: createTool('npm_install', 'Install npm packages', { packages: 'array', dev: 'boolean?', path: 'string?' },
-    async (p: { packages: string[]; dev?: boolean; path?: string }) => {
-      try {
-        const flag = p.dev ? '--save-dev' : '';
-        const { stdout } = await execAsync(`npm install ${flag} ${p.packages.join(' ')}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`npm init -y${p.name ? ` --name ${p.name}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  npm_uninstall: createTool('npm_uninstall', 'Uninstall npm packages', { packages: 'array', path: 'string?' },
-    async (p: { packages: string[]; path?: string }) => {
+  npm_install: createTool('npm_install', 'Install npm packages', { packages: 'array?', dev: 'boolean?', global: 'boolean?', path: 'string?' },
+    async (p: { packages?: string[]; dev?: boolean; global?: boolean; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`npm uninstall ${p.packages.join(' ')}`, { cwd: p.path || process.cwd() });
+        let cmd = 'npm install';
+        if (p.global) cmd += ' -g';
+        if (p.dev) cmd += ' --save-dev';
+        if (p.packages?.length) cmd += ' ' + p.packages.join(' ');
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  npm_update: createTool('npm_update', 'Update npm packages', { packages: 'array?', path: 'string?' },
-    async (p: { packages?: string[]; path?: string }) => {
+  npm_uninstall: createTool('npm_uninstall', 'Uninstall npm packages', { packages: 'array', global: 'boolean?', path: 'string?' },
+    async (p: { packages: string[]; global?: boolean; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`npm update ${p.packages?.join(' ') || ''}`, { cwd: p.path || process.cwd() });
+        let cmd = `npm uninstall ${p.packages.join(' ')}`;
+        if (p.global) cmd += ' -g';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  npm_list: createTool('npm_list', 'List installed packages', { depth: 'number?', path: 'string?' },
-    async (p: { depth?: number; path?: string }) => {
+  npm_run: createTool('npm_run', 'Run npm script', { script: 'string', args: 'array?', path: 'string?' },
+    async (p: { script: string; args?: string[]; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`npm list --depth=${p.depth || 0}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`npm run ${p.script}${p.args?.length ? ' ' + p.args.join(' ') : ''}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_test: createTool('npm_test', 'Run npm test', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('npm test', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_build: createTool('npm_build', 'Run npm build', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('npm run build', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_start: createTool('npm_start', 'Run npm start', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('npm start', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_list: createTool('npm_list', 'List installed packages', { global: 'boolean?', depth: 'number?', path: 'string?' },
+    async (p: { global?: boolean; depth?: number; path?: string }) => {
+      try {
+        let cmd = 'npm list';
+        if (p.global) cmd += ' -g';
+        if (p.depth !== undefined) cmd += ` --depth=${p.depth}`;
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1513,49 +1803,18 @@ export const npmTools: Record<string, any> = {
   npm_outdated: createTool('npm_outdated', 'Check for outdated packages', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync('npm outdated', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('npm outdated', { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message, data: e.stdout }; }
     }),
 
-  npm_run: createTool('npm_run', 'Run npm script', { script: 'string', args: 'array?', path: 'string?' },
-    async (p: { script: string; args?: string[]; path?: string }) => {
+  npm_update: createTool('npm_update', 'Update npm packages', { packages: 'array?', global: 'boolean?', path: 'string?' },
+    async (p: { packages?: string[]; global?: boolean; path?: string }) => {
       try {
-        const { stdout } = await execAsync(`npm run ${p.script} ${p.args?.join(' ') || ''}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  npm_version: createTool('npm_version', 'Get or bump package version', { bump: 'string?', path: 'string?' },
-    async (p: { bump?: string; path?: string }) => {
-      try {
-        const cmd = p.bump ? `npm version ${p.bump}` : 'npm --version';
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout.trim() };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  npm_search: createTool('npm_search', 'Search npm packages', { query: 'string' },
-    async (p: { query: string }) => {
-      try {
-        const { stdout } = await execAsync(`npm search ${p.query} | head -20`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  npm_view: createTool('npm_view', 'View package info', { package: 'string' },
-    async (p: { package: string }) => {
-      try {
-        const { stdout } = await execAsync(`npm view ${p.package}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  npm_audit: createTool('npm_audit', 'Run security audit', { fix: 'boolean?', path: 'string?' },
-    async (p: { fix?: boolean; path?: string }) => {
-      try {
-        const cmd = p.fix ? 'npm audit fix' : 'npm audit';
-        const { stdout } = await execAsync(cmd, { cwd: p.path || process.cwd() });
+        let cmd = 'npm update';
+        if (p.global) cmd += ' -g';
+        if (p.packages?.length) cmd += ' ' + p.packages.join(' ');
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
@@ -1563,722 +1822,175 @@ export const npmTools: Record<string, any> = {
   npm_cache_clean: createTool('npm_cache_clean', 'Clean npm cache', {},
     async () => {
       try {
-        const { stdout } = await execAsync('npm cache clean --force');
+        const { stdout } = await execCrossPlatform('npm cache clean --force');
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  yarn_add: createTool('yarn_add', 'Add yarn package', { packages: 'array', dev: 'boolean?', path: 'string?' },
-    async (p: { packages: string[]; dev?: boolean; path?: string }) => {
+  npm_audit: createTool('npm_audit', 'Run npm audit', { fix: 'boolean?', path: 'string?' },
+    async (p: { fix?: boolean; path?: string }) => {
       try {
-        const flag = p.dev ? '--dev' : '';
-        const { stdout } = await execAsync(`yarn add ${flag} ${p.packages.join(' ')}`, { cwd: p.path || process.cwd() });
+        let cmd = 'npm audit';
+        if (p.fix) cmd += ' fix';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  yarn_remove: createTool('yarn_remove', 'Remove yarn package', { packages: 'array', path: 'string?' },
-    async (p: { packages: string[]; path?: string }) => {
+  npm_publish: createTool('npm_publish', 'Publish npm package', { path: 'string?', access: 'string?' },
+    async (p: { path?: string; access?: string }) => {
       try {
-        const { stdout } = await execAsync(`yarn remove ${p.packages.join(' ')}`, { cwd: p.path || process.cwd() });
+        let cmd = 'npm publish';
+        if (p.access) cmd += ` --access ${p.access}`;
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  yarn_install: createTool('yarn_install', 'Install dependencies with yarn', { path: 'string?' },
-    async (p: { path?: string }) => {
+  npm_version: createTool('npm_version', 'Bump package version', { version: 'string', path: 'string?' },
+    async (p: { version: string; path?: string }) => {
       try {
-        const { stdout } = await execAsync('yarn install', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`npm version ${p.version}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  pip_install: createTool('pip_install', 'Install pip packages', { packages: 'array', user: 'boolean?' },
-    async (p: { packages: string[]; user?: boolean }) => {
+  npm_deprecate: createTool('npm_deprecate', 'Deprecate npm package', { package: 'string', message: 'string' },
+    async (p: { package: string; message: string }) => {
       try {
-        const flag = p.user ? '--user' : '';
-        const { stdout } = await execAsync(`pip install ${flag} ${p.packages.join(' ')}`);
+        const { stdout } = await execCrossPlatform(`npm deprecate ${p.package} "${p.message}"`);
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  pip_uninstall: createTool('pip_uninstall', 'Uninstall pip packages', { packages: 'array' },
-    async (p: { packages: string[] }) => {
-      try {
-        const { stdout } = await execAsync(`pip uninstall -y ${p.packages.join(' ')}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  pip_list: createTool('pip_list', 'List installed pip packages', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('pip list');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  pip_freeze: createTool('pip_freeze', 'Generate requirements.txt', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('pip freeze');
-        if (p.path) await writeFileAsync(p.path, stdout);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  cargo_install: createTool('cargo_install', 'Install Rust crate', { crate: 'string' },
-    async (p: { crate: string }) => {
-      try {
-        const { stdout } = await execAsync(`cargo install ${p.crate}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  cargo_build: createTool('cargo_build', 'Build Rust project', { release: 'boolean?', path: 'string?' },
-    async (p: { release?: boolean; path?: string }) => {
-      try {
-        const flag = p.release ? '--release' : '';
-        const { stdout } = await execAsync(`cargo build ${flag}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  cargo_test: createTool('cargo_test', 'Run Rust tests', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('cargo test', { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  go_install: createTool('go_install', 'Install Go package', { package: 'string' },
+  npm_info: createTool('npm_info', 'Get package info', { package: 'string' },
     async (p: { package: string }) => {
       try {
-        const { stdout } = await execAsync(`go install ${p.package}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  go_build: createTool('go_build', 'Build Go project', { output: 'string?', path: 'string?' },
-    async (p: { output?: string; path?: string }) => {
-      try {
-        const flag = p.output ? `-o ${p.output}` : '';
-        const { stdout } = await execAsync(`go build ${flag}`, { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  go_test: createTool('go_test', 'Run Go tests', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('go test ./...', { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  composer_install: createTool('composer_install', 'Install PHP dependencies', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('composer install', { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  gem_install: createTool('gem_install', 'Install Ruby gem', { gem: 'string' },
-    async (p: { gem: string }) => {
-      try {
-        const { stdout } = await execAsync(`gem install ${p.gem}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  bundler_install: createTool('bundler_install', 'Install Ruby dependencies', { path: 'string?' },
-    async (p: { path?: string }) => {
-      try {
-        const { stdout } = await execAsync('bundle install', { cwd: p.path || process.cwd() });
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  apt_install: createTool('apt_install', 'Install apt package', { packages: 'array' },
-    async (p: { packages: string[] }) => {
-      try {
-        const { stdout } = await execAsync(`sudo apt-get install -y ${p.packages.join(' ')}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  brew_install: createTool('brew_install', 'Install homebrew package', { packages: 'array' },
-    async (p: { packages: string[] }) => {
-      try {
-        const { stdout } = await execAsync(`brew install ${p.packages.join(' ')}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-};
-
-// ============================================
-// DATABASE TOOLS (20 tools)
-// ============================================
-export const databaseTools: Record<string, any> = {
-  sqlite_query: createTool('sqlite_query', 'Execute SQLite query', { database: 'string', query: 'string' },
-    async (p: { database: string; query: string }) => {
-      try {
-        const { stdout } = await execAsync(`sqlite3 "${p.database}" "${p.query.replace(/"/g, '\\"')}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  sqlite_tables: createTool('sqlite_tables', 'List SQLite tables', { database: 'string' },
-    async (p: { database: string }) => {
-      try {
-        const { stdout } = await execAsync(`sqlite3 "${p.database}" ".tables"`);
-        return { success: true, data: stdout.trim().split(/\s+/) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  sqlite_schema: createTool('sqlite_schema', 'Get SQLite schema', { database: 'string', table: 'string?' },
-    async (p: { database: string; table?: string }) => {
-      try {
-        const query = p.table ? `.schema ${p.table}` : '.schema';
-        const { stdout } = await execAsync(`sqlite3 "${p.database}" "${query}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  postgres_query: createTool('postgres_query', 'Execute PostgreSQL query', { query: 'string', database: 'string?', host: 'string?', user: 'string?' },
-    async (p: { query: string; database?: string; host?: string; user?: string }) => {
-      try {
-        const env = `PGDATABASE=${p.database || 'postgres'} PGHOST=${p.host || 'localhost'} PGUSER=${p.user || 'postgres'}`;
-        const { stdout } = await execAsync(`${env} psql -c "${p.query.replace(/"/g, '\\"')}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  postgres_tables: createTool('postgres_tables', 'List PostgreSQL tables', { database: 'string?', host: 'string?' },
-    async (p: { database?: string; host?: string }) => {
-      try {
-        const env = `PGDATABASE=${p.database || 'postgres'} PGHOST=${p.host || 'localhost'}`;
-        const { stdout } = await execAsync(`${env} psql -c "\\dt"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  mysql_query: createTool('mysql_query', 'Execute MySQL query', { query: 'string', database: 'string?', host: 'string?', user: 'string?' },
-    async (p: { query: string; database?: string; host?: string; user?: string }) => {
-      try {
-        const cmd = `mysql -h ${p.host || 'localhost'} -u ${p.user || 'root'} ${p.database || ''} -e "${p.query.replace(/"/g, '\\"')}"`;
-        const { stdout } = await execAsync(cmd);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  mysql_tables: createTool('mysql_tables', 'List MySQL tables', { database: 'string', host: 'string?', user: 'string?' },
-    async (p: { database: string; host?: string; user?: string }) => {
-      try {
-        const cmd = `mysql -h ${p.host || 'localhost'} -u ${p.user || 'root'} ${p.database} -e "SHOW TABLES"`;
-        const { stdout } = await execAsync(cmd);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  redis_get: createTool('redis_get', 'Get Redis key', { key: 'string', host: 'string?' },
-    async (p: { key: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`redis-cli -h ${p.host || 'localhost'} GET "${p.key}"`);
-        return { success: true, data: stdout.trim() };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  redis_set: createTool('redis_set', 'Set Redis key', { key: 'string', value: 'string', host: 'string?' },
-    async (p: { key: string; value: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`redis-cli -h ${p.host || 'localhost'} SET "${p.key}" "${p.value}"`);
-        return { success: true, data: stdout.trim() };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  redis_del: createTool('redis_del', 'Delete Redis key', { key: 'string', host: 'string?' },
-    async (p: { key: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`redis-cli -h ${p.host || 'localhost'} DEL "${p.key}"`);
-        return { success: true, data: stdout.trim() };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  redis_keys: createTool('redis_keys', 'List Redis keys', { pattern: 'string?', host: 'string?' },
-    async (p: { pattern?: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`redis-cli -h ${p.host || 'localhost'} KEYS "${p.pattern || '*'}"`);
-        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  mongo_query: createTool('mongo_query', 'Execute MongoDB query', { database: 'string', collection: 'string', query: 'string', host: 'string?' },
-    async (p: { database: string; collection: string; query: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`mongosh --host ${p.host || 'localhost'} ${p.database} --eval "db.${p.collection}.find(${p.query}).toArray()"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  mongo_insert: createTool('mongo_insert', 'Insert into MongoDB', { database: 'string', collection: 'string', document: 'string', host: 'string?' },
-    async (p: { database: string; collection: string; document: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`mongosh --host ${p.host || 'localhost'} ${p.database} --eval "db.${p.collection}.insertOne(${p.document})"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  mongo_collections: createTool('mongo_collections', 'List MongoDB collections', { database: 'string', host: 'string?' },
-    async (p: { database: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`mongosh --host ${p.host || 'localhost'} ${p.database} --eval "db.getCollectionNames()"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  elastic_search: createTool('elastic_search', 'Search Elasticsearch', { index: 'string', query: 'string', host: 'string?' },
-    async (p: { index: string; query: string; host?: string }) => {
-      try {
-        const { stdout } = await execAsync(`curl -s -X GET "${p.host || 'localhost:9200'}/${p.index}/_search" -H "Content-Type: application/json" -d '${p.query}'`);
+        const { stdout } = await execCrossPlatform(`npm info ${p.package} --json`);
         return { success: true, data: JSON.parse(stdout) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  elastic_index: createTool('elastic_index', 'Index document in Elasticsearch', { index: 'string', document: 'string', host: 'string?' },
-    async (p: { index: string; document: string; host?: string }) => {
+  npm_search: createTool('npm_search', 'Search npm packages', { query: 'string' },
+    async (p: { query: string }) => {
       try {
-        const { stdout } = await execAsync(`curl -s -X POST "${p.host || 'localhost:9200'}/${p.index}/_doc" -H "Content-Type: application/json" -d '${p.document}'`);
+        const { stdout } = await execCrossPlatform(`npm search ${p.query} --json`);
         return { success: true, data: JSON.parse(stdout) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  kafka_topics: createTool('kafka_topics', 'List Kafka topics', { bootstrap: 'string?' },
-    async (p: { bootstrap?: string }) => {
-      try {
-        const { stdout } = await execAsync(`kafka-topics.sh --bootstrap-server ${p.bootstrap || 'localhost:9092'} --list`);
-        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kafka_produce: createTool('kafka_produce', 'Produce to Kafka topic', { topic: 'string', message: 'string', bootstrap: 'string?' },
-    async (p: { topic: string; message: string; bootstrap?: string }) => {
-      try {
-        await execAsync(`echo "${p.message}" | kafka-console-producer.sh --bootstrap-server ${p.bootstrap || 'localhost:9092'} --topic ${p.topic}`);
-        return { success: true };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kafka_consume: createTool('kafka_consume', 'Consume from Kafka topic', { topic: 'string', fromBeginning: 'boolean?', bootstrap: 'string?' },
-    async (p: { topic: string; fromBeginning?: boolean; bootstrap?: string }) => {
-      try {
-        const flag = p.fromBeginning ? '--from-beginning' : '';
-        const { stdout } = await execAsync(`timeout 5 kafka-console-consumer.sh --bootstrap-server ${p.bootstrap || 'localhost:9092'} --topic ${p.topic} ${flag} 2>/dev/null || true`);
-        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-};
-
-// ============================================
-// CLOUD TOOLS (20 tools)
-// ============================================
-export const cloudTools: Record<string, any> = {
-  aws_s3_list: createTool('aws_s3_list', 'List S3 buckets', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('aws s3 ls');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  aws_s3_upload: createTool('aws_s3_upload', 'Upload to S3', { file: 'string', bucket: 'string', key: 'string?' },
-    async (p: { file: string; bucket: string; key?: string }) => {
-      try {
-        const key = p.key || path.basename(p.file);
-        const { stdout } = await execAsync(`aws s3 cp "${p.file}" "s3://${p.bucket}/${key}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  aws_s3_download: createTool('aws_s3_download', 'Download from S3', { bucket: 'string', key: 'string', destination: 'string' },
-    async (p: { bucket: string; key: string; destination: string }) => {
-      try {
-        const { stdout } = await execAsync(`aws s3 cp "s3://${p.bucket}/${p.key}" "${p.destination}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  aws_ec2_list: createTool('aws_ec2_list', 'List EC2 instances', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('aws ec2 describe-instances --query "Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,Type:InstanceType}" --output table');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  aws_lambda_list: createTool('aws_lambda_list', 'List Lambda functions', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('aws lambda list-functions --query "Functions[*].{Name:FunctionName,Runtime:Runtime,Handler:Handler}" --output table');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  aws_lambda_invoke: createTool('aws_lambda_invoke', 'Invoke Lambda function', { function: 'string', payload: 'string?' },
-    async (p: { function: string; payload?: string }) => {
-      try {
-        const payload = p.payload ? `--payload '${p.payload}'` : '';
-        const { stdout } = await execAsync(`aws lambda invoke --function-name ${p.function} ${payload} /tmp/lambda_output.json && cat /tmp/lambda_output.json`);
-        return { success: true, data: JSON.parse(stdout) };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  gcloud_storage_list: createTool('gcloud_storage_list', 'List GCS buckets', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('gsutil ls');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  gcloud_storage_upload: createTool('gcloud_storage_upload', 'Upload to GCS', { file: 'string', bucket: 'string' },
-    async (p: { file: string; bucket: string }) => {
-      try {
-        const { stdout } = await execAsync(`gsutil cp "${p.file}" "${p.bucket}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  gcloud_compute_list: createTool('gcloud_compute_list', 'List GCE instances', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('gcloud compute instances list');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  azure_storage_list: createTool('azure_storage_list', 'List Azure storage accounts', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('az storage account list --query "[].{Name:name,Location:location}" -o table');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  azure_vm_list: createTool('azure_vm_list', 'List Azure VMs', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('az vm list --query "[].{Name:name,Location:location,State:provisioningState}" -o table');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kubectl_get_pods: createTool('kubectl_get_pods', 'List Kubernetes pods', { namespace: 'string?' },
-    async (p: { namespace?: string }) => {
-      try {
-        const ns = p.namespace ? `-n ${p.namespace}` : '--all-namespaces';
-        const { stdout } = await execAsync(`kubectl get pods ${ns}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kubectl_get_services: createTool('kubectl_get_services', 'List Kubernetes services', { namespace: 'string?' },
-    async (p: { namespace?: string }) => {
-      try {
-        const ns = p.namespace ? `-n ${p.namespace}` : '--all-namespaces';
-        const { stdout } = await execAsync(`kubectl get services ${ns}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kubectl_apply: createTool('kubectl_apply', 'Apply Kubernetes manifest', { file: 'string' },
-    async (p: { file: string }) => {
-      try {
-        const { stdout } = await execAsync(`kubectl apply -f "${p.file}"`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  kubectl_logs: createTool('kubectl_logs', 'Get pod logs', { pod: 'string', namespace: 'string?', tail: 'number?' },
-    async (p: { pod: string; namespace?: string; tail?: number }) => {
-      try {
-        const ns = p.namespace ? `-n ${p.namespace}` : '';
-        const tail = p.tail ? `--tail=${p.tail}` : '';
-        const { stdout } = await execAsync(`kubectl logs ${p.pod} ${ns} ${tail}`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  terraform_init: createTool('terraform_init', 'Initialize Terraform', { path: 'string?' },
+  npm_pack: createTool('npm_pack', 'Create tarball from package', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync('terraform init', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('npm pack', { cwd: p.path });
+        return { success: true, data: stdout.trim() };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_link: createTool('npm_link', 'Link npm package', { package: 'string?', path: 'string?' },
+    async (p: { package?: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`npm link${p.package ? ` ${p.package}` : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  terraform_plan: createTool('terraform_plan', 'Plan Terraform changes', { path: 'string?' },
+  npm_unlink: createTool('npm_unlink', 'Unlink npm package', { package: 'string?', path: 'string?' },
+    async (p: { package?: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`npm unlink${p.package ? ` ${p.package}` : ''}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  npm_ci: createTool('npm_ci', 'Clean install from lock file', { path: 'string?' },
     async (p: { path?: string }) => {
       try {
-        const { stdout } = await execAsync('terraform plan', { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform('npm ci', { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  terraform_apply: createTool('terraform_apply', 'Apply Terraform changes', { path: 'string?', autoApprove: 'boolean?' },
-    async (p: { path?: string; autoApprove?: boolean }) => {
+  npm_run_script: createTool('npm_run_script', 'Run custom npm script', { script: 'string', path: 'string?' },
+    async (p: { script: string; path?: string }) => {
       try {
-        const flag = p.autoApprove ? '-auto-approve' : '';
-        const { stdout } = await execAsync(`terraform apply ${flag}`, { cwd: p.path || process.cwd() });
+        const { stdout } = await execCrossPlatform(`npm run ${p.script}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  helm_list: createTool('helm_list', 'List Helm releases', { namespace: 'string?' },
-    async (p: { namespace?: string }) => {
+  npx_run: createTool('npx_run', 'Run npx command', { command: 'string', args: 'array?', path: 'string?' },
+    async (p: { command: string; args?: string[]; path?: string }) => {
       try {
-        const ns = p.namespace ? `-n ${p.namespace}` : '-A';
-        const { stdout } = await execAsync(`helm list ${ns}`);
+        const { stdout } = await execCrossPlatform(`npx ${p.command}${p.args?.length ? ' ' + p.args.join(' ') : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  helm_install: createTool('helm_install', 'Install Helm chart', { name: 'string', chart: 'string', namespace: 'string?', values: 'string?' },
-    async (p: { name: string; chart: string; namespace?: string; values?: string }) => {
+  npm_exec: createTool('npm_exec', 'Run npm exec', { command: 'string', args: 'array?', path: 'string?' },
+    async (p: { command: string; args?: string[]; path?: string }) => {
       try {
-        const ns = p.namespace ? `-n ${p.namespace}` : '';
-        const values = p.values ? `-f ${p.values}` : '';
-        const { stdout } = await execAsync(`helm install ${p.name} ${p.chart} ${ns} ${values}`);
+        const { stdout } = await execCrossPlatform(`npm exec -- ${p.command}${p.args?.length ? ' ' + p.args.join(' ') : ''}`, { cwd: p.path });
         return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  yarn_install: createTool('yarn_install', 'Install with yarn', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('yarn install', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  yarn_add: createTool('yarn_add', 'Add package with yarn', { packages: 'array', dev: 'boolean?', path: 'string?' },
+    async (p: { packages: string[]; dev?: boolean; path?: string }) => {
+      try {
+        let cmd = `yarn add ${p.packages.join(' ')}`;
+        if (p.dev) cmd += ' --dev';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  yarn_run: createTool('yarn_run', 'Run yarn script', { script: 'string', path: 'string?' },
+    async (p: { script: string; path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`yarn ${p.script}`, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  pnpm_install: createTool('pnpm_install', 'Install with pnpm', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('pnpm install', { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  pnpm_add: createTool('pnpm_add', 'Add package with pnpm', { packages: 'array', dev: 'boolean?', path: 'string?' },
+    async (p: { packages: string[]; dev?: boolean; path?: string }) => {
+      try {
+        let cmd = `pnpm add ${p.packages.join(' ')}`;
+        if (p.dev) cmd += ' --save-dev';
+        const { stdout } = await execCrossPlatform(cmd, { cwd: p.path });
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  package_json_read: createTool('package_json_read', 'Read package.json', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const pkgPath = p.path ? path.join(p.path, 'package.json') : 'package.json';
+        const content = await readFileAsync(pkgPath, 'utf-8');
+        return { success: true, data: JSON.parse(content) };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 };
 
 // ============================================
-// SECURITY TOOLS (20 tools)
-// ============================================
-export const securityTools: Record<string, any> = {
-  security_scan_ports: createTool('security_scan_ports', 'Scan common ports', { host: 'string' },
-    async (p: { host: string }) => {
-      try {
-        const ports = [22, 80, 443, 3000, 3306, 5432, 6379, 8080, 27017];
-        const open: number[] = [];
-        for (const port of ports) {
-          try {
-            await execAsync(`timeout 1 bash -c "echo >/dev/tcp/${p.host}/${port}" 2>/dev/null`);
-            open.push(port);
-          } catch {}
-        }
-        return { success: true, data: { host: p.host, openPorts: open } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_check_ssl: createTool('security_check_ssl', 'Check SSL certificate', { domain: 'string' },
-    async (p: { domain: string }) => {
-      try {
-        const { stdout } = await execAsync(`echo | openssl s_client -servername ${p.domain} -connect ${p.domain}:443 2>/dev/null | openssl x509 -noout -dates -subject`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_check_headers: createTool('security_check_headers', 'Check security headers', { url: 'string' },
-    async (p: { url: string }) => {
-      return new Promise((resolve) => {
-        try {
-          const urlObj = new URL(p.url);
-          const lib = urlObj.protocol === 'https:' ? https : http;
-          lib.get(p.url, (res) => {
-            const h = res.headers;
-            const security = {
-              'Strict-Transport-Security': h['strict-transport-security'] || 'Missing',
-              'Content-Security-Policy': h['content-security-policy'] || 'Missing',
-              'X-Frame-Options': h['x-frame-options'] || 'Missing',
-              'X-XSS-Protection': h['x-xss-protection'] || 'Missing',
-              'X-Content-Type-Options': h['x-content-type-options'] || 'Missing'
-            };
-            resolve({ success: true, data: security });
-          }).on('error', (e) => resolve({ success: false, error: e.message }));
-        } catch (e: any) { resolve({ success: false, error: e.message }); }
-      });
-    }),
-
-  security_generate_password: createTool('security_generate_password', 'Generate secure password', { length: 'number?', includeSpecial: 'boolean?' },
-    async (p: { length?: number; includeSpecial?: boolean }) => {
-      const length = p.length || 16;
-      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + (p.includeSpecial !== false ? '!@#$%^&*()_+-=' : '');
-      let password = '';
-      const bytes = crypto.randomBytes(length);
-      for (let i = 0; i < length; i++) {
-        password += chars[bytes[i] % chars.length];
-      }
-      return { success: true, data: password };
-    }),
-
-  security_hash_password: createTool('security_hash_password', 'Hash password with bcrypt-like algorithm', { password: 'string', salt: 'string?' },
-    async (p: { password: string; salt?: string }) => {
-      const salt = p.salt || crypto.randomBytes(16).toString('hex');
-      const hash = crypto.pbkdf2Sync(p.password, salt, 100000, 64, 'sha512').toString('hex');
-      return { success: true, data: { hash, salt } };
-    }),
-
-  security_verify_password: createTool('security_verify_password', 'Verify password against hash', { password: 'string', hash: 'string', salt: 'string' },
-    async (p: { password: string; hash: string; salt: string }) => {
-      const verifyHash = crypto.pbkdf2Sync(p.password, p.salt, 100000, 64, 'sha512').toString('hex');
-      return { success: true, data: { valid: verifyHash === p.hash } };
-    }),
-
-  security_encrypt: createTool('security_encrypt', 'Encrypt data with AES-256', { data: 'string', key: 'string' },
-    async (p: { data: string; key: string }) => {
-      try {
-        const iv = crypto.randomBytes(16);
-        const keyHash = crypto.createHash('sha256').update(p.key).digest();
-        const cipher = crypto.createCipheriv('aes-256-cbc', keyHash, iv);
-        let encrypted = cipher.update(p.data, 'utf8', 'hex');
-        encrypted += cipher.final('hex');
-        return { success: true, data: { encrypted, iv: iv.toString('hex') } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_decrypt: createTool('security_decrypt', 'Decrypt AES-256 data', { encrypted: 'string', iv: 'string', key: 'string' },
-    async (p: { encrypted: string; iv: string; key: string }) => {
-      try {
-        const keyHash = crypto.createHash('sha256').update(p.key).digest();
-        const decipher = crypto.createDecipheriv('aes-256-cbc', keyHash, Buffer.from(p.iv, 'hex'));
-        let decrypted = decipher.update(p.encrypted, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        return { success: true, data: decrypted };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_generate_keypair: createTool('security_generate_keypair', 'Generate RSA key pair', { bits: 'number?' },
-    async (p: { bits?: number }) => {
-      try {
-        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-          modulusLength: p.bits || 2048,
-          publicKeyEncoding: { type: 'spki', format: 'pem' },
-          privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
-        });
-        return { success: true, data: { publicKey, privateKey } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_sign: createTool('security_sign', 'Sign data with private key', { data: 'string', privateKey: 'string' },
-    async (p: { data: string; privateKey: string }) => {
-      try {
-        const sign = crypto.createSign('SHA256');
-        sign.update(p.data);
-        sign.end();
-        const signature = sign.sign(p.privateKey, 'hex');
-        return { success: true, data: signature };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_verify: createTool('security_verify', 'Verify signature', { data: 'string', signature: 'string', publicKey: 'string' },
-    async (p: { data: string; signature: string; publicKey: string }) => {
-      try {
-        const verify = crypto.createVerify('SHA256');
-        verify.update(p.data);
-        verify.end();
-        const valid = verify.verify(p.publicKey, p.signature, 'hex');
-        return { success: true, data: { valid } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_jwt_create: createTool('security_jwt_create', 'Create JWT token', { payload: 'object', secret: 'string', expiresIn: 'string?' },
-    async (p: { payload: object; secret: string; expiresIn?: string }) => {
-      try {
-        const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-        const now = Math.floor(Date.now() / 1000);
-        const exp = p.expiresIn ? now + parseInt(p.expiresIn) : now + 3600;
-        const payloadStr = Buffer.from(JSON.stringify({ ...p.payload, iat: now, exp })).toString('base64url');
-        const signature = crypto.createHmac('sha256', p.secret).update(`${header}.${payloadStr}`).digest('base64url');
-        return { success: true, data: `${header}.${payloadStr}.${signature}` };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_jwt_verify: createTool('security_jwt_verify', 'Verify JWT token', { token: 'string', secret: 'string' },
-    async (p: { token: string; secret: string }) => {
-      try {
-        const [headerB64, payloadB64, signature] = p.token.split('.');
-        const expectedSig = crypto.createHmac('sha256', p.secret).update(`${headerB64}.${payloadB64}`).digest('base64url');
-        if (signature !== expectedSig) return { success: false, error: 'Invalid signature' };
-        const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
-        if (payload.exp < Math.floor(Date.now() / 1000)) return { success: false, error: 'Token expired' };
-        return { success: true, data: payload };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_scan_vulnerabilities: createTool('security_scan_vulnerabilities', 'Scan for known vulnerabilities', { path: 'string' },
-    async (p: { path: string }) => {
-      try {
-        const { stdout } = await execAsync(`npm audit --json`, { cwd: p.path });
-        const audit = JSON.parse(stdout);
-        return { success: true, data: { vulnerabilities: audit.metadata?.vulnerabilities || {} } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_check_secrets: createTool('security_check_secrets', 'Check for exposed secrets', { path: 'string' },
-    async (p: { path: string }) => {
-      try {
-        const patterns = [
-          /(?i)api[_-]?key\s*=\s*['"][^'"]+['"]/g,
-          /(?i)secret[_-]?key\s*=\s*['"][^'"]+['"]/g,
-          /(?i)password\s*=\s*['"][^'"]+['"]/g,
-          /(?i)token\s*=\s*['"][^'"]+['"]/g,
-          /ghp_[A-Za-z0-9]{36}/g,
-          /sk-[A-Za-z0-9]{48}/g,
-        ];
-        const { stdout } = await execAsync(`grep -rE "(api_key|secret|password|token|ghp_|sk-)" "${p.path}" --include="*.ts" --include="*.js" --include="*.py" --include="*.env" 2>/dev/null | head -20`);
-        return { success: true, data: { found: stdout.trim().split('\n').filter(Boolean) } };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_firewall_status: createTool('security_firewall_status', 'Check firewall status', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('ufw status 2>/dev/null || iptables -L -n 2>/dev/null | head -20');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_audit_users: createTool('security_audit_users', 'Audit system users', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('cat /etc/passwd | grep -v nologin | grep -v false');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_check_sudo: createTool('security_check_sudo', 'Check sudo access', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('sudo -l 2>/dev/null');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_fail2ban_status: createTool('security_fail2ban_status', 'Check fail2ban status', {},
-    async () => {
-      try {
-        const { stdout } = await execAsync('fail2ban-client status 2>/dev/null || echo "fail2ban not running"');
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-
-  security_log_analysis: createTool('security_log_analysis', 'Analyze security logs', { logPath: 'string?', lines: 'number?' },
-    async (p: { logPath?: string; lines?: number }) => {
-      try {
-        const log = p.logPath || '/var/log/auth.log';
-        const { stdout } = await execAsync(`tail -n ${p.lines || 100} "${log}" | grep -E "(Failed|Invalid|Attack|Blocked|Denied)" | head -20`);
-        return { success: true, data: stdout };
-      } catch (e: any) { return { success: false, error: e.message }; }
-    }),
-};
-
-// ============================================
-// ALL TOOLS REGISTRY
+// COMBINE ALL TOOLS
 // ============================================
 export const allTools: Record<string, any> = {
   ...fileSystemTools,
@@ -2286,50 +1998,22 @@ export const allTools: Record<string, any> = {
   ...webTools,
   ...gitTools,
   ...npmTools,
-  ...databaseTools,
-  ...cloudTools,
-  ...securityTools,
 };
 
-// Export tool count
-export const TOOL_COUNT = Object.keys(allTools).length;
+// Export helper functions
+export { isWindows, getTempDir, getHomeDir, execCrossPlatform };
 
 // Execute tool by name
-export async function executeTool(name: string, params: any): Promise<ToolResult> {
-  const tool = allTools[name];
+export async function executeTool(toolName: string, params: any): Promise<ToolResult> {
+  const tool = allTools[toolName];
   if (!tool) {
-    return { success: false, error: `Tool not found: ${name}` };
+    return { success: false, error: `Tool '${toolName}' not found` };
   }
-  return tool.execute(params);
-}
-
-// Get tool by name
-export function getTool(name: string) {
-  return allTools[name];
-}
-
-// List all tools
-export function listTools(): string[] {
-  return Object.keys(allTools);
-}
-
-// Count tools
-export function countTools(): number {
-  return Object.keys(allTools).length;
-}
-
-// Get tools by category
-export function getToolsByCategory() {
-  return {
-    fileSystem: Object.keys(fileSystemTools),
-    shell: Object.keys(shellTools),
-    web: Object.keys(webTools),
-    git: Object.keys(gitTools),
-    npm: Object.keys(npmTools),
-    database: Object.keys(databaseTools),
-    cloud: Object.keys(cloudTools),
-    security: Object.keys(securityTools),
-  };
+  try {
+    return await tool.execute(params);
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
 export default allTools;
