@@ -469,6 +469,18 @@ curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh 
 git clone https://github.com/Mohabsmar/voicedev.git
 cd voicedev
 npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+**Windows PowerShell:**
+```powershell
+git clone https://github.com/Mohabsmar/voicedev.git
+cd voicedev
+npm install
+npx prisma generate
+npx prisma db push
 npm run dev
 ```
 

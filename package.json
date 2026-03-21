@@ -4,7 +4,6 @@
   "description": "VoiceDev - The Ultimate AI Agent Platform with 250+ Tools, 123+ Skills, 15 Providers",
   "private": true,
   "scripts": {
-    "postinstall": "prisma generate",
     "dev": "next dev -p 3000",
     "chat": "tsx cli/chat.ts",
     "chat:build": "esbuild cli/chat.ts --bundle --platform=node --outfile=dist/chat.cjs && node dist/chat.cjs",
