@@ -1,9 +1,11 @@
 /**
- * VoiceDev Ultimate - 100 Real Working Skills
+ * VoiceDev Ultimate - 105 Real Working Skills
  * Skills combine tools for higher-level functionality
+ * Includes Browser Use skill for web automation
  */
 
 import { executeTool, ToolResult } from '../tools';
+import { browserUseSkill, browserTools } from './browser-use';
 
 // ============================================
 // SKILL TYPES
@@ -1844,6 +1846,90 @@ export const databaseSkills: Record<string, Skill> = {
 };
 
 // ============================================
+// BROWSER AUTOMATION SKILLS (5 skills)
+// ============================================
+export const browserSkills: Record<string, Skill> = {
+  'browser-navigate': {
+    name: 'Browser Navigate',
+    description: 'Open a URL in the browser',
+    category: 'browser',
+    tools: ['browser_navigate'],
+    execute: async (params: { url: string }): Promise<SkillResult> => {
+      const steps: SkillResult['steps'] = [];
+      const result = await browserUseSkill.actions.navigate(params.url);
+      steps.push({ tool: 'browser_navigate', result: { success: result.success, data: result.data } as ToolResult });
+      return { success: result.success, data: result.data, error: result.error, steps };
+    }
+  },
+
+  'browser-screenshot': {
+    name: 'Browser Screenshot',
+    description: 'Take a screenshot of a webpage',
+    category: 'browser',
+    tools: ['browser_screenshot'],
+    execute: async (params: { url: string; outputPath?: string }): Promise<SkillResult> => {
+      const steps: SkillResult['steps'] = [];
+      const result = await browserUseSkill.actions.screenshot(params.url, params.outputPath);
+      steps.push({ tool: 'browser_screenshot', result: { success: result.success, data: result.data } as ToolResult });
+      return { success: result.success, data: result.data, error: result.error, steps };
+    }
+  },
+
+  'browser-extract': {
+    name: 'Browser Extract',
+    description: 'Extract data from a webpage using CSS selectors',
+    category: 'browser',
+    tools: ['browser_extract'],
+    execute: async (params: { url: string; selectors: Record<string, string> }): Promise<SkillResult> => {
+      const steps: SkillResult['steps'] = [];
+      const result = await browserUseSkill.actions.extract(params.url, params.selectors);
+      steps.push({ tool: 'browser_extract', result: { success: result.success, data: result.data } as ToolResult });
+      return { success: result.success, data: result.data, error: result.error, steps };
+    }
+  },
+
+  'browser-search': {
+    name: 'Browser Search',
+    description: 'Search the web and get results',
+    category: 'browser',
+    tools: ['browser_search'],
+    execute: async (params: { query: string; engine?: 'google' | 'bing' | 'duckduckgo' }): Promise<SkillResult> => {
+      const steps: SkillResult['steps'] = [];
+      const result = await browserUseSkill.actions.search(params.query, params.engine || 'google');
+      steps.push({ tool: 'browser_search', result: { success: result.success, data: result.data } as ToolResult });
+      return { success: result.success, data: result.data, error: result.error, steps };
+    }
+  },
+
+  'browser-automate': {
+    name: 'Browser Automate',
+    description: 'Automate browser actions: navigate, click, type, extract',
+    category: 'browser',
+    tools: ['browser_navigate', 'browser_click', 'browser_type', 'browser_extract'],
+    execute: async (params: { url: string; actions: Array<{ type: string; selector?: string; value?: string }> }): Promise<SkillResult> => {
+      const steps: SkillResult['steps'] = [];
+      
+      // Navigate first
+      const navResult = await browserUseSkill.actions.navigate(params.url);
+      steps.push({ tool: 'browser_navigate', result: { success: navResult.success } as ToolResult });
+      
+      // Execute each action
+      for (const action of params.actions) {
+        if (action.type === 'click' && action.selector) {
+          const result = await browserUseSkill.actions.click(params.url, action.selector);
+          steps.push({ tool: 'browser_click', result: { success: result.success } as ToolResult });
+        } else if (action.type === 'type' && action.selector && action.value) {
+          const result = await browserUseSkill.actions.type(params.url, action.selector, action.value);
+          steps.push({ tool: 'browser_type', result: { success: result.success } as ToolResult });
+        }
+      }
+      
+      return { success: true, steps };
+    }
+  },
+};
+
+// ============================================
 // ALL SKILLS REGISTRY
 // ============================================
 export const allSkills: Record<string, Skill> = {
@@ -1855,6 +1941,7 @@ export const allSkills: Record<string, Skill> = {
   ...webSkills,
   ...gitSkills,
   ...databaseSkills,
+  ...browserSkills,
 };
 
 // Skill count
@@ -1895,6 +1982,7 @@ export function getSkillsByCategory() {
     web: Object.keys(webSkills),
     git: Object.keys(gitSkills),
     database: Object.keys(databaseSkills),
+    browser: Object.keys(browserSkills),
   };
 }
 

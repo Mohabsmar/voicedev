@@ -14,8 +14,8 @@
 [![Tauri](https://img.shields.io/badge/Tauri-2.0-blue?style=flat-square&logo=tauri)](https://tauri.app/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[![Tools](https://img.shields.io/badge/Tools-250-orange?style=flat-square)](src/tools/)
-[![Skills](https://img.shields.io/badge/Skills-100-blue?style=flat-square)](src/skills/)
+[![Tools](https://img.shields.io/badge/Tools-250+-orange?style=flat-square)](src/tools/)
+[![Skills](https://img.shields.io/badge/Skills-105+-blue?style=flat-square)](src/skills/)
 [![Providers](https://img.shields.io/badge/AI_Providers-15-informational?style=flat-square)](src/providers/)
 [![Channels](https://img.shields.io/badge/Channels-6-success?style=flat-square)](src/channels/)
 
@@ -41,12 +41,14 @@ irm https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.ps1 | iex
 VoiceDev is a comprehensive AI Agent Debugger Platform that combines:
 
 - **250+ Real Working Tools** - File system, shell, web, git, npm, database, cloud, security
-- **100+ Real Skills** - Multi-tool workflows for complex tasks
+- **105+ Real Skills** - Multi-tool workflows for complex tasks including Browser Automation
 - **15 AI Providers** - OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together AI, ElevenLabs, Qwen
 - **6 Messaging Channels** - Telegram, WhatsApp, Discord, Slack, Email, MCP
-- **Voice Support** - TTS, ASR, Voice Cloning with newest models
-- **Remote Computer Control** - SSH, RDP, VNC, Wake-on-LAN
+- **Voice Support** - TTS, ASR, Voice Cloning with newest 2026 models
+- **Remote Computer Control** - SSH, RDP, VNC, WinRM, Wake-on-LAN
+- **Browser Use Skill** - Web automation, scraping, screenshots
 - **Security Tools** - Port scanning, vulnerability testing, password tools
+- **Setup Wizard** - Interactive first-time setup experience
 - **Cross-Platform** - Windows (PowerShell), Linux, macOS (Bash)
 - **Desktop App** - Tauri-based native app
 
@@ -75,20 +77,73 @@ npm run tauri:build  # Build desktop app
 
 ---
 
-## 🖥️ Setup Wizard
+## 🖥️ Setup Wizard (NEW!)
 
 VoiceDev includes an interactive setup wizard that runs on first launch:
 
-1. **API Key Setup** - Configure your AI provider keys
-2. **Channel Setup** - Connect Telegram, WhatsApp, Discord, etc.
-3. **Voice Setup** - Select TTS/ASR preferences
-4. **Security Setup** - Configure permissions and limits
+1. **Welcome** - Introduction to VoiceDev features
+2. **AI Providers** - Select and configure your AI providers
+3. **API Keys** - Enter and validate your API keys
+4. **Features** - Enable Voice, Remote Control, Browser Use
+5. **Channels** - Configure Telegram, WhatsApp, Discord
+6. **Install** - Automated dependency installation
+
+The wizard guides you through the entire setup process with a beautiful UI!
+
+---
+
+## 🤖 15 AI Providers with Newest Models (March 2026)
+
+### Large Language Models (LLMs)
+
+| Provider | Newest Models (March 2026) |
+|----------|---------------------------|
+| **OpenAI** | GPT-4.5 Turbo ⭐, GPT-4.5, o3, o4-mini ⭐ |
+| **Anthropic** | Claude 4 Opus ⭐, Claude 4 Sonnet, Claude 3.7 Sonnet |
+| **Google** | Gemini 2.5 Pro ⭐, Gemini 2.5 Flash ⭐, Gemma 3 |
+| **Z.ai** | Z-2 Ultra ⭐, Z-2 Pro, Z-2 Mini |
+| **Moonshot AI** | Kimi K2 ⭐, Moonshot V1 128K |
+| **MiniMax** | ABAB 7 Chat ⭐, ABAB 6.5 Chat |
+| **Groq** | Llama 4 70B ⭐, Llama 4 8B ⭐ |
+| **DeepSeek** | DeepSeek R2 ⭐, DeepSeek V3 |
+| **Mistral** | Mistral Large 2 ⭐, Codestral |
+| **xAI** | Grok 3 ⭐, Grok 3 Mini ⭐ |
+| **Cohere** | Command R+, Embed V4 |
+| **Replicate** | Llama 4 70B ⭐, Flux 2 ⭐ |
+| **Together AI** | Llama 4 70B Turbo ⭐ |
+| **Qwen** | Qwen 3 Max ⭐, Qwen Long (10M context) |
+
+⭐ = Released in 2026
+
+### Voice Models (TTS/ASR) - March 2026
+
+| Provider | TTS Models | ASR Models |
+|----------|-----------|------------|
+| **OpenAI** | TTS-2 ⭐, GPT-4o Mini TTS | Whisper 2 ⭐ |
+| **ElevenLabs** | Eleven V3 ⭐, Multilingual V2 | Scribe V2 ⭐ |
+| **MiniMax** | Speech-02 Turbo ⭐ | - |
+| **Groq** | - | Whisper Large V3 Turbo |
+| **Qwen** | - | Qwen Audio Turbo |
+
+### Image Generation
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | DALL-E 4 ⭐, DALL-E 3 |
+| **Replicate** | Flux 2 ⭐, Flux Schnell, SDXL |
+
+### Reasoning Models
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | o4-mini ⭐, o3 ⭐, o3-mini |
+| **DeepSeek** | DeepSeek R2 ⭐ |
 
 ---
 
 ## 🎛️ Features
 
-### 🔧 250 Real Tools
+### 🔧 250+ Real Tools
 
 | Category | Count | Examples |
 |----------|-------|----------|
@@ -100,10 +155,11 @@ VoiceDev includes an interactive setup wizard that runs on first launch:
 | **Database** | 20 | SQLite, PostgreSQL, MySQL, Redis, MongoDB |
 | **Cloud** | 20 | Docker, Kubernetes, AWS, GCP, Azure |
 | **Security** | 20 | Encrypt, hash, port scan, vulnerability test |
-| **Remote** | 10 | SSH, RDP, VNC, Wake-on-LAN |
+| **Remote** | 25 | SSH, RDP, VNC, WinRM, Wake-on-LAN |
+| **Browser** | 13 | Navigate, screenshot, extract, automate |
 | **Pentest** | 15 | Nmap, DNS enum, SQL injection, XSS test |
 
-### 🎨 100 Real Skills
+### 🎨 105+ Real Skills
 
 Skills combine multiple tools for complex workflows:
 
@@ -115,48 +171,191 @@ Skills combine multiple tools for complex workflows:
 | **Security** | 15 | Port scan, SSL check, audit |
 | **Voice** | 10 | TTS speak, ASR transcribe |
 | **Channels** | 10 | Send messages, notifications |
-| **Remote** | 10 | SSH exec, file transfer |
-| **Browser** | 5 | Web scraping, screenshots |
+| **Remote** | 15 | SSH exec, file transfer, remote control |
+| **Browser** | 5 | Navigate, screenshot, extract, search, automate |
 
 ---
 
-## 🤖 15 AI Providers with Newest Models (2025)
+## 🌐 Browser Use Skill (NEW!)
 
-### Large Language Models (LLMs)
+VoiceDev includes a powerful browser automation skill for web scraping and testing:
 
-| Provider | Newest Models |
-|----------|--------------|
-| **OpenAI** | GPT-4o, o1, o1-mini, o1-pro |
-| **Anthropic** | Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude Sonnet 4 |
-| **Google** | Gemini 2.0 Flash, Gemini 2.0 Pro, Gemma 3 |
-| **Z.ai** | Z-1 Large, Z-1 Standard, Z-1 Fast |
-| **Moonshot AI** | Kimi Latest, Moonshot V1 128K |
-| **MiniMax** | ABAB 6.5 Chat, ABAB 6.5G |
-| **Groq** | Llama 3.3 70B, Mixtral 8x7B |
-| **DeepSeek** | DeepSeek R1 (Reasoner), DeepSeek Chat |
-| **Mistral** | Mistral Large, Codestral, Pixtral 12B |
-| **xAI** | Grok 2, Grok 2 Vision |
-| **Cohere** | Command R+, Embed V4 |
-| **Replicate** | Llama 3.3 70B, DeepSeek R1 |
-| **Together AI** | Llama 3.3 70B Turbo, Qwen 2.5 72B |
-| **Qwen** | Qwen Max, Qwen Long (10M context) |
+### Navigate to URLs
+```typescript
+await executeSkill('browser-navigate', {
+  url: 'https://example.com'
+});
+```
 
-### Voice Models (TTS/ASR)
+### Take Screenshots
+```typescript
+await executeSkill('browser-screenshot', {
+  url: 'https://example.com',
+  outputPath: '/screenshots/page.png'
+});
+```
 
-| Provider | TTS Models | ASR Models |
-|----------|-----------|------------|
-| **OpenAI** | TTS-1, TTS-1 HD, GPT-4o Mini TTS | Whisper-1 |
-| **ElevenLabs** | Multilingual V2, Turbo V2.5, Flash V2.5 | Scribe V1 |
-| **MiniMax** | Speech-01 Turbo, Speech-01 Emotional | - |
-| **Groq** | - | Whisper Large V3 Turbo |
-| **Qwen** | - | Qwen Audio Turbo |
+### Extract Data
+```typescript
+await executeSkill('browser-extract', {
+  url: 'https://example.com',
+  selectors: {
+    title: 'h1',
+    description: '.description',
+    links: 'a[href]'
+  }
+});
+```
 
-### Image Generation
+### Web Search
+```typescript
+await executeSkill('browser-search', {
+  query: 'VoiceDev AI platform',
+  engine: 'google'  // or 'bing', 'duckduckgo'
+});
+```
 
-| Provider | Models |
-|----------|--------|
-| **OpenAI** | DALL-E 3 |
-| **Replicate** | Flux Schnell, Flux Dev, SDXL |
+### Full Browser Automation
+```typescript
+await executeSkill('browser-automate', {
+  url: 'https://example.com/login',
+  actions: [
+    { type: 'type', selector: '#email', value: 'user@example.com' },
+    { type: 'type', selector: '#password', value: 'password123' },
+    { type: 'click', selector: '#submit' }
+  ]
+});
+```
+
+### Available Browser Tools
+
+| Tool | Description |
+|------|-------------|
+| `browser_navigate` | Open a URL in browser |
+| `browser_screenshot` | Take full page screenshot |
+| `browser_extract` | Extract data with CSS selectors |
+| `browser_click` | Click elements |
+| `browser_type` | Type into input fields |
+| `browser_scroll` | Scroll page (up/down/top/bottom) |
+| `browser_wait` | Wait for element |
+| `browser_evaluate` | Execute JavaScript |
+| `browser_fill_form` | Fill multiple form fields |
+| `browser_get_content` | Get full HTML |
+| `browser_get_text` | Get visible text |
+| `browser_download` | Download files |
+| `browser_search` | Web search |
+
+---
+
+## 🖥️ Remote Computer Control (ENHANCED!)
+
+### SSH Tools
+```typescript
+// Execute command
+await executeTool('ssh_exec', {
+  host: '192.168.1.100',
+  user: 'admin',
+  command: 'ls -la'
+});
+
+// Copy files via SCP
+await executeTool('ssh_copy_file', {
+  source: '/local/file.txt',
+  destination: '/remote/file.txt',
+  direction: 'upload'
+});
+
+// Create SSH tunnel
+await executeTool('ssh_tunnel', {
+  host: '192.168.1.100',
+  user: 'admin',
+  localPort: 8080,
+  remotePort: 80
+});
+
+// Generate SSH keys
+await executeTool('ssh_keygen', {
+  type: 'ed25519',
+  path: '~/.ssh/my_key'
+});
+```
+
+### RDP (Windows Remote Desktop)
+```typescript
+// Connect to RDP
+await executeTool('rdp_connect', {
+  host: '192.168.1.100',
+  user: 'admin',
+  password: 'password'
+});
+
+// List RDP sessions
+await executeTool('rdp_session_list', {
+  server: '192.168.1.100'
+});
+
+// Enable RDP
+await executeTool('rdp_enable', {});
+```
+
+### VNC
+```typescript
+// Connect to VNC
+await executeTool('vnc_connect', {
+  host: '192.168.1.100',
+  port: 5900
+});
+
+// Start VNC server (Linux)
+await executeTool('vnc_server_start', {
+  display: 1,
+  geometry: '1920x1080'
+});
+```
+
+### WinRM (Windows Remote Management)
+```typescript
+await executeTool('winrm_exec', {
+  host: '192.168.1.100',
+  user: 'admin',
+  password: 'password',
+  command: 'Get-Process'
+});
+```
+
+### Remote Monitoring
+```typescript
+// Ping
+await executeTool('ping', { host: 'example.com', count: 10 });
+
+// Port scan
+await executeTool('port_scan', { 
+  host: '192.168.1.100',
+  ports: '22,80,443,3389,5900'
+});
+
+// DNS lookup
+await executeTool('dns_lookup', { 
+  host: 'example.com',
+  type: 'MX'
+});
+
+// HTTP check
+await executeTool('http_check', { url: 'https://example.com' });
+
+// Remote shutdown
+await executeTool('remote_shutdown', {
+  host: '192.168.1.100',
+  action: 'restart',
+  message: 'System maintenance',
+  timeout: 60
+});
+
+// Wake-on-LAN
+await executeTool('wake_on_lan', {
+  mac: 'AA:BB:CC:DD:EE:FF'
+});
+```
 
 ---
 
@@ -200,36 +399,26 @@ await executeTool('slack_send_message', {
 });
 ```
 
-### Generic MCP API
-```typescript
-await executeTool('mcp_call', {
-  config: {
-    baseUrl: 'https://api.example.com',
-    headers: { 'Authorization': 'Bearer TOKEN' }
-  },
-  endpoint: '/v1/resource',
-  method: 'GET'
-});
-```
-
 ---
 
 ## 🎤 Voice Support
 
 ### Text-to-Speech (TTS)
 ```typescript
-// OpenAI TTS
+// OpenAI TTS-2 (New!)
 await executeTool('tts_speak', {
   text: 'Hello, World!',
   provider: 'openai',
-  voice: 'alloy'
+  voice: 'alloy',
+  model: 'tts-2'
 });
 
-// ElevenLabs TTS
+// ElevenLabs V3 (New!)
 await executeTool('tts_speak', {
   text: 'Hello, World!',
   provider: 'elevenlabs',
-  voice: 'rachel'
+  voice: 'rachel',
+  model: 'eleven_v3'
 });
 
 // MiniMax TTS
@@ -242,70 +431,24 @@ await executeTool('tts_speak', {
 
 ### Speech-to-Text (ASR)
 ```typescript
-// Whisper (OpenAI or Groq)
+// OpenAI Whisper 2 (New!)
 await executeTool('asr_transcribe', {
   audioPath: '/path/to/audio.mp3',
-  provider: 'openai'  // or 'groq' for ultra-fast
+  provider: 'openai',
+  model: 'whisper-2'
 });
 
-// ElevenLabs Scribe
+// Groq Whisper (Ultra-fast)
 await executeTool('asr_transcribe', {
   audioPath: '/path/to/audio.mp3',
-  provider: 'elevenlabs'
-});
-```
-
-### Voice Cloning
-```typescript
-await executeTool('voice_clone', {
-  audioPaths: ['/path/to/sample1.mp3', '/path/to/sample2.mp3'],
-  name: 'My Voice',
-  provider: 'elevenlabs'
-});
-```
-
----
-
-## 🖥️ Remote Computer Control
-
-### SSH
-```typescript
-await executeTool('ssh_exec', {
-  host: '192.168.1.100',
-  user: 'admin',
-  command: 'ls -la'
+  provider: 'groq'
 });
 
-await executeTool('ssh_copy_file', {
-  host: '192.168.1.100',
-  user: 'admin',
-  source: '/local/file.txt',
-  destination: '/remote/file.txt'
-});
-```
-
-### RDP (Windows Remote Desktop)
-```typescript
-await executeTool('rdp_connect', {
-  host: '192.168.1.100',
-  user: 'admin',
-  password: 'password'
-});
-```
-
-### VNC
-```typescript
-await executeTool('vnc_connect', {
-  host: '192.168.1.100',
-  port: 5900
-});
-```
-
-### Wake-on-LAN
-```typescript
-await executeTool('wake_on_lan', {
-  mac: 'AA:BB:CC:DD:EE:FF',
-  broadcastIp: '192.168.1.255'
+// ElevenLabs Scribe V2 (New!)
+await executeTool('asr_transcribe', {
+  audioPath: '/path/to/audio.mp3',
+  provider: 'elevenlabs',
+  model: 'scribe_v2'
 });
 ```
 
@@ -315,13 +458,11 @@ await executeTool('wake_on_lan', {
 
 ### Port Scanning
 ```typescript
-// Quick port scan
 await executeTool('port_scan', {
   host: 'example.com',
   ports: '22,80,443,3389'
 });
 
-// Nmap scan
 await executeTool('nmap_scan', {
   target: '192.168.1.0/24',
   scanType: '-sV'
@@ -342,59 +483,9 @@ await executeTool('xss_test', {
   param: 'q'
 });
 
-// HTTP headers check
-await executeTool('http_headers_check', {
-  url: 'https://example.com'
-});
-
 // SSL check
 await executeTool('ssl_check', {
   hostname: 'example.com'
-});
-```
-
-### Password Tools
-```typescript
-// Identify hash type
-await executeTool('hash_identify', {
-  hash: '5f4dcc3b5aa765d61d8327deb882cf99'
-});
-
-// Generate password
-await executeTool('generate_password', {
-  length: 24,
-  includeSymbols: true
-});
-
-// Check password strength
-await executeTool('password_strength', {
-  password: 'MyP@ssw0rd!'
-});
-```
-
----
-
-## 🌐 Browser Automation Skill
-
-VoiceDev includes a browser automation skill for web scraping and testing:
-
-```typescript
-await executeSkill('browser_navigate', {
-  url: 'https://example.com'
-});
-
-await executeSkill('browser_screenshot', {
-  selector: '.content',
-  savePath: '/screenshots/page.png'
-});
-
-await executeSkill('browser_click', {
-  selector: '#submit-button'
-});
-
-await executeSkill('browser_fill', {
-  selector: '#email',
-  value: 'test@example.com'
 });
 ```
 
@@ -407,16 +498,17 @@ voicedev/
 ├── src/
 │   ├── app/              # Next.js App Router
 │   ├── components/       # React Components
-│   ├── tools/            # 250 Real Tools
-│   ├── skills/           # 100 Real Skills
-│   ├── providers/        # 15 AI Providers
+│   │   └── SetupWizard.tsx  # Setup Wizard Component
+│   ├── tools/            # 250+ Real Tools
+│   ├── skills/           # 105+ Real Skills
+│   │   └── browser-use.ts   # Browser Automation Skill
+│   ├── providers/        # 15 AI Providers (March 2026)
 │   ├── channels/         # 6 Messaging Channels
 │   ├── voice/            # TTS/ASR Support
 │   ├── remote/           # Remote Control Tools
 │   ├── pentest/          # Security Tools
 │   ├── marketplace/      # Skill Marketplace
 │   ├── security/         # 5 Security Layers
-│   ├── wizard/           # Setup Wizard
 │   └── lib/              # Utilities
 ├── src-tauri/            # Tauri Desktop App
 │   └── src/
@@ -446,15 +538,6 @@ This creates native installers:
 - **macOS**: `.dmg` and `.app`
 - **Linux**: `.deb`, `.rpm`, `.AppImage`
 
-### Tauri Features
-- Native desktop experience
-- System tray integration
-- Auto-updater
-- Native file dialogs
-- System notifications
-- Clipboard access
-- Shell integration
-
 ---
 
 ## 🛡️ 5-Layer Security
@@ -472,7 +555,7 @@ This creates native installers:
 Create a `.env` file:
 
 ```env
-# AI Providers
+# AI Providers (March 2026)
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=...
@@ -523,14 +606,7 @@ Body: { "skill": "skill_name", "params": {...} }
 GET /api/providers          # List all providers
 GET /api/providers/:id      # Get provider details
 GET /api/models?category=llm  # List models by category
-```
-
-### Channels API
-```
-POST /api/channels/telegram/send
-POST /api/channels/whatsapp/send
-POST /api/channels/discord/send
-POST /api/channels/slack/send
+GET /api/models/newest      # Get newest 2026 models
 ```
 
 ---
@@ -579,6 +655,8 @@ MIT License - Use it however you want!
 
 **Desktop App: Tauri v2**
 
-**250 Tools + 100 Skills + 15 AI Providers + 6 Channels**
+**250+ Tools + 105+ Skills + 15 AI Providers + 6 Channels**
+
+**New in March 2026: GPT-4.5, Claude 4, o4-mini, Gemini 2.5, Browser Use, Setup Wizard!**
 
 </div>
