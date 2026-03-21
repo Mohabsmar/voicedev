@@ -4,7 +4,7 @@
 Write-Host ""
 Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
 Write-Host "║                                                           ║" -ForegroundColor Magenta
-Write-Host "║     🎤 VoiceDev - AI Agent Debugger Platform              ║" -ForegroundColor Magenta
+Write-Host "║     🎤 VoiceDev - Ultimate AI Agent Platform              ║" -ForegroundColor Magenta
 Write-Host "║     Built with 💜 by an 11-year-old developer             ║" -ForegroundColor Magenta
 Write-Host "║                                                           ║" -ForegroundColor Magenta
 Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Magenta

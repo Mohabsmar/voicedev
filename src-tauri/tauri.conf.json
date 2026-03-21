@@ -1,7 +1,7 @@
 {
   "name": "voicedev",
   "version": "1.0.0",
-  "description": "VoiceDev - AI Agent Debugger Platform",
+  "description": "VoiceDev - Ultimate AI Agent Platform",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

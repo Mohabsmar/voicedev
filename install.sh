@@ -18,7 +18,7 @@ NC='\033[0m'
 echo -e "${PURPLE}"
 echo "╔═══════════════════════════════════════════════════════════╗"
 echo "║                                                           ║"
-echo "║     🎤 VoiceDev - AI Agent Debugger Platform              ║"
+echo "║     🎤 VoiceDev - Ultimate AI Agent Platform              ║"
 echo "║     Built with 💜 by an 11-year-old developer             ║"
 echo "║                                                           ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
