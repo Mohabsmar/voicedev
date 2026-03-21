@@ -81,6 +81,10 @@ echo -e "${BLUE}Installing dependencies...${NC}"
 npm install
 
 echo ""
+echo -e "${BLUE}Setting up database...${NC}"
+npm run db:setup
+
+echo ""
 echo -e "${GREEN}✓ Installation complete!${NC}"
 echo ""
 

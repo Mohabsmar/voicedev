@@ -55,6 +55,10 @@ Write-Host "Installing dependencies..." -ForegroundColor Blue
 npm install
 
 Write-Host ""
+Write-Host "Setting up database..." -ForegroundColor Blue
+npm run db:setup
+
+Write-Host ""
 Write-Host "✓ Installation complete!" -ForegroundColor Green
 Write-Host ""
 

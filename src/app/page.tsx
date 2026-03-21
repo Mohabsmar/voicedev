@@ -296,7 +296,7 @@ export default function VoiceDevPro() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProvider, setSelectedProvider] = useState('openai')
-  const [selectedModel, setSelectedModel] = useState('gpt-4o')
+  const [selectedModel, setSelectedModel] = useState('gpt-5.4')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [exportFormat, setExportFormat] = useState<'json' | 'markdown' | 'csv'>('json')
   const [replaySpeed, setReplaySpeed] = useState(1)
@@ -306,13 +306,21 @@ export default function VoiceDevPro() {
   
   const chatEndRef = useRef<HTMLDivElement>(null)
   
-  // Provider/Model options
+  // Provider/Model options - LATEST MODELS (March 2026)
   const providers = [
-    { id: 'openai', name: 'OpenAI', models: ['gpt-4o', 'gpt-4o-mini', 'o1-preview', 'o1-mini'] },
-    { id: 'anthropic', name: 'Anthropic', models: ['claude-3.5-sonnet', 'claude-3-opus', 'claude-3-haiku'] },
-    { id: 'google', name: 'Google', models: ['gemini-2.0-flash', 'gemini-1.5-pro'] },
-    { id: 'deepseek', name: 'DeepSeek', models: ['deepseek-chat', 'deepseek-reasoner'] },
-    { id: 'xai', name: 'xAI', models: ['grok-2', 'grok-2-mini'] },
+    { id: 'openai', name: 'OpenAI', models: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.3-codex', 'o4', 'o4-mini', 'o3'] },
+    { id: 'anthropic', name: 'Anthropic', models: ['claude-sonnet-4.6', 'claude-opus-4.6', 'claude-opus-4.5', 'claude-4-sonnet', 'claude-4-haiku'] },
+    { id: 'google', name: 'Google AI', models: ['gemini-3.1-pro', 'gemini-3-deep-think', 'gemini-3-pro', 'gemini-2.5-pro', 'gemma-3-27b'] },
+    { id: 'zai', name: 'Z.ai', models: ['z-3-ultra', 'z-3-pro', 'z-3-mini', 'z-2-ultra', 'z-2-pro'] },
+    { id: 'deepseek', name: 'DeepSeek', models: ['deepseek-v3.2-exp', 'deepseek-v3.1', 'deepseek-r1-0528', 'deepseek-coder-v2'] },
+    { id: 'xai', name: 'xAI (Grok)', models: ['grok-4.20-beta', 'grok-4.1-fast', 'grok-4.1', 'grok-4-vision'] },
+    { id: 'moonshot', name: 'Moonshot AI', models: ['kimi-k2.5', 'kimi-k2-thinking', 'kimi-k2', 'moonshot-v1-128k'] },
+    { id: 'minimax', name: 'MiniMax', models: ['minimax-m2.7', 'minimax-m2.5', 'minimax-m2'] },
+    { id: 'mistral', name: 'Mistral AI', models: ['mistral-small-4', 'mistral-large-3', 'magistral-medium', 'codestral-latest'] },
+    { id: 'qwen', name: 'Alibaba Qwen', models: ['qwen-3.5', 'qwen-3.5-small-series', 'qwen-3-next', 'qwen-vl-max', 'qwen-long'] },
+    { id: 'glm', name: 'GLM (Zhipu AI)', models: ['glm-5', 'glm-4.7', 'glm-4.7-chat', 'glm-4.7-thinking', 'glm-4.6', 'glm-4.6-vision'] },
+    { id: 'groq', name: 'Groq', models: ['llama-4-maverick', 'llama-4-scout', 'llama-3.3-70b', 'mixtral-8x7b'] },
+    { id: 'cohere', name: 'Cohere', models: ['command-r3', 'command-r-plus', 'command-r'] },
   ]
   
   const currentProvider = providers.find(p => p.id === selectedProvider)
