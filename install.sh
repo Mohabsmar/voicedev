@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # VoiceDev One-Liner Installer
-# curl -fsSL https://voicedev.dev/install.sh | bash
+# curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
 #
 # Works on: Windows (WSL/Git Bash), Linux, macOS
 #
@@ -13,6 +13,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 echo -e "${PURPLE}"
@@ -69,7 +70,8 @@ INSTALL_DIR="${INSTALL_DIR:-$HOME/voicedev}"
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${BLUE}Updating existing installation...${NC}"
     cd "$INSTALL_DIR"
-    git pull
+    git fetch origin
+    git reset --hard origin/main
 else
     echo -e "${BLUE}Cloning VoiceDev...${NC}"
     git clone https://github.com/Mohabsmar/voicedev.git "$INSTALL_DIR"
@@ -82,7 +84,8 @@ npm install
 
 echo ""
 echo -e "${BLUE}Setting up database...${NC}"
-npm run db:setup
+npx prisma generate
+npx prisma db push
 
 echo ""
 echo -e "${GREEN}✓ Installation complete!${NC}"
@@ -138,6 +141,6 @@ echo "  npm run dev"
 echo ""
 echo -e "${BLUE}Then open:${NC} http://localhost:3000"
 echo ""
-echo -e "${BLUE}Edit API keys:${NC} $INSTALL_DIR/.env"
+echo -e "${CYAN}The Setup Wizard will guide you through configuration!${NC}"
 echo ""
 echo -e "${PURPLE}══════════════════════════════════════════════════════════${NC}"

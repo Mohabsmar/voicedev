@@ -43,7 +43,8 @@ $installDir = if ($env:INSTALL_DIR) { $env:INSTALL_DIR } else { Join-Path $env:U
 if (Test-Path $installDir) {
     Write-Host "Updating existing installation..." -ForegroundColor Blue
     Set-Location $installDir
-    git pull
+    git fetch origin
+    git reset --hard origin/main
 } else {
     Write-Host "Cloning VoiceDev..." -ForegroundColor Blue
     git clone https://github.com/Mohabsmar/voicedev.git $installDir
@@ -56,7 +57,8 @@ npm install
 
 Write-Host ""
 Write-Host "Setting up database..." -ForegroundColor Blue
-npm run db:setup
+npx prisma generate
+npx prisma db push
 
 Write-Host ""
 Write-Host "✓ Installation complete!" -ForegroundColor Green
@@ -116,6 +118,6 @@ Write-Host "  npm run dev"
 Write-Host ""
 Write-Host "Then open: http://localhost:3000" -ForegroundColor Blue
 Write-Host ""
-Write-Host "Edit API keys: $installDir\.env" -ForegroundColor Blue
+Write-Host "The Setup Wizard will guide you through configuration!" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Magenta

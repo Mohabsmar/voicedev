@@ -4,6 +4,7 @@
   "description": "VoiceDev - The Ultimate AI Agent Platform with 250+ Tools, 123+ Skills, 17 Providers",
   "private": true,
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "next dev -p 3000",
     "dev:log": "next dev -p 3000 > dev.log 2>&1",
     "build": "prisma generate && next build",
