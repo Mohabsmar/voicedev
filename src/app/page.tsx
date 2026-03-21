@@ -523,13 +523,17 @@ export default function VoiceDevApp() {
 
       const data = await response.json()
 
+      if (!response.ok) {
+        throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: data.content || data.error || 'Sorry, I could not generate a response.',
+        content: data.content || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
         model: config.model,
-        tokens: data.usage?.total_tokens,
+        tokens: data.usage?.totalTokens,
       }
 
       const finalSession = {
@@ -538,12 +542,12 @@ export default function VoiceDevApp() {
       }
       setCurrentSession(finalSession)
       setSessions(sessions.map(s => s.id === currentSession.id ? finalSession : s))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chat error:', error)
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'Sorry, there was an error connecting to the AI. Please check your API key.',
+        content: `Error: ${error.message || 'There was an error connecting to the AI. Please check your API key and connection.'}`,
         timestamp: new Date(),
       }
       const finalSession = {

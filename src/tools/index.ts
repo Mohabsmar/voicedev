@@ -1089,22 +1089,33 @@ export const shellTools: Record<string, any> = {
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  security_encrypt: createTool('security_encrypt', 'Encrypt data using AES-256-CBC', { data: 'string', key: 'string' },
-    async (p: { data: string; key: string }) => {
+  security_encrypt: createTool('security_encrypt', 'Encrypt data using AES-256-CBC with PBKDF2', { data: 'string', key: 'string', salt: 'string?' },
+    async (p: { data: string; key: string; salt?: string }) => {
       try {
+        const salt = p.salt ? Buffer.from(p.salt, 'hex') : crypto.randomBytes(16);
+        const derivedKey = crypto.pbkdf2Sync(p.key, salt, 100000, 32, 'sha256');
         const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.alloc(32, p.key), iv);
+        const cipher = crypto.createCipheriv('aes-256-cbc', derivedKey, iv);
         let encrypted = cipher.update(p.data, 'utf8', 'hex');
         encrypted += cipher.final('hex');
-        return { success: true, data: { encrypted, iv: iv.toString('hex') } };
+        return {
+          success: true,
+          data: {
+            encrypted,
+            iv: iv.toString('hex'),
+            salt: salt.toString('hex')
+          }
+        };
       } catch (e: any) { return { success: false, error: e.message }; }
     }),
 
-  security_decrypt: createTool('security_decrypt', 'Decrypt data using AES-256-CBC', { encrypted: 'string', iv: 'string', key: 'string' },
-    async (p: { encrypted: string; iv: string; key: string }) => {
+  security_decrypt: createTool('security_decrypt', 'Decrypt data using AES-256-CBC with PBKDF2', { encrypted: 'string', iv: 'string', key: 'string', salt: 'string' },
+    async (p: { encrypted: string; iv: string; key: string; salt: string }) => {
       try {
+        const salt = Buffer.from(p.salt, 'hex');
         const iv = Buffer.from(p.iv, 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.alloc(32, p.key), iv);
+        const derivedKey = crypto.pbkdf2Sync(p.key, salt, 100000, 32, 'sha256');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', derivedKey, iv);
         let decrypted = decipher.update(p.encrypted, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
         return { success: true, data: decrypted };

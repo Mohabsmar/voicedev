@@ -337,10 +337,47 @@ export const browserUseSkill = {
   // Execute a browser automation sequence
   execute: async (actions: BrowserAction[]): Promise<BrowserResult[]> => {
     const results: BrowserResult[] = [];
+    let currentUrl = '';
+
     for (const action of actions) {
-      // Execute each action in sequence
-      // This is a simplified implementation
-      results.push({ success: true, data: { action: action.type } });
+      try {
+        let result: BrowserResult;
+
+        switch (action.type) {
+          case 'navigate':
+            result = await browserUseSkill.actions.navigate(action.value || '');
+            if (result.success) currentUrl = action.value || '';
+            break;
+          case 'click':
+            result = await browserUseSkill.actions.click(currentUrl, action.selector || '');
+            break;
+          case 'type':
+            result = await browserUseSkill.actions.type(currentUrl, action.selector || '', action.value || '');
+            break;
+          case 'screenshot':
+            result = await browserUseSkill.actions.screenshot(currentUrl, action.value);
+            break;
+          case 'extract':
+            result = await browserUseSkill.actions.extract(currentUrl, JSON.parse(action.value || '{}'));
+            break;
+          case 'scroll':
+            result = await browserUseSkill.actions.scroll(currentUrl, action.value as any || 'down');
+            break;
+          case 'wait':
+            result = await browserUseSkill.actions.waitFor(currentUrl, action.selector || '', action.timeout);
+            break;
+          case 'evaluate':
+            result = await browserUseSkill.actions.evaluate(currentUrl, action.value || '');
+            break;
+          default:
+            result = { success: false, error: `Unknown action type: ${action.type}` };
+        }
+        results.push(result);
+        if (!result.success) break; // Stop on failure
+      } catch (e: any) {
+        results.push({ success: false, error: e.message });
+        break;
+      }
     }
     return results;
   },
