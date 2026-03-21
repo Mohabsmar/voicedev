@@ -97,12 +97,11 @@ export async function GET() {
       { id: 'groq', name: 'Groq', models: ['llama-4-maverick', 'llama-4-scout', 'whisper-large-v3-turbo'] },
       { id: 'mistral', name: 'Mistral AI', models: ['mistral-small-4', 'mistral-large-3', 'codestral-latest'] },
       { id: 'xai', name: 'xAI (Grok)', models: ['grok-4.20-beta', 'grok-4.1', 'grok-4-vision'] },
-      { id: 'glm', name: 'GLM (Zhipu)', models: ['glm-5', 'glm-4.7', 'glm-4.7-flash'] },
+      { id: 'zai', name: 'Z.ai (GLM)', models: ['glm-5', 'glm-4.7', 'glm-4.7-flash'], note: 'Z.ai = GLM = Zhipu AI' },
       { id: 'moonshot', name: 'Moonshot (Kimi)', models: ['kimi-k2.5', 'kimi-k2', 'moonshot-v1-128k'] },
       { id: 'minimax', name: 'MiniMax', models: ['minimax-m2.7', 'minimax-m2.5', 'speech-2.6-turbo'] },
       { id: 'cohere', name: 'Cohere', models: ['command-r3', 'command-r-plus', 'embed-v4'] },
       { id: 'together', name: 'Together AI', models: ['meta-llama/Llama-4-Maverick-Turbo', 'Qwen/Qwen3.5-397B-A17B'] },
-      { id: 'zai', name: 'Z.ai', models: ['z-3-ultra', 'z-3-pro', 'z-3-mini'] },
     ],
     note: 'All API calls are REAL - they make actual HTTP requests to each provider.',
   })

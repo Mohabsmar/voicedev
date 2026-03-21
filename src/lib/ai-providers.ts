@@ -96,7 +96,7 @@ const PROVIDERS = {
     envKey: 'ELEVENLABS_API_KEY',
   },
   zai: {
-    baseUrl: 'https://api.z.ai/v1/chat/completions',
+    baseUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
     authHeader: 'Authorization',
     authPrefix: 'Bearer ',
     envKey: 'ZAI_API_KEY',
@@ -433,46 +433,6 @@ async function callXAI(options: ChatOptions): Promise<ChatResponse> {
 }
 
 /**
- * Make a real API call to GLM (Zhipu AI)
- */
-async function callGLM(options: ChatOptions): Promise<ChatResponse> {
-  const apiKey = options.apiKey || process.env.GLM_API_KEY;
-  if (!apiKey) throw new Error('GLM API key required');
-
-  const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: options.model,
-      messages: options.messages,
-      temperature: options.temperature ?? 0.7,
-      max_tokens: options.maxTokens ?? 4096,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.error?.message || `GLM API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return {
-    content: data.choices[0]?.message?.content || '',
-    usage: {
-      promptTokens: data.usage?.prompt_tokens || 0,
-      completionTokens: data.usage?.completion_tokens || 0,
-      totalTokens: data.usage?.total_tokens || 0,
-    },
-    model: options.model,
-    provider: 'glm',
-    finishReason: data.choices[0]?.finish_reason,
-  };
-}
-
-/**
  * Make a real API call to Moonshot (Kimi)
  */
 async function callMoonshot(options: ChatOptions): Promise<ChatResponse> {
@@ -641,13 +601,13 @@ async function callTogether(options: ChatOptions): Promise<ChatResponse> {
 }
 
 /**
- * Make a real API call to Z.ai
+ * Make a real API call to Z.ai / GLM (Zhipu AI) - they're the same!
  */
 async function callZAI(options: ChatOptions): Promise<ChatResponse> {
-  const apiKey = options.apiKey || process.env.ZAI_API_KEY;
-  if (!apiKey) throw new Error('Z.ai API key required');
+  const apiKey = options.apiKey || process.env.ZAI_API_KEY || process.env.GLM_API_KEY;
+  if (!apiKey) throw new Error('Z.ai/GLM API key required (set ZAI_API_KEY or GLM_API_KEY)');
 
-  const response = await fetch('https://api.z.ai/v1/chat/completions', {
+  const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -663,7 +623,7 @@ async function callZAI(options: ChatOptions): Promise<ChatResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error?.message || `Z.ai API error: ${response.status}`);
+    throw new Error(error.error?.message || `Z.ai/GLM API error: ${response.status}`);
   }
 
   const data = await response.json();
@@ -705,7 +665,8 @@ export async function callAI(options: ChatOptions): Promise<ChatResponse> {
       return callXAI(options);
     case 'glm':
     case 'zhipu':
-      return callGLM(options);
+    case 'zai':
+      return callZAI(options);
     case 'moonshot':
     case 'kimi':
       return callMoonshot(options);
@@ -715,9 +676,6 @@ export async function callAI(options: ChatOptions): Promise<ChatResponse> {
       return callCohere(options);
     case 'together':
       return callTogether(options);
-    case 'zai':
-    case 'z.ai':
-      return callZAI(options);
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }

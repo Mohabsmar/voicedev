@@ -124,20 +124,19 @@ export const providers: Provider[] = [
     ]
   },
 
-  // 4. Z.ai
+  // 4. Z.ai / GLM / Zhipu AI (same provider)
   {
     id: 'zai',
-    name: 'Z.ai',
-    baseUrl: 'https://api.z.ai/v1',
+    name: 'Z.ai (GLM)',
+    baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     apiKeyEnv: 'ZAI_API_KEY',
-    website: 'https://z.ai',
+    website: 'https://open.bigmodel.cn',
     features: ['chat', 'streaming', 'function_calling', 'vision'],
     models: [
-      { id: 'z-3-ultra', name: 'Z-3 Ultra', category: 'llm', contextWindow: 512000, features: ['powerful', 'reasoning', 'vision', 'agentic'], releaseDate: '2026-03-10' },
-      { id: 'z-3-pro', name: 'Z-3 Pro', category: 'llm', contextWindow: 256000, features: ['balanced', 'fast', 'vision'], releaseDate: '2026-03-10' },
-      { id: 'z-3-mini', name: 'Z-3 Mini', category: 'llm', contextWindow: 128000, features: ['efficient', 'fast'], releaseDate: '2026-03-10' },
-      { id: 'z-2-ultra', name: 'Z-2 Ultra', category: 'llm', contextWindow: 256000, features: ['powerful', 'reasoning', 'vision'] },
-      { id: 'z-2-pro', name: 'Z-2 Pro', category: 'llm', contextWindow: 128000, features: ['balanced', 'fast'] },
+      // REAL models - GLM-5, GLM-4.7, GLM-4.7 Flash
+      { id: 'glm-5', name: 'GLM-5', category: 'llm', contextWindow: 512000, features: ['latest', 'multimodal', 'reasoning'], releaseDate: '2026-03-01' },
+      { id: 'glm-4.7', name: 'GLM-4.7', category: 'llm', contextWindow: 256000, features: ['balanced', 'efficient', 'coding'], releaseDate: '2026-01-15' },
+      { id: 'glm-4.7-flash', name: 'GLM-4.7 Flash', category: 'llm', contextWindow: 256000, features: ['fast', 'efficient', 'optimized'], releaseDate: '2026-02-01' },
     ]
   },
 
@@ -335,23 +334,7 @@ export const providers: Provider[] = [
     ]
   },
 
-  // 16. GLM (Zhipu AI)
-  {
-    id: 'glm',
-    name: 'GLM (Zhipu AI)',
-    baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
-    apiKeyEnv: 'GLM_API_KEY',
-    website: 'https://open.bigmodel.cn',
-    features: ['chat', 'vision', 'long_context', 'streaming'],
-    models: [
-      // VERIFIED March 2026 - Real models only
-      { id: 'glm-5', name: 'GLM-5', category: 'llm', contextWindow: 512000, features: ['latest', 'multimodal', 'reasoning'], releaseDate: '2026-03-01' },
-      { id: 'glm-4.7', name: 'GLM-4.7', category: 'llm', contextWindow: 256000, features: ['balanced', 'efficient', 'coding'], releaseDate: '2026-01-15' },
-      { id: 'glm-4.7-flash', name: 'GLM-4.7 Flash', category: 'llm', contextWindow: 256000, features: ['fast', 'efficient', 'optimized'], releaseDate: '2026-02-01' },
-    ]
-  },
-
-  // 17. Custom Provider (for user-defined endpoints)
+  // 16. Custom Provider (for user-defined endpoints)
   {
     id: 'custom',
     name: 'Custom Endpoint',
