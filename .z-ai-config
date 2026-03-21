@@ -1,0 +1,7 @@
+{
+  "apiKey": "",
+  "baseUrl": "https://api.z.ai/v1",
+  "defaultModel": "z-3-pro",
+  "timeout": 60000,
+  "maxRetries": 3
+}

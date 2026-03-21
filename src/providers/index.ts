@@ -344,14 +344,10 @@ export const providers: Provider[] = [
     website: 'https://open.bigmodel.cn',
     features: ['chat', 'vision', 'long_context', 'streaming'],
     models: [
+      // VERIFIED March 2026 - Real models only
       { id: 'glm-5', name: 'GLM-5', category: 'llm', contextWindow: 512000, features: ['latest', 'multimodal', 'reasoning'], releaseDate: '2026-03-01' },
-      { id: 'glm-4.7', name: 'GLM-4.7', category: 'llm', contextWindow: 256000, features: ['balanced', 'efficient'], releaseDate: '2026-01-15' },
-      { id: 'glm-4.7-chat', name: 'GLM-4.7 Chat', category: 'llm', contextWindow: 256000, features: ['chat', 'efficient'], releaseDate: '2026-01-15' },
-      { id: 'glm-4.7-thinking', name: 'GLM-4.7 Thinking', category: 'reasoning', contextWindow: 256000, features: ['reasoning', 'chain_of_thought'], releaseDate: '2026-01-15' },
-      { id: 'glm-4.6', name: 'GLM-4.6', category: 'llm', contextWindow: 128000, features: ['fast', 'coding'], releaseDate: '2025-11-01' },
-      { id: 'glm-4.6-chat', name: 'GLM-4.6 Chat', category: 'llm', contextWindow: 128000, features: ['chat', 'efficient'], releaseDate: '2025-11-01' },
-      { id: 'glm-4.6-vision', name: 'GLM-4.6 Vision', category: 'vision', contextWindow: 128000, features: ['vision', 'multimodal'], releaseDate: '2025-11-01' },
-      { id: 'glm-4-plus', name: 'GLM-4 Plus', category: 'llm', contextWindow: 128000, features: ['powerful'] },
+      { id: 'glm-4.7', name: 'GLM-4.7', category: 'llm', contextWindow: 256000, features: ['balanced', 'efficient', 'coding'], releaseDate: '2026-01-15' },
+      { id: 'glm-4.7-flash', name: 'GLM-4.7 Flash', category: 'llm', contextWindow: 256000, features: ['fast', 'efficient', 'optimized'], releaseDate: '2026-02-01' },
     ]
   },
 
