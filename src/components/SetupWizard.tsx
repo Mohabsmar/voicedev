@@ -157,8 +157,8 @@ export default function SetupWizard({ onComplete }: { onComplete?: () => void })
           <div className="space-y-6">
             <div className="text-center">
               <div className="text-6xl mb-4">🎤</div>
-              <h2 className="text-2xl font-bold">Welcome to VoiceDev Pro</h2>
-              <p className="text-zinc-400 mt-2">The ultimate AI development platform with 250+ tools, 100+ skills, and 15 AI providers.</p>
+              <h2 className="text-2xl font-bold">Welcome to VoiceDev</h2>
+              <p className="text-zinc-400 mt-2">The Ultimate AI Agent Platform with 250+ tools, 123+ skills, and 17 AI providers.</p>
             </div>
             
             <div className="grid grid-cols-3 gap-4 mt-8">
@@ -169,12 +169,12 @@ export default function SetupWizard({ onComplete }: { onComplete?: () => void })
               </div>
               <div className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700">
                 <div className="text-3xl mb-2">⚡</div>
-                <h3 className="font-semibold">100+ Skills</h3>
-                <p className="text-sm text-zinc-400">Pre-built automation workflows</p>
+                <h3 className="font-semibold">123+ Skills</h3>
+                <p className="text-sm text-zinc-400">Real multi-tool workflows</p>
               </div>
               <div className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700">
                 <div className="text-3xl mb-2">🤖</div>
-                <h3 className="font-semibold">15 Providers</h3>
+                <h3 className="font-semibold">17 Providers</h3>
                 <p className="text-sm text-zinc-400">OpenAI, Anthropic, Google, and more</p>
               </div>
             </div>

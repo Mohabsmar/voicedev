@@ -14,24 +14,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  title: "VoiceDev - Ultimate AI Agent Platform",
+  description: "VoiceDev - The Ultimate AI Agent Platform with 250+ Tools, 123+ Skills, 17 Providers, 95+ Models. Built by an 11-year-old Egyptian developer.",
+  keywords: ["AI", "Agent", "GPT", "Claude", "Gemini", "VoiceDev", "Next.js", "TypeScript", "Tauri", "TTS", "ASR"],
+  authors: [{ name: "Mohabsmar" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "VoiceDev - Ultimate AI Agent Platform",
+    description: "250+ Tools, 123+ Skills, 17 Providers, Custom Endpoints. Built by an 11-year-old Egyptian developer.",
+    url: "https://github.com/Mohabsmar/voicedev",
+    siteName: "VoiceDev",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "VoiceDev - Ultimate AI Agent Platform",
+    description: "250+ Tools, 123+ Skills, 17 Providers. Built by an 11-year-old Egyptian developer.",
   },
 };
 

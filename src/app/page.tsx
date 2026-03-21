@@ -794,8 +794,8 @@ export default function VoiceDevPro() {
             <div className="flex-1 flex items-center justify-center text-zinc-500">
               <div className="text-center">
                 <div className="text-6xl mb-4">🎤</div>
-                <p className="text-lg font-medium text-zinc-300">VoiceDev Pro</p>
-                <p className="text-sm mt-2">Click "New" to create a debugging session</p>
+                <p className="text-lg font-medium text-zinc-300">VoiceDev</p>
+                <p className="text-sm mt-2">Click "New" to create an AI agent session</p>
               </div>
             </div>
           ) : (
