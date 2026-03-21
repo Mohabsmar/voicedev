@@ -135,11 +135,11 @@ const PROVIDERS = [
   },
   { 
     id: 'zai', 
-    name: 'Z.ai', 
+    name: 'Z.ai (GLM)', 
     models: [
-      { id: 'z-3-ultra', name: 'Z-3 Ultra', contextWindow: 512000 },
-      { id: 'z-3-pro', name: 'Z-3 Pro', contextWindow: 256000 },
-      { id: 'z-3-mini', name: 'Z-3 Mini', contextWindow: 128000 },
+      { id: 'glm-5', name: 'GLM-5', contextWindow: 512000 },
+      { id: 'glm-4.7', name: 'GLM-4.7', contextWindow: 256000 },
+      { id: 'glm-4.7-flash', name: 'GLM-4.7 Flash', contextWindow: 256000 },
     ]
   },
   { 
@@ -164,15 +164,6 @@ const PROVIDERS = [
     models: [
       { id: 'qwen-3.5', name: 'Qwen 3.5', contextWindow: 256000 },
       { id: 'qwen-3-next', name: 'Qwen 3-Next', contextWindow: 128000 },
-    ]
-  },
-  { 
-    id: 'glm', 
-    name: 'GLM (Zhipu AI)', 
-    models: [
-      { id: 'glm-5', name: 'GLM-5', contextWindow: 512000 },
-      { id: 'glm-4.7', name: 'GLM-4.7', contextWindow: 256000 },
-      { id: 'glm-4.7-thinking', name: 'GLM-4.7 Thinking', contextWindow: 256000 },
     ]
   },
   { 

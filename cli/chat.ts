@@ -43,8 +43,8 @@ const PROVIDERS: Record<string, { name: string; models: string[] }> = {
     models: ['grok-4.20-beta', 'grok-4.1-fast', 'grok-4.1']
   },
   zai: {
-    name: 'Z.ai',
-    models: ['z-3-ultra', 'z-3-pro', 'z-3-mini']
+    name: 'Z.ai (GLM)',
+    models: ['glm-5', 'glm-4.7', 'glm-4.7-flash']
   },
   moonshot: {
     name: 'Moonshot AI',
@@ -57,10 +57,6 @@ const PROVIDERS: Record<string, { name: string; models: string[] }> = {
   qwen: {
     name: 'Alibaba Qwen',
     models: ['qwen-3.5', 'qwen-3-next']
-  },
-  glm: {
-    name: 'GLM (Zhipu AI)',
-    models: ['glm-5', 'glm-4.7', 'glm-4.7-thinking']
   },
   groq: {
     name: 'Groq',
