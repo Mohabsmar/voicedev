@@ -6,20 +6,39 @@
 
 **Cross-Platform Desktop App + Web Interface**
 
-**Built with 💜 by an 11-year-old developer**
+**Built with 💜 by an 11-year-old Egyptian developer**
 
-[![Built by 11 yo Developer](https://img.shields.io/badge/Built%20by-11%20yo%20Developer-purple?style=for-the-badge)](https://github.com/Mohabsmar/voicedev)
+[![Built by 11 yo Egyptian Developer](https://img.shields.io/badge/Built%20by-11%20yo%20Egyptian%20Developer-purple?style=for-the-badge)](https://github.com/Mohabsmar/voicedev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-2.0-blue?style=flat-square&logo=tauri)](https://tauri.app/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 [![Tools](https://img.shields.io/badge/Tools-250+-orange?style=flat-square)](src/tools/)
-[![Skills](https://img.shields.io/badge/Skills-50+-blue?style=flat-square)](src/skills/)
-[![Providers](https://img.shields.io/badge/AI_Providers-15-informational?style=flat-square)](src/providers/)
-[![Models](https://img.shields.io/badge/AI_Models-92+-success?style=flat-square)](src/providers/)
+[![Skills](https://img.shields.io/badge/Skills-123+-blue?style=flat-square)](src/skills/)
+[![Providers](https://img.shields.io/badge/AI_Providers-17-informational?style=flat-square)](src/providers/)
+[![Models](https://img.shields.io/badge/AI_Models-95+-success?style=flat-square)](src/providers/)
+[![Custom Endpoints](https://img.shields.io/badge/Custom_Endpoints-✓-9cf?style=flat-square)](src/providers/)
 
 </div>
+
+---
+
+## 🇪🇬 My Story
+
+Hey there! I'm an 11-year-old developer from **Egypt** 🇪🇬, and I built VoiceDev because I believe that age shouldn't stop you from building amazing things.
+
+**How it started:** Like many kids, I loved playing games and watching YouTube. But one day, I discovered coding and everything changed. I started with simple tutorials, then moved to building actual projects. My parents were skeptical at first (screen time, right?), but when they saw me building real applications, they started supporting my journey.
+
+**Why VoiceDev?** I noticed that AI assistants were becoming super popular, but setting them up was complicated. You needed to know about APIs, endpoints, tools, and a bunch of technical stuff. I thought: "What if there was a platform that made this easy?" And VoiceDev was born.
+
+**The Egyptian Connection:** I'm proud to be Egyptian! Egypt has a rich history of innovation - from the pyramids to modern tech startups. I want to show the world that young Egyptians can build world-class software. We have talent, creativity, and determination.
+
+**My Dream:** I hope VoiceDev inspires other young developers, especially in the Middle East and Africa, to pursue their coding dreams. Technology doesn't care about your age, your background, or where you're from. It only cares about what you build.
+
+**Future Goals:** I want to turn VoiceDev into a real business and earn $5,000/month passive income. I'm learning about marketing, user acquisition, and product development. It's hard, but I'm not giving up!
+
+*"The only way to do great work is to love what you do."* - Steve Jobs (and me! 😄)
 
 ---
 
@@ -44,12 +63,13 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 | Feature | Description |
 |---------|-------------|
 | **250+ Tools** | FileSystem, Shell, Git, NPM, HTTP, Crypto, Archives, Process Management |
-| **50+ Skills** | Multi-tool workflows for development, data, automation |
-| **15 AI Providers** | OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together, ElevenLabs, Qwen |
-| **92+ AI Models** | Newest March 2026 models including GPT-5.2, Claude 4.6, Gemini 3.1 |
+| **123+ Skills** | Multi-tool workflows for development, data, automation |
+| **17 AI Providers** | OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together, ElevenLabs, Qwen, GLM, Custom |
+| **95+ AI Models** | Verified newest March 2026 models including GPT-5.4, Claude 4.6, Gemini 3.1 |
+| **Custom Endpoints** | Add your own AI models and endpoints with full configuration |
 | **Remote Control** | SSH, RDP, VNC, WinRM, Wake-on-LAN |
 | **6 Channels** | Telegram, WhatsApp, Discord, Slack, Email, MCP |
-| **Voice Support** | TTS-3, Whisper 3, ElevenLabs V3 |
+| **Voice Support** | GPT-4o Mini TTS, Whisper Large V3 Turbo, ElevenLabs V3 |
 | **Browser Automation** | Navigate, screenshot, extract, automate |
 | **Security Tools** | Port scanning, vulnerability testing, password tools |
 | **Setup Wizard** | Interactive first-time configuration |
@@ -58,32 +78,66 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 
 ---
 
-## 🤖 15 AI Providers with Newest Models (March 21, 2026)
+## 🔧 Custom Endpoints & Models
 
-### Latest Flagship Models
+VoiceDev supports adding your own AI models and endpoints:
 
-| Provider | Newest Model | Key Features |
-|----------|--------------|--------------|
-| **OpenAI** | GPT-5.2 Pro | 512K context, agentic, reasoning |
-| **Anthropic** | Claude Opus 4.6 | Coding, computer use, 200K context |
-| **Google** | Gemini 3.1 Pro | 2M context, multimodal, agentic |
-| **DeepSeek** | DeepSeek V4 | Trillion-param MoE, open weights |
-| **xAI** | Grok 4 | Real-time X integration, witty |
-| **Meta** | Llama 4 Behemoth | Open weights, powerful |
-| **Mistral** | Mistral Large 3 | 41B active params, efficient |
-| **Qwen** | Qwen 3 235B | MoE, multilingual, reasoning |
-| **Moonshot** | Kimi K3 | 1M context, multimodal |
-| **Z.ai** | Z-3 Ultra | Agentic, vision, reasoning |
-| **MiniMax** | ABAB 8 Chat | Multilingual, voice support |
+```typescript
+// Add a custom endpoint
+import { addCustomEndpoint, addCustomModel } from '@/providers';
 
-### Voice Models (TTS/ASR) - March 2026
+addCustomEndpoint({
+  id: 'my-custom-llm',
+  name: 'My Custom LLM',
+  baseUrl: 'https://api.mycustomllm.com/v1',
+  apiKey: 'your-api-key',
+  apiKeyHeader: 'Authorization',
+  headers: {
+    'X-Custom-Header': 'value'
+  },
+  enabled: true
+});
 
-| Provider | TTS Models | ASR Models |
-|----------|-----------|------------|
-| **OpenAI** | TTS-3, GPT-5 TTS | Whisper 3 |
-| **ElevenLabs** | Eleven V3 ⭐ | Scribe V3 |
-| **MiniMax** | Speech-03 Turbo | - |
-| **Groq** | - | Whisper 3 Turbo (ultra-fast) |
+// Add a model to your custom endpoint
+addCustomModel('my-custom-llm', {
+  id: 'custom-model-1',
+  name: 'Custom Model 1',
+  category: 'llm',
+  contextWindow: 128000,
+  features: ['chat', 'streaming']
+});
+```
+
+---
+
+## 🤖 Verified AI Models (March 21, 2026)
+
+*All models verified against official provider sources - no fabricated models!*
+
+### Latest Flagship LLMs
+
+| Provider | Current Flagship | Context | Key Features |
+|----------|-----------------|---------|--------------|
+| **OpenAI** | GPT-5.4 | 1M | Thinking, Pro/Mini/Nano variants, Agentic |
+| **Anthropic** | Claude Sonnet 4.6 | 1M | Faster & cheaper, 14.5hr task horizon |
+| **Google** | Gemini 3.1 Pro | 2M | 77.1% ARC-AGI-2, 80.6% SWE-Bench |
+| **xAI** | Grok 4.20 Beta | 512K | Multi-agent, Enterprise API |
+| **Meta** | Llama 4 Maverick | 1M | 400B/17B active, Open-weight |
+| **Mistral** | Mistral Small 4 | 128K | 119B/6B active, Apache 2.0 |
+| **Qwen** | Qwen 3.5 | 256K | 201 languages, Vision integrated |
+| **DeepSeek** | V3.2-Exp | 256K | IMO/ICPC gold medal level |
+| **Moonshot** | Kimi K2.5 | 1M | Agent Swarm (up to 100 agents) |
+| **MiniMax** | M2.7 | 512K | Self-trained, coding focused |
+| **GLM** | GLM-5 | 512K | Multimodal, reasoning |
+
+### Voice Models (Verified March 2026)
+
+| Provider | TTS | ASR |
+|----------|-----|-----|
+| **OpenAI** | gpt-4o-mini-tts | gpt-4o-mini-transcribe |
+| **ElevenLabs** | Eleven V3 (70+ languages, audio tags) | Scribe V2 (90+ languages) |
+| **MiniMax** | Speech 2.6 Turbo (40+ languages) | - |
+| **Groq** | - | Whisper Large V3 Turbo (216× realtime) |
 
 ### Image Generation
 
@@ -92,14 +146,6 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 | **OpenAI** | DALL-E 4, Sora (video) |
 | **Replicate** | Flux 3, Flux Schnell |
 | **xAI** | Grok Aurora |
-
-### Reasoning Models
-
-| Provider | Models |
-|----------|--------|
-| **OpenAI** | o4, o4-mini |
-| **DeepSeek** | R3, R2 |
-| **Google** | Gemini 3 Deep Think |
 
 ---
 
@@ -110,9 +156,9 @@ voicedev/
 ├── src/
 │   ├── app/              # Next.js App Router (15 API routes)
 │   ├── components/       # React Components + Setup Wizard
-│   ├── tools/            # 174+ Core Tools (2019 lines)
-│   ├── skills/           # 50+ Skills + Browser Automation
-│   ├── providers/        # 15 AI Providers, 92+ Models
+│   ├── tools/            # 174+ Core Tools (2000+ lines)
+│   ├── skills/           # 123+ Real Skills (2000+ lines)
+│   ├── providers/        # 17 Providers, 95+ Models, Custom Endpoints
 │   ├── channels/         # 6 Messaging Channels
 │   ├── voice/            # TTS/ASR Support
 │   ├── remote/           # Remote Control Tools
@@ -148,17 +194,18 @@ voicedev/
 
 ---
 
-## 🎨 50+ Skills by Category
+## 🎨 123+ Skills by Category
 
 | Category | Count | Examples |
 |----------|-------|----------|
-| **Development** | 20+ | project init, API test, git workflow, build |
-| **Data** | 15+ | JSON transform, CSV convert, aggregation |
-| **Automation** | 10+ | batch rename, cleanup, sync, schedule |
-| **Security** | 10+ | port scan, SSL check, audit |
-| **Voice** | 5+ | TTS speak, ASR transcribe |
-| **Remote** | 5+ | SSH exec, file transfer |
-| **Browser** | 5+ | navigate, screenshot, extract |
+| **Development** | 25+ | project init, API test, git workflow, build, deploy |
+| **Data** | 20+ | JSON transform, CSV convert, aggregation, pivot |
+| **Automation** | 20+ | batch rename, cleanup, sync, schedule, watch |
+| **Security** | 15+ | port scan, SSL check, audit, hardening |
+| **Voice** | 10+ | TTS speak, ASR transcribe, voice clone |
+| **Remote** | 15+ | SSH exec, file transfer, remote control |
+| **Browser** | 13+ | navigate, screenshot, extract, search, automate |
+| **DevOps** | 10+ | Docker setup, CI config, deployment |
 
 ---
 
@@ -185,6 +232,15 @@ await executeTool('browser_search', {
   query: 'VoiceDev AI',
   engine: 'google'
 });
+
+// Fill form
+await executeTool('browser_fill_form', {
+  url: 'https://example.com/login',
+  fields: {
+    '#email': 'user@example.com',
+    '#password': 'password123'
+  }
+});
 ```
 
 **Available:** navigate, screenshot, extract, click, type, scroll, wait, evaluate, fill_form, get_content, get_text, download, search
@@ -198,6 +254,7 @@ await executeTool('browser_search', {
 await executeTool('ssh_exec', { host: '192.168.1.100', user: 'admin', command: 'ls -la' });
 await executeTool('ssh_tunnel', { host: '192.168.1.100', localPort: 8080, remotePort: 80 });
 await executeTool('ssh_copy_file', { source: '/file', destination: '/remote' });
+await executeTool('ssh_keygen', { type: 'ed25519' });
 
 // RDP (Windows)
 await executeTool('rdp_connect', { host: '192.168.1.100', user: 'admin' });
@@ -207,9 +264,12 @@ await executeTool('rdp_enable', {});
 await executeTool('vnc_connect', { host: '192.168.1.100' });
 await executeTool('vnc_server_start', { display: 1 });
 
+// WinRM
+await executeTool('winrm_exec', { host: '192.168.1.100', command: 'Get-Process' });
+
 // Monitoring
 await executeTool('ping', { host: 'example.com' });
-await executeTool('port_scan', { host: '192.168.1.100' });
+await executeTool('port_scan', { host: '192.168.1.100', ports: '22,80,443' });
 await executeTool('remote_shutdown', { host: '192.168.1.100', action: 'restart' });
 await executeTool('wake_on_lan', { mac: 'AA:BB:CC:DD:EE:FF' });
 ```
@@ -223,10 +283,16 @@ await executeTool('wake_on_lan', { mac: 'AA:BB:CC:DD:EE:FF' });
 await executeTool('telegram_send_message', { 
   botToken: 'TOKEN', chatId: 'ID', message: 'Hello!' 
 });
+await executeTool('telegram_send_photo', { 
+  botToken: 'TOKEN', chatId: 'ID', photoUrl: 'URL' 
+});
 
 // WhatsApp
 await executeTool('whatsapp_send_message', { 
   accessToken: 'TOKEN', phoneNumberId: 'ID', to: '+123456', message: 'Hello!' 
+});
+await executeTool('whatsapp_send_template', { 
+  accessToken: 'TOKEN', phoneNumberId: 'ID', to: '+123456', templateName: 'welcome' 
 });
 
 // Discord
@@ -239,7 +305,12 @@ await executeTool('slack_send_message', {
   webhookUrl: 'URL', text: 'Build completed!' 
 });
 
-// MCP (Generic)
+// Email
+await executeTool('email_send', { 
+  to: 'user@example.com', subject: 'Hello', body: 'Message content' 
+});
+
+// MCP (Generic API)
 await executeTool('mcp_call', { 
   config: { baseUrl: 'https://api.example.com', headers: {} },
   endpoint: '/messages',
@@ -253,24 +324,44 @@ await executeTool('mcp_call', {
 ## 🎤 Voice Support
 
 ```typescript
-// TTS - OpenAI TTS-3
+// TTS - OpenAI GPT-4o Mini TTS (Verified!)
 await executeTool('tts_speak', { 
-  text: 'Hello!', provider: 'openai', model: 'tts-3', voice: 'alloy' 
+  text: 'Hello!', provider: 'openai', model: 'gpt-4o-mini-tts', voice: 'alloy' 
 });
 
-// TTS - ElevenLabs V3 (Newest!)
+// TTS - ElevenLabs V3 (Newest! 70+ languages, audio tags)
 await executeTool('tts_speak', { 
-  text: 'Hello!', provider: 'elevenlabs', model: 'eleven_v3', voice: 'rachel' 
+  text: '[excited] Hello! [whispers] This is amazing!', 
+  provider: 'elevenlabs', 
+  model: 'eleven_v3', 
+  voice: 'rachel' 
 });
 
-// ASR - Whisper 3
-await executeTool('asr_transcribe', { 
-  audioPath: '/audio.mp3', provider: 'openai', model: 'whisper-3' 
+// TTS - MiniMax Speech 2.6 Turbo (40+ languages, <250ms)
+await executeTool('tts_speak', { 
+  text: 'Hello!', provider: 'minimax', model: 'speech-2.6-turbo' 
 });
 
-// ASR - Groq Whisper (Ultra-fast)
+// ASR - GPT-4o Mini Transcribe
 await executeTool('asr_transcribe', { 
-  audioPath: '/audio.mp3', provider: 'groq' 
+  audioPath: '/audio.mp3', provider: 'openai', model: 'gpt-4o-mini-transcribe' 
+});
+
+// ASR - Groq Whisper Large V3 Turbo (216× realtime!)
+await executeTool('asr_transcribe', { 
+  audioPath: '/audio.mp3', provider: 'groq', model: 'whisper-large-v3-turbo' 
+});
+
+// ASR - ElevenLabs Scribe V2 (90+ languages, best WER)
+await executeTool('asr_transcribe', { 
+  audioPath: '/audio.mp3', provider: 'elevenlabs', model: 'scribe_v2' 
+});
+
+// Voice Cloning
+await executeTool('voice_clone', { 
+  audioPaths: ['/voice1.mp3', '/voice2.mp3'], 
+  name: 'My Voice',
+  provider: 'elevenlabs' 
 });
 ```
 
@@ -281,6 +372,7 @@ await executeTool('asr_transcribe', {
 ```typescript
 // Port scanning
 await executeTool('nmap_scan', { target: '192.168.1.0/24', scanType: '-sV' });
+await executeTool('nmap_vuln', { target: '192.168.1.100' });
 await executeTool('port_scan', { host: 'example.com', ports: '22,80,443' });
 
 // Vulnerability testing
@@ -288,6 +380,12 @@ await executeTool('sql_injection_test', { url: 'https://site.com/search?q={param
 await executeTool('xss_test', { url: 'https://site.com/search?q={param}', param: 'q' });
 await executeTool('ssl_check', { hostname: 'example.com' });
 await executeTool('http_headers_check', { url: 'https://example.com' });
+await executeTool('cors_check', { url: 'https://example.com' });
+
+// DNS enumeration
+await executeTool('dns_enum', { domain: 'example.com' });
+await executeTool('subdomain_enum', { domain: 'example.com' });
+await executeTool('whois_lookup', { domain: 'example.com' });
 
 // Password tools
 await executeTool('hash_identify', { hash: '5f4dcc3b5aa765d61d8327deb882cf99' });
@@ -316,18 +414,18 @@ Creates native installers:
 
 ## 🛡️ 5-Layer Security
 
-1. **Static Code Analysis** - Detects dangerous patterns
-2. **Sandboxed Execution** - Timeout, memory limits
-3. **Permission System** - Granular permissions per tool
-4. **Rate Limiting** - Prevent abuse
-5. **Audit Logging** - Complete operation trail
+1. **Static Code Analysis** - Detects dangerous patterns before execution
+2. **Sandboxed Execution** - Timeout limits, memory constraints
+3. **Permission System** - Granular permissions per tool and skill
+4. **Rate Limiting** - Prevent abuse and API spam
+5. **Audit Logging** - Complete operation trail for compliance
 
 ---
 
 ## ⚙️ Environment Variables
 
 ```env
-# AI Providers
+# AI Providers (17 providers)
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=...
@@ -343,8 +441,9 @@ REPLICATE_API_TOKEN=...
 TOGETHER_API_KEY=...
 ELEVENLABS_API_KEY=...
 QWEN_API_KEY=...
+GLM_API_KEY=...
 
-# Channels
+# Messaging Channels
 TELEGRAM_BOT_TOKEN=...
 WHATSAPP_ACCESS_TOKEN=...
 DISCORD_WEBHOOK_URL=...
@@ -386,9 +485,12 @@ npm run tauri:dev
 ```
 POST /api/tools/execute    # Execute a tool
 POST /api/skills/execute   # Execute a skill
-GET  /api/providers        # List providers
+GET  /api/providers        # List all providers
+GET  /api/providers/:id    # Get provider details
 GET  /api/models?category=llm  # List models by category
 GET  /api/models/newest    # Get newest models
+POST /api/custom/endpoint  # Add custom endpoint
+POST /api/custom/model     # Add custom model
 ```
 
 ---
@@ -396,24 +498,25 @@ GET  /api/models/newest    # Get newest models
 ## 🤝 Contributing
 
 1. Fork the repo
-2. Create feature branch
-3. Commit changes
-4. Push to branch
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
 5. Open Pull Request
 
 ---
 
 ## 📄 License
 
-MIT License
+MIT License - Use it however you want!
 
 ---
 
 ## 🙏 Special Thanks
 
-- My parents for screen time
-- The AI that helped me learn
-- Everyone who believes young devs can build cool stuff
+- My parents for believing in me and supporting my coding journey
+- The amazing AI community for making these technologies accessible
+- Everyone who believes young developers can build incredible things
+- Egypt 🇪🇬 for inspiring me to dream big
 
 ---
 
@@ -427,16 +530,20 @@ MIT License
 
 <div align="center">
 
-**Made with 💜 by an 11-year-old who loves coding**
+**Made with 💜 by an 11-year-old Egyptian who loves coding**
 
 ### ⭐ Star this repo if you think it's cool! ⭐
+
+**🇪🇬 Proud Egyptian Developer**
 
 **Cross-Platform: Windows (PowerShell) + Linux + macOS**
 
 **Desktop App: Tauri v2**
 
-**250+ Tools • 50+ Skills • 15 Providers • 92+ Models • 6 Channels**
+**250+ Tools • 123+ Skills • 17 Providers • 95+ Models • 6 Channels • Custom Endpoints**
 
-**Updated March 21, 2026: GPT-5.2, Claude 4.6, Gemini 3.1, DeepSeek V4, Llama 4, Grok 4!**
+**Updated March 21, 2026: GPT-5.4, Claude 4.6, Gemini 3.1, GLM-5, Grok 4.20 Beta!**
+
+*All models verified - no fabricated entries!*
 
 </div>
