@@ -1,0 +1,422 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../db/dev.db"
+}
+
+// Core Models
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sessions      Session[]
+  agents        Agent[]
+  channels      Channel[]           @relation("UserChannels")
+  ownedChannels Channel[]           @relation("OwnedChannels")
+  channelMemberships ChannelMember[]
+  messages      Message[]
+  teamMembers   TeamMember[]
+  apiKeys       ApiKey[]
+  webhooks      Webhook[]
+  notifications Notification[]
+  bookmarks     Bookmark[]
+  comments      Comment[]
+  sharedBy      Share[]             @relation("SharedBy")
+  sharedTo      Share[]             @relation("SharedTo")
+  auditLogs     AuditLog[]
+}
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String?
+  description   String?
+  status        String    @default("active")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  events        Event[]
+  memories      Memory[]
+  toolCalls     ToolCall[]
+  costs         Cost[]
+  errors        Error[]
+  replays       Replay[]
+  exports       Export[]
+  tags          SessionTag[]
+  comments      Comment[]
+}
+
+model Agent {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  provider      String    @default("openai")
+  model         String    @default("gpt-4")
+  systemPrompt  String?
+  temperature   Float     @default(0.7)
+  maxTokens     Int       @default(4096)
+  config        String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  runs          AgentRun[]
+  tools         AgentTool[]
+}
+
+model AgentRun {
+  id            String    @id @default(cuid())
+  agentId       String
+  agent         Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  input         String
+  output        String?
+  status        String    @default("pending")
+  tokensUsed    Int       @default(0)
+  cost          Float     @default(0)
+  duration      Int       @default(0)
+  createdAt     DateTime  @default(now())
+  
+  steps         RunStep[]
+}
+
+model RunStep {
+  id            String    @id @default(cuid())
+  runId         String
+  run           AgentRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  type          String
+  content       String
+  metadata      String?
+  order         Int
+  createdAt     DateTime  @default(now())
+}
+
+model AgentTool {
+  id            String    @id @default(cuid())
+  agentId       String
+  agent         Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  name          String
+  description   String
+  parameters    String
+  enabled       Boolean   @default(true)
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type          String
+  content       String
+  metadata      String?
+  timestamp     DateTime  @default(now())
+  duration      Int       @default(0)
+  order         Int
+}
+
+model Memory {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  key           String
+  value         String
+  type          String    @default("string")
+  scope         String    @default("session")
+  ttl           Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  expiresAt     DateTime?
+  
+  @@unique([sessionId, key])
+}
+
+model ToolCall {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name          String
+  input         String
+  output        String?
+  status        String    @default("pending")
+  error         String?
+  duration      Int       @default(0)
+  tokensUsed    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+}
+
+model Cost {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  provider      String
+  model         String
+  inputTokens   Int       @default(0)
+  outputTokens  Int       @default(0)
+  cost          Float     @default(0)
+  currency      String    @default("USD")
+  metadata      String?
+  createdAt     DateTime  @default(now())
+}
+
+model Error {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type          String
+  message       String
+  stack         String?
+  context       String?
+  resolved      Boolean   @default(false)
+  resolution    String?
+  createdAt     DateTime  @default(now())
+  resolvedAt    DateTime?
+}
+
+model Replay {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name          String?
+  events        String
+  duration      Int       @default(0)
+  playbackCount Int       @default(0)
+  isPublic      Boolean   @default(false)
+  shareToken    String?   @unique
+  createdAt     DateTime  @default(now())
+}
+
+model Channel {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  type          String    @default("public")
+  ownerId       String
+  owner         User      @relation("OwnedChannels", fields: [ownerId], references: [id], onDelete: Cascade)
+  members       ChannelMember[]
+  messages      Message[]
+  users         User[]    @relation("UserChannels")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ChannelMember {
+  id            String    @id @default(cuid())
+  channelId     String
+  channel       Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          String    @default("member")
+  joinedAt      DateTime  @default(now())
+  
+  @@unique([channelId, userId])
+}
+
+model Message {
+  id            String    @id @default(cuid())
+  channelId     String?
+  channel       Channel?  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content       String
+  type          String    @default("text")
+  metadata      String?
+  replyToId     String?
+  replyTo       Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies       Message[] @relation("MessageReplies")
+  reactions     Reaction[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Reaction {
+  id            String    @id @default(cuid())
+  messageId     String
+  message       Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  emoji         String
+  count         Int       @default(1)
+  createdAt     DateTime  @default(now())
+  
+  @@unique([messageId, emoji])
+}
+
+model Team {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  plan          String    @default("free")
+  members       TeamMember[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model TeamMember {
+  id            String    @id @default(cuid())
+  teamId        String
+  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          String    @default("member")
+  joinedAt      DateTime  @default(now())
+  
+  @@unique([teamId, userId])
+}
+
+model ApiKey {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  key           String    @unique
+  permissions   String
+  lastUsedAt    DateTime?
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+model Webhook {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  url           String
+  events        String
+  secret        String?
+  isActive      Boolean   @default(true)
+  lastTriggered DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+model Notification {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String
+  title         String
+  message       String
+  link          String?
+  read          Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+model Bookmark {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String
+  targetId      String
+  createdAt     DateTime  @default(now())
+  
+  @@unique([userId, type, targetId])
+}
+
+model Tag {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  color         String?
+  sessions      SessionTag[]
+}
+
+model SessionTag {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  tagId         String
+  tag           Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@unique([sessionId, tagId])
+}
+
+model Comment {
+  id            String    @id @default(cuid())
+  sessionId     String?
+  session       Session?  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content       String
+  parentId      String?
+  parent        Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies       Comment[] @relation("CommentReplies")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Share {
+  id            String    @id @default(cuid())
+  type          String
+  targetId      String
+  sharedById    String
+  sharedBy      User      @relation("SharedBy", fields: [sharedById], references: [id], onDelete: Cascade)
+  sharedToId    String
+  sharedTo      User      @relation("SharedTo", fields: [sharedToId], references: [id], onDelete: Cascade)
+  permission    String    @default("view")
+  createdAt     DateTime  @default(now())
+  
+  @@unique([type, targetId, sharedToId])
+}
+
+model Export {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  format        String
+  status        String    @default("pending")
+  url           String?
+  size          Int?
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime?
+}
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action        String
+  resource      String
+  resourceId    String?
+  metadata      String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime  @default(now())
+}
+
+model Setting {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  value         String
+  description   String?
+  updatedAt     DateTime  @updatedAt
+}
+
+model ProviderConfig {
+  id            String    @id @default(cuid())
+  provider      String    @unique
+  models        String
+  defaultModel  String?
+  config        String?
+  isActive      Boolean   @default(true)
+}
+
+model UsageStat {
+  id            String    @id @default(cuid())
+  date          DateTime  @default(now())
+  provider      String
+  model         String
+  requests      Int       @default(0)
+  inputTokens   Int       @default(0)
+  outputTokens  Int       @default(0)
+  cost          Float     @default(0)
+  
+  @@unique([date, provider, model])
+}
