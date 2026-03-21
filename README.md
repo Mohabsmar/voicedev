@@ -92,7 +92,7 @@ The wizard guides you through the entire setup process with a beautiful UI!
 
 ---
 
-## 🤖 15 AI Providers with Newest Models (March 2026)
+## 🤖 15 AI Providers with Newest Models (March 21, 2026)
 
 ### Large Language Models (LLMs)
 
@@ -657,6 +657,6 @@ MIT License - Use it however you want!
 
 **250+ Tools + 105+ Skills + 15 AI Providers + 6 Channels**
 
-**New in March 2026: GPT-4.5, Claude 4, o4-mini, Gemini 2.5, Browser Use, Setup Wizard!**
+**New in March 2026 (Updated March 21): GPT-4.5 Turbo, Claude 4 Opus, o4-mini, Gemini 2.5, DeepSeek R2, Browser Use, Setup Wizard!**
 
 </div>

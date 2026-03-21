@@ -180,9 +180,9 @@ export default function SetupWizard({ onComplete }: { onComplete?: () => void })
             </div>
             
             <div className="bg-violet-500/10 border border-violet-500/30 rounded-lg p-4">
-              <h4 className="font-semibold text-violet-400">New in March 2026</h4>
+              <h4 className="font-semibold text-violet-400">New in March 2026 (Updated March 21)</h4>
               <ul className="text-sm text-zinc-300 mt-2 space-y-1">
-                <li>• GPT-4.5, Claude 4, Gemini 2.5, and o4-mini models</li>
+                <li>• GPT-4.5 Turbo, Claude 4 Opus, Gemini 2.5 Pro, DeepSeek R2, o4-mini</li>
                 <li>• Browser Use skill for web automation</li>
                 <li>• Remote computer control</li>
                 <li>• Telegram & WhatsApp channels via MCP</li>
