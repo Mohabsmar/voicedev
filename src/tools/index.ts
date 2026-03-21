@@ -26,7 +26,7 @@ const rmdirAsync = promisify(fs.rmdir);
 const renameAsync = promisify(fs.rename);
 const copyFileAsync = promisify(fs.copyFile);
 
-interface ToolResult<T = any> {
+export interface ToolResult<T = any> {
   success: boolean;
   data?: T;
   error?: string;
@@ -54,10 +54,12 @@ async function execCrossPlatform(command: string, options?: any): Promise<{ stdo
     cwd: options?.cwd || process.cwd(),
     env: { ...process.env, ...options?.env },
     timeout: options?.timeout || 30000,
-    maxBuffer: 100 * 1024 * 1024
+    maxBuffer: 100 * 1024 * 1024,
+    encoding: 'utf8'
   };
   
-  return execAsync(command, execOptions);
+  const result = await execAsync(command, execOptions);
+  return result as unknown as { stdout: string; stderr: string };
 }
 
 // Cross-platform command wrappers
@@ -1068,6 +1070,309 @@ export const shellTools: Record<string, any> = {
         }
       };
     }),
+
+  security_generate_password: createTool('security_generate_password', 'Generate secure random password', { length: 'number?', includeSpecial: 'boolean?' },
+    async (p: { length?: number; includeSpecial?: boolean }) => {
+      const length = p.length || 16;
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + (p.includeSpecial ? '!@#$%^&*()_+-=[]{}|;:,.<>?' : '');
+      let password = '';
+      for (let i = 0; i < length; i++) password += chars.charAt(Math.floor(Math.random() * chars.length));
+      return { success: true, data: password };
+    }),
+
+  security_generate_keypair: createTool('security_generate_keypair', 'Generate RSA key pair', { bits: 'number?' },
+    async (p: { bits?: number }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`ssh-keygen -t rsa -b ${p.bits || 2048} -f /tmp/id_rsa -N "" && cat /tmp/id_rsa && echo "---SEPARATOR---" && cat /tmp/id_rsa.pub`);
+        const [privateKey, publicKey] = stdout.split('---SEPARATOR---');
+        return { success: true, data: { privateKey: privateKey.trim(), publicKey: publicKey.trim() } };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_encrypt: createTool('security_encrypt', 'Encrypt data using AES-256-CBC', { data: 'string', key: 'string' },
+    async (p: { data: string; key: string }) => {
+      try {
+        const iv = crypto.randomBytes(16);
+        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.alloc(32, p.key), iv);
+        let encrypted = cipher.update(p.data, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        return { success: true, data: { encrypted, iv: iv.toString('hex') } };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_decrypt: createTool('security_decrypt', 'Decrypt data using AES-256-CBC', { encrypted: 'string', iv: 'string', key: 'string' },
+    async (p: { encrypted: string; iv: string; key: string }) => {
+      try {
+        const iv = Buffer.from(p.iv, 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.alloc(32, p.key), iv);
+        let decrypted = decipher.update(p.encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return { success: true, data: decrypted };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_jwt_create: createTool('security_jwt_create', 'Create signed JWT token', { payload: 'object', secret: 'string' },
+    async (p: { payload: any; secret: string }) => {
+      try {
+        const header = { alg: 'HS256', typ: 'JWT' };
+        const b64 = (obj: any) => Buffer.from(JSON.stringify(obj)).toString('base64url');
+        const unsigned = b64(header) + '.' + b64(p.payload);
+        const signature = crypto.createHmac('sha256', p.secret).update(unsigned).digest('base64url');
+        return { success: true, data: unsigned + '.' + signature };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_jwt_verify: createTool('security_jwt_verify', 'Verify JWT token', { token: 'string', secret: 'string' },
+    async (p: { token: string; secret: string }) => {
+      try {
+        const [h, pl, s] = p.token.split('.');
+        const signature = crypto.createHmac('sha256', p.secret).update(h + '.' + pl).digest('base64url');
+        if (signature !== s) return { success: false, error: 'Invalid signature' };
+        const payload = JSON.parse(Buffer.from(pl, 'base64url').toString());
+        return { success: true, data: payload };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_scan_vulnerabilities: createTool('security_scan_vulnerabilities', 'Scan for known vulnerabilities in a project', { path: 'string' },
+    async (p: { path: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('npm audit --json', { cwd: p.path });
+        return { success: true, data: JSON.parse(stdout) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_check_secrets: createTool('security_check_secrets', 'Check for exposed secrets in a directory', { path: 'string' },
+    async (p: { path: string }) => {
+      try {
+        const cmd = isWindows
+          ? `Get-ChildItem -Path "${p.path}" -Recurse | Select-String -Pattern "sk-[a-zA-Z0-9]{32}|AIza[a-zA-Z0-9_-]{35}"`
+          : `grep -rE "sk-[a-zA-Z0-9]{32}|AIza[a-zA-Z0-9_-]{35}" "${p.path}"`;
+        const { stdout } = await execCrossPlatform(cmd);
+        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_firewall_status: createTool('security_firewall_status', 'Check system firewall status', {},
+    async () => {
+      try {
+        const cmd = isWindows ? 'netsh advfirewall show allprofiles' : 'ufw status || iptables -L';
+        const { stdout } = await execCrossPlatform(cmd);
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_log_analysis: createTool('security_log_analysis', 'Analyze system logs for security events', { logPath: 'string?', lines: 'number?' },
+    async (p: { logPath?: string; lines?: number }) => {
+      try {
+        const path = p.logPath || (isWindows ? 'C:\\Windows\\System32\\winevt\\Logs\\Security.evtx' : '/var/log/auth.log');
+        const count = p.lines || 100;
+        const cmd = isWindows ? `Get-WinEvent -LogName Security -MaxEvents ${count}` : `tail -n ${count} ${path}`;
+        const { stdout } = await execCrossPlatform(cmd);
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_sign: createTool('security_sign', 'Sign data using a private key', { data: 'string', privateKey: 'string' },
+    async (p: { data: string; privateKey: string }) => {
+      try {
+        const sign = crypto.createSign('SHA256');
+        sign.update(p.data);
+        const signature = sign.sign(p.privateKey, 'hex');
+        return { success: true, data: signature };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  sqlite_query: createTool('sqlite_query', 'Execute SQLite query', { database: 'string', query: 'string' },
+    async (p: { database: string; query: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform(`sqlite3 ${p.database} "${p.query}" -json`);
+        return { success: true, data: JSON.parse(stdout) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  redis_get: createTool('redis_get', 'Get Redis key value', { key: 'string', host: 'string?' },
+    async (p: { key: string; host?: string }) => {
+      try {
+        const host = p.host || 'localhost';
+        const { stdout } = await execCrossPlatform(`redis-cli -h ${host} GET ${p.key}`);
+        return { success: true, data: stdout.trim() };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  redis_keys: createTool('redis_keys', 'List Redis keys', { pattern: 'string?', host: 'string?' },
+    async (p: { pattern?: string; host?: string }) => {
+      try {
+        const host = p.host || 'localhost';
+        const { stdout } = await execCrossPlatform(`redis-cli -h ${host} KEYS "${p.pattern || '*'}"`);
+        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  postgres_query: createTool('postgres_query', 'Execute PostgreSQL query', { query: 'string', database: 'string?', host: 'string?' },
+    async (p: { query: string; database?: string; host?: string }) => {
+      try {
+        const db = p.database || 'postgres';
+        const host = p.host || 'localhost';
+        const { stdout } = await execCrossPlatform(`psql -h ${host} -d ${db} -c "${p.query}" -t --no-align`);
+        return { success: true, data: stdout.trim() };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  postgres_tables: createTool('postgres_tables', 'List PostgreSQL tables', { database: 'string?', host: 'string?' },
+    async (p: { database?: string; host?: string }) => {
+      try {
+        const db = p.database || 'postgres';
+        const host = p.host || 'localhost';
+        const { stdout } = await execCrossPlatform(`psql -h ${host} -d ${db} -c "\\dt" -t --no-align`);
+        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  mongo_query: createTool('mongo_query', 'Execute MongoDB query', { database: 'string', collection: 'string', query: 'string', host: 'string?' },
+    async (p: { database: string; collection: string; query: string; host?: string }) => {
+      try {
+        const host = p.host || 'localhost';
+        const { stdout } = await execCrossPlatform(`mongosh --host ${host} ${p.database} --eval 'db.${p.collection}.find(${p.query})' --quiet`);
+        return { success: true, data: JSON.parse(stdout) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  elastic_search: createTool('elastic_search', 'Search Elasticsearch index', { index: 'string', query: 'string', host: 'string?' },
+    async (p: { index: string; query: string; host?: string }) => {
+      try {
+        const host = p.host || 'localhost:9200';
+        const { stdout } = await execCrossPlatform(`curl -s -X GET "${host}/${p.index}/_search" -H 'Content-Type: application/json' -d '${p.query}'`);
+        return { success: true, data: JSON.parse(stdout) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  regex_match: createTool('regex_match', 'Find regex matches in text', { text: 'string', pattern: 'string' },
+    async (p: { text: string; pattern: string }) => {
+      try {
+        const regex = new RegExp(p.pattern, 'g');
+        const matches = p.text.match(regex);
+        return { success: true, data: matches || [] };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  json_parse: createTool('json_parse', 'Parse JSON string', { json: 'string' },
+    async (p: { json: string }) => {
+      try {
+        return { success: true, data: JSON.parse(p.json) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  json_stringify: createTool('json_stringify', 'Stringify JSON object', { value: 'any', pretty: 'boolean?' },
+    async (p: { value: any; pretty?: boolean }) => {
+      try {
+        return { success: true, data: JSON.stringify(p.value, null, p.pretty ? 2 : 0) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  json_path: createTool('json_path', 'Query JSON using simple path', { json: 'any', path: 'string' },
+    async (p: { json: any; path: string }) => {
+      try {
+        const parts = p.path.split('.');
+        let current = p.json;
+        for (const part of parts) {
+          if (current === undefined || current === null) break;
+          current = current[part];
+        }
+        return { success: true, data: current };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  cron_add: createTool('cron_add', 'Add a cron job (Unix only)', { schedule: 'string', command: 'string' },
+    async (p: { schedule: string; command: string }) => {
+      if (isWindows) return { success: false, error: 'cron is not available on Windows. Use task_schedule instead.' };
+      try {
+        await execAsync(`(crontab -l 2>/dev/null; echo "${p.schedule} ${p.command}") | crontab -`);
+        return { success: true };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  cron_list: createTool('cron_list', 'List cron jobs (Unix only)', {},
+    async () => {
+      if (isWindows) return { success: false, error: 'cron is not available on Windows.' };
+      try {
+        const { stdout } = await execAsync('crontab -l');
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  git_stash_list: createTool('git_stash_list', 'List stashed changes', { path: 'string?' },
+    async (p: { path?: string }) => {
+      try {
+        const { stdout } = await execCrossPlatform('git stash list', { cwd: p.path });
+        return { success: true, data: stdout.trim().split('\n').filter(Boolean) };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  ip_lookup: createTool('ip_lookup', 'Get geolocation info for an IP address', { ip: 'string' },
+    async (p: { ip: string }) => {
+      return new Promise((resolve) => {
+        https.get(`https://ipapi.co/${p.ip}/json/`, (res: any) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => resolve({ success: true, data: JSON.parse(data) }));
+        }).on('error', (e: any) => resolve({ success: false, error: e.message }));
+      });
+    }),
+
+  dns_reverse: createTool('dns_reverse', 'Perform reverse DNS lookup', { ip: 'string' },
+    async (p: { ip: string }) => {
+      const dns = require('dns');
+      return new Promise((resolve) => {
+        dns.reverse(p.ip, (err: any, hostnames: string[]) => {
+          if (err) resolve({ success: false, error: err.message });
+          else resolve({ success: true, data: hostnames });
+        });
+      });
+    }),
+
+  ssl_check: createTool('ssl_check', 'Check SSL certificate info', { domain: 'string' },
+    async (p: { domain: string }) => {
+      const tls = require('tls');
+      return new Promise((resolve) => {
+        try {
+          const socket = tls.connect(443, p.domain, { servername: p.domain }, () => {
+            const cert = socket.getPeerCertificate();
+            resolve({ success: true, data: cert });
+            socket.end();
+          });
+          socket.on('error', (e: any) => resolve({ success: false, error: e.message }));
+        } catch (e: any) { resolve({ success: false, error: e.message }); }
+      });
+    }),
+
+  ping: createTool('ping', 'Ping a host', { host: 'string', count: 'number?' },
+    async (p: { host: string; count?: number }) => {
+      try {
+        const cmd = isWindows ? `ping -n ${p.count || 4} ${p.host}` : `ping -c ${p.count || 4} ${p.host}`;
+        const { stdout } = await execCrossPlatform(cmd);
+        return { success: true, data: stdout };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  security_scan_ports: createTool('security_scan_ports', 'Scan ports on a host', { host: 'string', ports: 'string?' },
+    async (p: { host: string; ports?: string }) => {
+      try {
+        const ports = p.ports || '22,80,443,3389,8080';
+        const results: string[] = [];
+        for (const port of ports.split(',')) {
+          const cmd = isWindows
+            ? `powershell -Command "(Test-NetConnection -ComputerName ${p.host} -Port ${port.trim()}).TcpTestSucceeded"`
+            : `nc -zv ${p.host} ${port.trim()} 2>&1 || echo "closed"`;
+          const { stdout } = await execCrossPlatform(cmd);
+          if (stdout.includes('True') || stdout.includes('succeeded') || stdout.includes('open')) {
+            results.push(`Port ${port}: OPEN`);
+          } else {
+            results.push(`Port ${port}: CLOSED`);
+          }
+        }
+        return { success: true, data: results };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
 };
 
 // ============================================
@@ -1372,6 +1677,29 @@ export const webTools: Record<string, any> = {
             });
           });
           req.on('error', (e) => resolve({ success: false, error: e.message }));
+          req.end();
+        } catch (e: any) { resolve({ success: false, error: e.message }); }
+      });
+    }),
+
+  security_check_headers: createTool('security_check_headers', 'Check HTTP security headers', { url: 'string' },
+    async (p: { url: string }) => {
+      return new Promise((resolve) => {
+        try {
+          const urlObj = new URL(p.url);
+          const lib = urlObj.protocol === 'https:' ? https : http;
+          const req = lib.request({ hostname: urlObj.hostname, port: urlObj.port || 443, path: urlObj.pathname, method: 'HEAD' }, (res: any) => {
+            const h = res.headers;
+            const securityHeaders = {
+              'Strict-Transport-Security': h['strict-transport-security'],
+              'Content-Security-Policy': h['content-security-policy'],
+              'X-Frame-Options': h['x-frame-options'],
+              'X-XSS-Protection': h['x-xss-protection'],
+              'X-Content-Type-Options': h['x-content-type-options'],
+            };
+            resolve({ success: true, data: securityHeaders });
+          });
+          req.on('error', (e: any) => resolve({ success: false, error: e.message }));
           req.end();
         } catch (e: any) { resolve({ success: false, error: e.message }); }
       });

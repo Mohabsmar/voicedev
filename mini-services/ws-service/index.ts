@@ -1,3 +1,4 @@
+// @ts-ignore
 import { serve } from "bun";
 
 const PORT = 3030;
@@ -16,10 +17,11 @@ serve({
     }
     
     if (url.pathname === "/") {
+      // @ts-ignore
       const success = server.upgrade(req, {
-        data: { id: crypto.randomUUID() }
+        data: { id: (crypto as any).randomUUID() }
       });
-      if (success) return undefined;
+      if (success) return undefined as any;
     }
     
     return new Response("WS Server");

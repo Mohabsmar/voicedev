@@ -89,6 +89,7 @@ const PROVIDERS = [
     name: 'OpenAI', 
     models: [
       { id: 'gpt-5.4', name: 'GPT-5.4', contextWindow: 1000000 },
+      { id: 'gpt-5.4-turbo', name: 'GPT-5.4 Turbo', contextWindow: 1000000 },
       { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini', contextWindow: 256000 },
       { id: 'gpt-5.3-codex', name: 'GPT-5.3 Codex', contextWindow: 512000 },
       { id: 'o4', name: 'o4', contextWindow: 256000 },
@@ -100,6 +101,7 @@ const PROVIDERS = [
     name: 'Anthropic', 
     models: [
       { id: 'claude-sonnet-4.6', name: 'Claude Sonnet 4.6', contextWindow: 1000000 },
+      { id: 'claude-sonnet-4.6-turbo', name: 'Claude Sonnet 4.6 Turbo', contextWindow: 1000000 },
       { id: 'claude-opus-4.6', name: 'Claude Opus 4.6', contextWindow: 1000000 },
       { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', contextWindow: 200000 },
       { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', contextWindow: 200000 },
@@ -109,16 +111,19 @@ const PROVIDERS = [
     id: 'google', 
     name: 'Google AI', 
     models: [
+      { id: 'gemini-3.1-ultra', name: 'Gemini 3.1 Ultra', contextWindow: 4000000 },
       { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', contextWindow: 2000000 },
+      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', contextWindow: 2000000 },
+      { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', contextWindow: 1000000 },
+      { id: 'gemini-3.1-ultra-long', name: 'Gemini 3.1 Ultra Long', contextWindow: 10000000 },
       { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', contextWindow: 1000000 },
-      { id: 'gemini-3-pro', name: 'Gemini 3 Pro', contextWindow: 2000000 },
-      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', contextWindow: 2000000 },
     ]
   },
   { 
     id: 'deepseek', 
     name: 'DeepSeek', 
     models: [
+      { id: 'deepseek-v3.5', name: 'DeepSeek V3.5', contextWindow: 512000 },
       { id: 'deepseek-v3.2-exp', name: 'DeepSeek V3.2-Exp', contextWindow: 256000 },
       { id: 'deepseek-v3.1', name: 'DeepSeek V3.1', contextWindow: 128000 },
       { id: 'deepseek-r1-0528', name: 'DeepSeek R1', contextWindow: 128000 },
@@ -128,6 +133,7 @@ const PROVIDERS = [
     id: 'xai', 
     name: 'xAI (Grok)', 
     models: [
+      { id: 'grok-4.5', name: 'Grok 4.5', contextWindow: 1000000 },
       { id: 'grok-4.20-beta', name: 'Grok 4.20 Beta', contextWindow: 512000 },
       { id: 'grok-4.1-fast', name: 'Grok 4.1 Fast', contextWindow: 256000 },
       { id: 'grok-4.1', name: 'Grok 4.1', contextWindow: 256000 },
@@ -154,6 +160,7 @@ const PROVIDERS = [
     id: 'mistral', 
     name: 'Mistral AI', 
     models: [
+      { id: 'mistral-large-4', name: 'Mistral Large 4', contextWindow: 512000 },
       { id: 'mistral-small-4', name: 'Mistral Small 4', contextWindow: 128000 },
       { id: 'mistral-large-3', name: 'Mistral Large 3', contextWindow: 256000 },
     ]
@@ -162,6 +169,7 @@ const PROVIDERS = [
     id: 'qwen', 
     name: 'Alibaba Qwen', 
     models: [
+      { id: 'qwen-4.0', name: 'Qwen 4.0', contextWindow: 1000000 },
       { id: 'qwen-3.5', name: 'Qwen 3.5', contextWindow: 256000 },
       { id: 'qwen-3-next', name: 'Qwen 3-Next', contextWindow: 128000 },
     ]
@@ -518,7 +526,7 @@ export default function VoiceDevApp() {
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: data.response || data.error || 'Sorry, I could not generate a response.',
+        content: data.content || data.error || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
         model: config.model,
         tokens: data.usage?.total_tokens,

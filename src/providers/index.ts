@@ -123,7 +123,6 @@ export const providers: Provider[] = [
       { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', category: 'llm', contextWindow: 2000000, features: ['low_latency', 'real_time_stream'], releaseDate: '2026-03-15' },
       { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', category: 'llm', contextWindow: 1000000, features: ['speed', 'efficiency'], releaseDate: '2026-02-25' },
       { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite', category: 'llm', contextWindow: 512000, features: ['ultra_fast', 'cost_effective'], releaseDate: '2026-03-01' },
-      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', category: 'llm', contextWindow: 2000000, features: ['low_latency', 'fast_inference'], releaseDate: '2026-03-12' },
       { id: 'gemini-3.1-ultra-long', name: 'Gemini 3.1 Ultra Long', category: 'llm', contextWindow: 10000000, features: ['10M_context', 'infinite_memory'], releaseDate: '2026-03-18' },
       { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', category: 'reasoning', contextWindow: 1000000, features: ['deep_reasoning', 'ultra_subscribers'], releaseDate: '2025-12-01' },
       { id: 'gemini-3-pro', name: 'Gemini 3 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'multimodal'], releaseDate: '2025-11-18' },

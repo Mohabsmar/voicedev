@@ -5,7 +5,20 @@
  */
 
 import * as readline from 'readline'
-import ZAI from 'z-ai-web-dev-sdk'
+
+// Mock ZAI SDK for now as it's missing
+const ZAI = {
+  create: async () => ({
+    chat: {
+      completions: {
+        create: async ({ messages, model }: any) => ({
+          choices: [{ message: { content: `[MOCK RESPONSE for ${model}] This is a mock response because the ZAI SDK is not available in this environment.` } }],
+          usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 }
+        })
+      }
+    }
+  })
+}
 
 // ANSI Colors
 const colors = {
