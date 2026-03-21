@@ -6,6 +6,8 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev -p 3000",
+    "chat": "tsx cli/chat.ts",
+    "chat:build": "esbuild cli/chat.ts --bundle --platform=node --outfile=dist/chat.cjs && node dist/chat.cjs",
     "dev:log": "next dev -p 3000 > dev.log 2>&1",
     "build": "prisma generate && next build",
     "build:standalone": "next build && cp -r .next/static .next/standalone/.next/ 2>/dev/null; cp -r public .next/standalone/ 2>/dev/null",
