@@ -56,3 +56,4 @@ prisma/db/
 
 # Tauri
 src-tauri/target/
+.z-ai-config
