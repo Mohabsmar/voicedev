@@ -4,730 +4,502 @@
 
 ### The Ultimate AI Agent Debugger Platform
 
+**Cross-Platform Desktop App + Web Interface**
+
 **Built with 💜 by an 11-year-old developer**
 
 [![Built by 11 yo Developer](https://img.shields.io/badge/Built%20by-11%20yo%20Developer-purple?style=for-the-badge)](https://github.com/Mohabsmar/voicedev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-2.0-blue?style=flat-square&logo=tauri)](https://tauri.app/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
 [![Tools](https://img.shields.io/badge/Tools-250-orange?style=flat-square)](src/tools/)
 [![Skills](https://img.shields.io/badge/Skills-100-blue?style=flat-square)](src/skills/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-informational?style=flat-square)](https://github.com/Mohabsmar/voicedev)
-
-[Getting Started](#-getting-started) • [Documentation](#-documentation) • [Windows Setup](#-windows-setup) • [Tools](#-tools-250-real-implementations) • [Skills](#-skills-100-real-implementations) • [Marketplace](#-marketplace) • [Contributing](#-contributing)
+[![Providers](https://img.shields.io/badge/AI_Providers-15-informational?style=flat-square)](src/providers/)
+[![Channels](https://img.shields.io/badge/Channels-6-success?style=flat-square)](src/channels/)
 
 </div>
 
 ---
 
-## 📖 Table of Contents
+## ⚡ One-Liner Install (Recommended)
 
-1. [What is VoiceDev?](#-what-is-voicedev)
-2. [Features Overview](#-features-overview)
-3. [Getting Started](#-getting-started)
-4. [Windows Setup](#-windows-setup)
-5. [Linux/macOS Setup](#-linuxmacos-setup)
-6. [Cross-Platform Support](#-cross-platform-support)
-7. [Tools: 250 Real Implementations](#-tools-250-real-implementations)
-8. [Skills: 100 Real Implementations](#-skills-100-real-implementations)
-9. [5-Layer Security System](#-5-layer-security-system)
-10. [Marketplace](#-marketplace)
-11. [How to Edit This Project](#-how-to-edit-this-project)
-12. [How to Add New Tools](#-how-to-add-new-tools)
-13. [How to Add New Skills](#-how-to-add-new-skills)
-14. [How to Use the Marketplace](#-how-to-use-the-marketplace)
-15. [How to Rate Tools and Skills](#-how-to-rate-tools-and-skills)
-16. [How to Debug Issues](#-how-to-debug-issues)
-17. [API Reference](#-api-reference)
-18. [Architecture](#-architecture)
-19. [Testing](#-testing)
-20. [Contributing](#-contributing)
-21. [License](#-license)
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
+```
+
+**Or on Windows PowerShell:**
+```powershell
+irm https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.ps1 | iex
+```
 
 ---
 
 ## 🎯 What is VoiceDev?
 
-VoiceDev is an **AI Agent Debugger Platform** that helps developers understand, debug, and control their AI agents. It provides a visual interface for monitoring AI agent behavior, tracking tool calls, analyzing costs, and managing sessions.
+VoiceDev is a comprehensive AI Agent Debugger Platform that combines:
 
-### The Story
-
-This entire project was **vibecoded by an 11-year-old** who wanted to build something cool. Every feature, every tool, every skill - all built with determination, curiosity, and way too much screen time (thanks, parents!).
-
-### What Makes It Special
-
-- **250 Real Working Tools** - Not stubs or placeholders. Every tool has a real `execute()` function that actually works.
-- **100 Real Working Skills** - Skills that combine multiple tools for complex workflows.
-- **5-Layer Security System** - Enterprise-grade protection for safe execution.
-- **Built-in Marketplace** - Discover, install, rate, and publish tools and skills.
-- **Cross-Platform Support** - Works on Windows (PowerShell), Linux, and macOS (Bash).
-- **Visual Debugging** - Timeline view, tool calls, memory viewer, cost analytics, and session replay.
+- **250+ Real Working Tools** - File system, shell, web, git, npm, database, cloud, security
+- **100+ Real Skills** - Multi-tool workflows for complex tasks
+- **15 AI Providers** - OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together AI, ElevenLabs, Qwen
+- **6 Messaging Channels** - Telegram, WhatsApp, Discord, Slack, Email, MCP
+- **Voice Support** - TTS, ASR, Voice Cloning with newest models
+- **Remote Computer Control** - SSH, RDP, VNC, Wake-on-LAN
+- **Security Tools** - Port scanning, vulnerability testing, password tools
+- **Cross-Platform** - Windows (PowerShell), Linux, macOS (Bash)
+- **Desktop App** - Tauri-based native app
 
 ---
 
-## ✨ Features Overview
+## 🚀 Quick Start
 
-### Simple Mode
-Perfect for quick debugging sessions:
-- ⚡ **Timeline** - Visual timeline of all events
-- 🔧 **Tool Calls** - Every tool call with input/output
-- 📋 **Logs** - Real-time log viewer
-
-### Advanced Mode
-Full power for power users:
-- 💾 **Memory Viewer** - Inspect agent memory state
-- 💰 **Cost Analytics** - Track spending by provider
-- 🐛 **Error Tracking** - Detailed error analysis
-- 🔄 **Session Replay** - Replay any session step-by-step
-- ⚙️ **Provider Settings** - Configure AI providers
-- 📊 **Statistics** - Usage statistics and insights
-
----
-
-## 🏁 Getting Started
-
-### Prerequisites
-
-- **Node.js** 18.0 or higher ([Download](https://nodejs.org/))
-- **npm** 9.0 or higher (comes with Node.js)
-- **Git** for cloning the repository ([Download](https://git-scm.com/))
-
-### Quick Install
-
+### Option 1: One-Liner (Recommended)
 ```bash
-# Clone the repository
+curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
+```
+
+### Option 2: Manual Install
+```bash
 git clone https://github.com/Mohabsmar/voicedev.git
-
-# Navigate to project
 cd voicedev
-
-# Install dependencies
 npm install
-
-# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser!
-
----
-
-## 🪟 Windows Setup
-
-VoiceDev fully supports Windows with PowerShell! Here's a detailed setup guide:
-
-### Step 1: Install Prerequisites
-
-#### Install Node.js
-1. Go to [nodejs.org](https://nodejs.org/)
-2. Download the **LTS version** (recommended)
-3. Run the installer with default options
-4. Verify installation:
-   ```powershell
-   node --version
-   npm --version
-   ```
-
-#### Install Git
-1. Go to [git-scm.com](https://git-scm.com/download/win)
-2. Download the Windows installer
-3. Run installer (recommended: select "Git from the command line")
-4. Verify installation:
-   ```powershell
-   git --version
-   ```
-
-### Step 2: Clone and Setup
-
-Open **PowerShell** or **Command Prompt**:
-
-```powershell
-# Navigate to your projects folder
-cd C:\Users\YourName\Projects
-
-# Clone the repository
-git clone https://github.com/Mohabsmar/voicedev.git
-
-# Navigate to project
-cd voicedev
-
-# Install dependencies
-npm install
-```
-
-### Step 3: Run the Application
-
-```powershell
-# Start development server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser!
-
-### Windows-Specific Notes
-
-1. **PowerShell Execution Policy**: If you get script execution errors, run:
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-
-2. **Windows Defender**: You might need to allow Node.js through Windows Defender Firewall.
-
-3. **Long Path Names**: If you encounter path length issues, enable long paths:
-   - Open Registry Editor (`regedit`)
-   - Navigate to `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem`
-   - Set `LongPathsEnabled` to `1`
-
-4. **Admin Privileges**: Some tools (like symlink creation) require Administrator privileges on Windows.
-
-### Windows PowerShell Tools
-
-VoiceDev includes PowerShell equivalents for all shell commands:
-
-```typescript
-// These work on both Windows and Linux/Mac
-await executeTool('shell_exec', { command: 'Get-Process' });  // Windows
-await executeTool('shell_exec', { command: 'ps aux' });       // Linux/Mac
-
-// Dedicated PowerShell tool
-await executeTool('powershell_exec', { 
-  command: 'Get-ChildItem -Path "C:\\Users" -Recurse' 
-});
-
-// Cross-platform file operations
-await executeTool('dir_list', { path: 'C:\\Projects' });  // Windows
-await executeTool('dir_list', { path: '/home/user' });    // Linux
-```
-
----
-
-## 🐧 Linux/macOS Setup
-
-### Step 1: Install Prerequisites
-
-#### Ubuntu/Debian
+### Option 3: Desktop App
 ```bash
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Install Git
-sudo apt-get install -y git
-```
-
-#### macOS (with Homebrew)
-```bash
-# Install Node.js
-brew install node
-
-# Install Git
-brew install git
-```
-
-### Step 2: Clone and Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/Mohabsmar/voicedev.git
-
-# Navigate to project
-cd voicedev
-
-# Install dependencies
-npm install
-```
-
-### Step 3: Run the Application
-
-```bash
-# Start development server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser!
-
----
-
-## 🖥️ Cross-Platform Support
-
-VoiceDev automatically detects your operating system and uses the appropriate commands:
-
-| Feature | Windows | Linux/macOS |
-|---------|---------|-------------|
-| **Shell** | PowerShell | Bash |
-| **File Operations** | Native + PowerShell | Native + Bash |
-| **Process Management** | `Get-Process`, `Stop-Process` | `ps`, `kill` |
-| **Service Management** | `Get-Service`, `Start-Service` | `systemctl` |
-| **Archive Operations** | `Compress-Archive`, `Expand-Archive` | `zip`, `tar` |
-| **Scheduled Tasks** | Task Scheduler | Cron |
-| **Disk Usage** | `Get-PSDrive` | `df -h` |
-| **Memory Info** | `Get-CimInstance` | `free -h` |
-
-### Cross-Platform Tool Examples
-
-```typescript
-// These work on ALL platforms!
-await executeTool('os_info', {});
-// Returns: { platform: 'win32' | 'linux' | 'darwin', ... }
-
-await executeTool('shell_exec', { command: 'echo "Hello World"' });
-// Uses PowerShell on Windows, Bash on Linux/Mac
-
-await executeTool('file_search', { path: '.', pattern: '*.ts' });
-// Uses Get-ChildItem on Windows, find on Linux/Mac
-
-await executeTool('dir_size', { path: './src' });
-// Uses PowerShell on Windows, du on Linux/Mac
-```
-
-### Platform Detection
-
-```typescript
-import { isWindows, getTempDir, getHomeDir } from './tools';
-
-if (isWindows) {
-  console.log('Running on Windows');
-  console.log('Temp dir:', getTempDir()); // C:\Users\...\AppData\Local\Temp
-} else {
-  console.log('Running on Linux/macOS');
-  console.log('Temp dir:', getTempDir()); // /tmp
-}
+npm run tauri:dev    # Development
+npm run tauri:build  # Build desktop app
 ```
 
 ---
 
-## 🔧 Tools: 250 Real Implementations
+## 🖥️ Setup Wizard
 
-### Overview
+VoiceDev includes an interactive setup wizard that runs on first launch:
 
-Every tool in VoiceDev has a **real working implementation** that works on **Windows, Linux, and macOS**.
-
-### Tool Categories
-
-| Category | Count | Description |
-|----------|-------|-------------|
-| **FileSystem** | 50 | Read, write, delete, copy, move, compress files |
-| **Shell** | 40 | Execute commands, manage processes (PowerShell + Bash) |
-| **Web/HTTP** | 50 | HTTP requests, DNS, webhooks, API testing |
-| **Git** | 30 | Clone, commit, push, merge, branch management |
-| **NPM/Packages** | 30 | Install, build, test, publish packages |
-| **Database** | 20 | SQLite, PostgreSQL, MySQL, Redis, MongoDB |
-| **Cloud** | 20 | AWS, GCP, Azure, Kubernetes, Terraform |
-| **Security** | 20 | Encrypt, decrypt, hash, JWT, SSL |
-
-### Using Tools
-
-```typescript
-import { executeTool } from './tools';
-
-// Read a file (cross-platform)
-const result = await executeTool('file_read', { path: '/data/file.txt' });
-// On Windows: C:\data\file.txt
-// On Linux: /data/file.txt
-
-// Write a file (cross-platform)
-await executeTool('file_write', { 
-  path: '/output.txt', 
-  content: 'Hello, World!' 
-});
-
-// Execute shell command (cross-platform)
-const { stdout, stderr } = await executeTool('shell_exec', { 
-  command: 'echo "Hello"'  // Works on PowerShell and Bash
-});
-
-// PowerShell-specific command
-await executeTool('powershell_exec', { 
-  command: 'Get-Process | Sort-Object CPU -Descending | Select-Object -First 10' 
-});
-
-// Git operations (cross-platform)
-await executeTool('git_commit', { 
-  message: 'Add new feature',
-  path: '/path/to/repo' 
-});
-
-// Get OS information
-const osInfo = await executeTool('os_info', {});
-// { platform: 'win32', arch: 'x64', cpus: 8, ... }
-```
-
-### Tool Result Format
-
-```typescript
-interface ToolResult<T = any> {
-  success: boolean;      // Did the operation succeed?
-  data?: T;              // The result data
-  error?: string;        // Error message if failed
-  metadata?: {           // Additional information
-    duration?: number;   // Execution time in ms
-    platform?: string;   // 'win32' | 'linux' | 'darwin'
-    [key: string]: any;
-  };
-}
-```
+1. **API Key Setup** - Configure your AI provider keys
+2. **Channel Setup** - Connect Telegram, WhatsApp, Discord, etc.
+3. **Voice Setup** - Select TTS/ASR preferences
+4. **Security Setup** - Configure permissions and limits
 
 ---
 
-## 🎨 Skills: 100 Real Implementations
+## 🎛️ Features
 
-### What are Skills?
-
-Skills combine multiple tools to perform complex workflows. They're higher-level abstractions that make it easier to accomplish common tasks.
-
-### Skill Categories
+### 🔧 250 Real Tools
 
 | Category | Count | Examples |
 |----------|-------|----------|
-| **Development** | 20 | project-init, api-test, git-workflow, backup-project |
-| **Data** | 15 | json-transform, csv-to-json, data-validate, aggregate-data |
-| **Automation** | 15 | batch-rename, cleanup-temp, schedule-task, sync-directories |
-| **Security** | 15 | port-scan, ssl-check, security-audit, encrypt-files |
-| **File** | 10 | find-duplicates, archive-project, compare-files |
-| **Web** | 10 | health-check, webhook-test, crawl-website |
-| **Git** | 10 | quick-commit, branch-manager, stash-manager |
-| **Database** | 5 | export-database, backup-database, search-database |
+| **FileSystem** | 50 | Read, write, copy, move, compress, hash |
+| **Shell** | 40 | Execute commands, manage processes |
+| **Web/HTTP** | 50 | GET, POST, DNS, webhooks, JWT |
+| **Git** | 30 | Clone, commit, push, merge, rebase |
+| **NPM/Packages** | 30 | Install, build, test, publish |
+| **Database** | 20 | SQLite, PostgreSQL, MySQL, Redis, MongoDB |
+| **Cloud** | 20 | Docker, Kubernetes, AWS, GCP, Azure |
+| **Security** | 20 | Encrypt, hash, port scan, vulnerability test |
+| **Remote** | 10 | SSH, RDP, VNC, Wake-on-LAN |
+| **Pentest** | 15 | Nmap, DNS enum, SQL injection, XSS test |
 
-### Using Skills
+### 🎨 100 Real Skills
 
+Skills combine multiple tools for complex workflows:
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Development** | 20 | Project init, API test, git workflow |
+| **Data** | 15 | JSON transform, CSV convert, aggregation |
+| **Automation** | 15 | Batch rename, cleanup, sync |
+| **Security** | 15 | Port scan, SSL check, audit |
+| **Voice** | 10 | TTS speak, ASR transcribe |
+| **Channels** | 10 | Send messages, notifications |
+| **Remote** | 10 | SSH exec, file transfer |
+| **Browser** | 5 | Web scraping, screenshots |
+
+---
+
+## 🤖 15 AI Providers with Newest Models (2025)
+
+### Large Language Models (LLMs)
+
+| Provider | Newest Models |
+|----------|--------------|
+| **OpenAI** | GPT-4o, o1, o1-mini, o1-pro |
+| **Anthropic** | Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude Sonnet 4 |
+| **Google** | Gemini 2.0 Flash, Gemini 2.0 Pro, Gemma 3 |
+| **Z.ai** | Z-1 Large, Z-1 Standard, Z-1 Fast |
+| **Moonshot AI** | Kimi Latest, Moonshot V1 128K |
+| **MiniMax** | ABAB 6.5 Chat, ABAB 6.5G |
+| **Groq** | Llama 3.3 70B, Mixtral 8x7B |
+| **DeepSeek** | DeepSeek R1 (Reasoner), DeepSeek Chat |
+| **Mistral** | Mistral Large, Codestral, Pixtral 12B |
+| **xAI** | Grok 2, Grok 2 Vision |
+| **Cohere** | Command R+, Embed V4 |
+| **Replicate** | Llama 3.3 70B, DeepSeek R1 |
+| **Together AI** | Llama 3.3 70B Turbo, Qwen 2.5 72B |
+| **Qwen** | Qwen Max, Qwen Long (10M context) |
+
+### Voice Models (TTS/ASR)
+
+| Provider | TTS Models | ASR Models |
+|----------|-----------|------------|
+| **OpenAI** | TTS-1, TTS-1 HD, GPT-4o Mini TTS | Whisper-1 |
+| **ElevenLabs** | Multilingual V2, Turbo V2.5, Flash V2.5 | Scribe V1 |
+| **MiniMax** | Speech-01 Turbo, Speech-01 Emotional | - |
+| **Groq** | - | Whisper Large V3 Turbo |
+| **Qwen** | - | Qwen Audio Turbo |
+
+### Image Generation
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | DALL-E 3 |
+| **Replicate** | Flux Schnell, Flux Dev, SDXL |
+
+---
+
+## 📱 Messaging Channels (MCP)
+
+VoiceDev supports multiple messaging platforms:
+
+### Telegram
 ```typescript
-import { executeSkill } from './skills';
-
-// Initialize a new project (cross-platform)
-const result = await executeSkill('project-init', {
-  name: 'my-awesome-app',
-  type: 'node'
+await executeTool('telegram_send_message', {
+  botToken: 'YOUR_BOT_TOKEN',
+  chatId: 'CHAT_ID',
+  message: 'Hello from VoiceDev!'
 });
-// Creates: src/, tests/, docs/, package.json
+```
 
-// Test an API endpoint
-const apiResult = await executeSkill('api-test', {
-  url: 'https://api.example.com/users',
+### WhatsApp Business API
+```typescript
+await executeTool('whatsapp_send_message', {
+  accessToken: 'YOUR_TOKEN',
+  phoneNumberId: 'YOUR_PHONE_ID',
+  to: '+1234567890',
+  message: 'Hello!'
+});
+```
+
+### Discord
+```typescript
+await executeTool('discord_send_embed', {
+  webhookUrl: 'YOUR_WEBHOOK',
+  title: 'Alert',
+  description: 'Task completed!'
+});
+```
+
+### Slack
+```typescript
+await executeTool('slack_send_message', {
+  webhookUrl: 'YOUR_WEBHOOK',
+  text: 'Build completed!'
+});
+```
+
+### Generic MCP API
+```typescript
+await executeTool('mcp_call', {
+  config: {
+    baseUrl: 'https://api.example.com',
+    headers: { 'Authorization': 'Bearer TOKEN' }
+  },
+  endpoint: '/v1/resource',
   method: 'GET'
 });
-
-// Complete git workflow
-await executeSkill('git-workflow', {
-  message: 'Fix bug in authentication',
-  branch: 'main'
-});
-// Performs: git status -> git add -> git commit -> git push
 ```
 
 ---
 
-## 🛡️ 5-Layer Security System
+## 🎤 Voice Support
 
-VoiceDev implements enterprise-grade security with 5 independent layers:
+### Text-to-Speech (TTS)
+```typescript
+// OpenAI TTS
+await executeTool('tts_speak', {
+  text: 'Hello, World!',
+  provider: 'openai',
+  voice: 'alloy'
+});
 
-### Layer 1: Static Code Analysis
-Scans code for dangerous patterns before execution.
+// ElevenLabs TTS
+await executeTool('tts_speak', {
+  text: 'Hello, World!',
+  provider: 'elevenlabs',
+  voice: 'rachel'
+});
 
-### Layer 2: Sandboxed Execution
-Runs untrusted code in isolation with timeouts and memory limits.
+// MiniMax TTS
+await executeTool('tts_speak', {
+  text: '你好世界',
+  provider: 'minimax',
+  voice: 'female-shaonv'
+});
+```
 
-### Layer 3: Permission System
-Granular permissions for each tool.
+### Speech-to-Text (ASR)
+```typescript
+// Whisper (OpenAI or Groq)
+await executeTool('asr_transcribe', {
+  audioPath: '/path/to/audio.mp3',
+  provider: 'openai'  // or 'groq' for ultra-fast
+});
 
-### Layer 4: Rate Limiting
-Prevent abuse with configurable limits.
+// ElevenLabs Scribe
+await executeTool('asr_transcribe', {
+  audioPath: '/path/to/audio.mp3',
+  provider: 'elevenlabs'
+});
+```
 
-### Layer 5: Audit Logging
-Complete audit trail of all operations.
+### Voice Cloning
+```typescript
+await executeTool('voice_clone', {
+  audioPaths: ['/path/to/sample1.mp3', '/path/to/sample2.mp3'],
+  name: 'My Voice',
+  provider: 'elevenlabs'
+});
+```
 
 ---
 
-## 🏪 Marketplace
+## 🖥️ Remote Computer Control
 
-The built-in marketplace lets you discover, install, and rate tools and skills.
+### SSH
+```typescript
+await executeTool('ssh_exec', {
+  host: '192.168.1.100',
+  user: 'admin',
+  command: 'ls -la'
+});
 
-### Browsing the Marketplace
+await executeTool('ssh_copy_file', {
+  host: '192.168.1.100',
+  user: 'admin',
+  source: '/local/file.txt',
+  destination: '/remote/file.txt'
+});
+```
+
+### RDP (Windows Remote Desktop)
+```typescript
+await executeTool('rdp_connect', {
+  host: '192.168.1.100',
+  user: 'admin',
+  password: 'password'
+});
+```
+
+### VNC
+```typescript
+await executeTool('vnc_connect', {
+  host: '192.168.1.100',
+  port: 5900
+});
+```
+
+### Wake-on-LAN
+```typescript
+await executeTool('wake_on_lan', {
+  mac: 'AA:BB:CC:DD:EE:FF',
+  broadcastIp: '192.168.1.255'
+});
+```
+
+---
+
+## 🔒 Security & Penetration Testing
+
+### Port Scanning
+```typescript
+// Quick port scan
+await executeTool('port_scan', {
+  host: 'example.com',
+  ports: '22,80,443,3389'
+});
+
+// Nmap scan
+await executeTool('nmap_scan', {
+  target: '192.168.1.0/24',
+  scanType: '-sV'
+});
+```
+
+### Vulnerability Testing
+```typescript
+// SQL Injection test
+await executeTool('sql_injection_test', {
+  url: 'https://example.com/search?q={param}',
+  param: 'q'
+});
+
+// XSS test
+await executeTool('xss_test', {
+  url: 'https://example.com/search?q={param}',
+  param: 'q'
+});
+
+// HTTP headers check
+await executeTool('http_headers_check', {
+  url: 'https://example.com'
+});
+
+// SSL check
+await executeTool('ssl_check', {
+  hostname: 'example.com'
+});
+```
+
+### Password Tools
+```typescript
+// Identify hash type
+await executeTool('hash_identify', {
+  hash: '5f4dcc3b5aa765d61d8327deb882cf99'
+});
+
+// Generate password
+await executeTool('generate_password', {
+  length: 24,
+  includeSymbols: true
+});
+
+// Check password strength
+await executeTool('password_strength', {
+  password: 'MyP@ssw0rd!'
+});
+```
+
+---
+
+## 🌐 Browser Automation Skill
+
+VoiceDev includes a browser automation skill for web scraping and testing:
 
 ```typescript
-import { marketplace } from './marketplace';
-
-// Search for items
-const results = marketplace.search('file', {
-  type: 'tool',
-  minRating: 4.0
+await executeSkill('browser_navigate', {
+  url: 'https://example.com'
 });
 
-// Install an item
-await marketplace.install('file_read', 'user-123');
+await executeSkill('browser_screenshot', {
+  selector: '.content',
+  savePath: '/screenshots/page.png'
+});
 
-// Add a review
-marketplace.addReview('file_read', 'user-123', 5, 'Works great!');
+await executeSkill('browser_click', {
+  selector: '#submit-button'
+});
+
+await executeSkill('browser_fill', {
+  selector: '#email',
+  value: 'test@example.com'
+});
 ```
 
 ---
 
-## ✏️ How to Edit This Project
-
-### Project Structure
+## 📦 Project Structure
 
 ```
 voicedev/
 ├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── api/                # API Routes
-│   │   ├── layout.tsx          # Root layout
-│   │   └── page.tsx            # Home page
-│   │
-│   ├── components/             # React Components
-│   │   └── ui/                 # shadcn/ui components
-│   │
-│   ├── tools/                  # 250 Tools (cross-platform)
-│   │   └── index.ts
-│   │
-│   ├── skills/                 # 100 Skills
-│   │   └── index.ts
-│   │
-│   ├── security/               # 5 Security Layers
-│   │   └── index.ts
-│   │
-│   └── marketplace/            # Marketplace System
-│       └── index.ts
-│
-├── prisma/                     # Database Schema
-├── package.json
-└── tsconfig.json
-```
-
-### Editing Components
-
-1. Find the component in `src/components/`
-2. Make your changes
-3. Test with `npm run dev`
-4. Build with `npm run build`
-
----
-
-## 🔨 How to Add New Tools
-
-### Step 1: Define Your Tool
-
-Open `src/tools/index.ts` and add your tool:
-
-```typescript
-my_tool: createTool(
-  'my_tool',
-  'Brief description of what the tool does',
-  {
-    required_param: 'string',
-    optional_param: 'number?',
-  },
-  async (p: { required_param: string; optional_param?: number }) => {
-    try {
-      // Your implementation here
-      const result = await someOperation(p.required_param);
-      
-      return { 
-        success: true, 
-        data: result,
-        metadata: {
-          platform: process.platform  // Include platform info
-        }
-      };
-    } catch (e: any) {
-      return { success: false, error: e.message };
-    }
-  }
-),
-```
-
-### Step 2: Make It Cross-Platform
-
-Use the built-in utilities for cross-platform support:
-
-```typescript
-import { isWindows, execCrossPlatform, shellCommands } from './tools';
-
-my_crossplatform_tool: createTool(
-  'my_crossplatform_tool',
-  'A tool that works everywhere',
-  { path: 'string' },
-  async (p: { path: string }) => {
-    try {
-      // Use execCrossPlatform instead of execAsync
-      const { stdout } = await execCrossPlatform(
-        isWindows 
-          ? `Get-ChildItem "${p.path}"` 
-          : `ls -la "${p.path}"`
-      );
-      
-      return { success: true, data: stdout };
-    } catch (e: any) {
-      return { success: false, error: e.message };
-    }
-  }
-),
+│   ├── app/              # Next.js App Router
+│   ├── components/       # React Components
+│   ├── tools/            # 250 Real Tools
+│   ├── skills/           # 100 Real Skills
+│   ├── providers/        # 15 AI Providers
+│   ├── channels/         # 6 Messaging Channels
+│   ├── voice/            # TTS/ASR Support
+│   ├── remote/           # Remote Control Tools
+│   ├── pentest/          # Security Tools
+│   ├── marketplace/      # Skill Marketplace
+│   ├── security/         # 5 Security Layers
+│   ├── wizard/           # Setup Wizard
+│   └── lib/              # Utilities
+├── src-tauri/            # Tauri Desktop App
+│   └── src/
+│       └── main.rs       # Rust Backend
+├── prisma/               # Database Schema
+├── install.sh            # Linux/macOS Installer
+├── install.ps1           # Windows Installer
+└── README.md
 ```
 
 ---
 
-## 🎯 How to Add New Skills
+## 🖥️ Desktop App (Tauri)
 
-Open `src/skills/index.ts` and add your skill:
-
-```typescript
-'my_skill': {
-  name: 'My Skill Name',
-  description: 'What this skill does',
-  category: 'development',
-  tools: ['tool_one', 'tool_two'],
-  execute: async (params: { path: string }): Promise<SkillResult> => {
-    const steps: SkillResult['steps'] = [];
-    
-    // Step 1
-    const step1 = await runTool('tool_one', { path: params.path });
-    steps.push({ tool: 'tool_one', result: step1 });
-    
-    if (!step1.success) {
-      return { success: false, error: step1.error, steps };
-    }
-    
-    // Step 2
-    const step2 = await runTool('tool_two', { data: step1.data });
-    steps.push({ tool: 'tool_two', result: step2 });
-    
-    return {
-      success: true,
-      data: step2.data,
-      steps
-    };
-  }
-},
-```
-
----
-
-## 🛒 How to Use the Marketplace
-
-### Searching
-
-```typescript
-const results = marketplace.search('database', {
-  type: 'skill',
-  category: 'database',
-  minRating: 4.0,
-  sortBy: 'downloads'
-});
-```
-
-### Installing
-
-```typescript
-const result = await marketplace.install('postgres_query', 'user-123');
-```
-
-### Publishing
-
-```typescript
-const result = await marketplace.publishItem({
-  name: 'My Custom Tool',
-  description: 'Does something awesome',
-  type: 'tool',
-  category: 'utility',
-  author: 'your-username',
-  version: '1.0.0',
-  price: 'free',
-  tags: ['custom', 'utility'],
-  dependencies: []
-});
-```
-
----
-
-## ⭐ How to Rate Tools and Skills
-
-```typescript
-// Add a review
-marketplace.addReview(
-  'file_read',           // Item ID
-  'user-123',            // Your user ID
-  5,                     // Rating (1-5 stars)
-  'This tool is amazing! Works perfectly on Windows.'
-);
-
-// Get reviews
-const reviews = marketplace.getReviews('file_read', 20);
-```
-
----
-
-## 🐛 How to Debug Issues
-
-### Enable Debug Mode
-
+### Development
 ```bash
-# Windows PowerShell
-$env:DEBUG="voicedev:*"
-npm run dev
-
-# Linux/macOS
-DEBUG=voicedev:* npm run dev
+npm run tauri:dev
 ```
 
-### Common Windows Issues
-
-#### PowerShell Execution Policy
-```powershell
-# Error: "running scripts is disabled on this system"
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-#### Long Path Names
-```powershell
-# Enable long paths in Windows
-# Run as Administrator in PowerShell:
-New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
-  -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-```
-
-#### Permission Denied
-```powershell
-# Run PowerShell as Administrator for:
-# - Symlink creation
-# - Service management
-# - System file operations
-```
-
-### Common Linux/macOS Issues
-
-#### Permission Denied
+### Build for Production
 ```bash
-# Make scripts executable
-chmod +x script.sh
-
-# Use sudo for system operations
-sudo npm install -g some-package
+npm run tauri:build
 ```
 
-#### Port Already in Use
-```bash
-# Find process using port 3000
-lsof -i :3000
+This creates native installers:
+- **Windows**: `.msi` and `.exe`
+- **macOS**: `.dmg` and `.app`
+- **Linux**: `.deb`, `.rpm`, `.AppImage`
 
-# Kill the process
-kill -9 <PID>
-```
+### Tauri Features
+- Native desktop experience
+- System tray integration
+- Auto-updater
+- Native file dialogs
+- System notifications
+- Clipboard access
+- Shell integration
 
-### Check OS Information
+---
 
-```typescript
-const osInfo = await executeTool('os_info', {});
-console.log(osInfo);
-// {
-//   platform: 'win32',
-//   arch: 'x64',
-//   type: 'Windows_NT',
-//   release: '10.0.19045',
-//   cpus: 8,
-//   totalMemory: 17179869184,
-//   freeMemory: 8589934592,
-//   isWindows: true,
-//   shell: 'powershell'
-// }
+## 🛡️ 5-Layer Security
+
+1. **Static Code Analysis** - Detects dangerous patterns
+2. **Sandboxed Execution** - Timeout, memory limits
+3. **Permission System** - Granular permissions per tool
+4. **Rate Limiting** - Prevent abuse
+5. **Audit Logging** - Complete operation trail
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file:
+
+```env
+# AI Providers
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=...
+ZAI_API_KEY=...
+MOONSHOT_API_KEY=...
+MINIMAX_API_KEY=...
+GROQ_API_KEY=...
+DEEPSEEK_API_KEY=...
+MISTRAL_API_KEY=...
+XAI_API_KEY=...
+COHERE_API_KEY=...
+REPLICATE_API_TOKEN=...
+TOGETHER_API_KEY=...
+ELEVENLABS_API_KEY=...
+QWEN_API_KEY=...
+
+# Messaging Channels
+TELEGRAM_BOT_TOKEN=...
+WHATSAPP_ACCESS_TOKEN=...
+DISCORD_WEBHOOK_URL=...
+SLACK_WEBHOOK_URL=...
+
+# Email (Optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
 ```
 
 ---
@@ -735,138 +507,43 @@ console.log(osInfo);
 ## 📚 API Reference
 
 ### Tools API
-
 ```
 POST /api/tools/execute
-Execute a tool with parameters
-
-Request:
-{
-  "tool": "file_read",
-  "params": { "path": "/data/file.txt" }
-}
-
-Response:
-{
-  "success": true,
-  "data": "file contents..."
-}
+Body: { "tool": "tool_name", "params": {...} }
 ```
 
 ### Skills API
-
 ```
 POST /api/skills/execute
-Execute a skill with parameters
-
-Request:
-{
-  "skill": "project-init",
-  "params": { "name": "my-project" }
-}
+Body: { "skill": "skill_name", "params": {...} }
 ```
 
-### OS Info API
-
+### Providers API
 ```
-POST /api/tools/execute
-Get operating system information
-
-Request:
-{
-  "tool": "os_info",
-  "params": {}
-}
-
-Response:
-{
-  "success": true,
-  "data": {
-    "platform": "win32",
-    "isWindows": true,
-    "shell": "powershell",
-    ...
-  }
-}
+GET /api/providers          # List all providers
+GET /api/providers/:id      # Get provider details
+GET /api/models?category=llm  # List models by category
 ```
 
----
-
-## 🏗️ Architecture
-
-### Cross-Platform Architecture
-
+### Channels API
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    VoiceDev Application                 │
-├─────────────────────────────────────────────────────────┤
-│                     Tool Layer                          │
-│  ┌─────────────────┐    ┌─────────────────┐            │
-│  │  Cross-Platform │    │   Platform      │            │
-│  │     Utils       │    │   Detection     │            │
-│  └────────┬────────┘    └────────┬────────┘            │
-│           │                      │                      │
-│           ▼                      ▼                      │
-│  ┌─────────────────────────────────────────┐           │
-│  │          Platform-Specific              │           │
-│  │            Commands                     │           │
-│  │  ┌──────────────┐  ┌──────────────┐    │           │
-│  │  │  PowerShell  │  │    Bash      │    │           │
-│  │  │  (Windows)   │  │ (Linux/Mac)  │    │           │
-│  │  └──────────────┘  └──────────────┘    │           │
-│  └─────────────────────────────────────────┘           │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run with coverage
-npm run test:coverage
-```
-
-### Cross-Platform Testing
-
-```typescript
-describe('file operations', () => {
-  it('should work on all platforms', async () => {
-    const result = await executeTool('file_write', {
-      path: path.join(os.tmpdir(), 'test.txt'),
-      content: 'Hello World'
-    });
-    expect(result.success).toBe(true);
-  });
-});
+POST /api/channels/telegram/send
+POST /api/channels/whatsapp/send
+POST /api/channels/discord/send
+POST /api/channels/slack/send
 ```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions!
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Contribution Guidelines
-
-- **Cross-Platform**: Ensure code works on Windows, Linux, and macOS
-- **Tests**: Add tests for new functionality
-- **Documentation**: Update README for new features
-- **Security**: Consider security implications
+1. Fork the repo
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Open Pull Request
 
 ---
 
@@ -878,11 +555,9 @@ MIT License - Use it however you want!
 
 ## 🙏 Special Thanks
 
-- My parents for the screen time (and snacks)
+- My parents for screen time
 - The AI that helped me learn
-- Hot chocolate (just kidding, I'm 11 - more screen time!)
 - Everyone who believes young devs can build cool stuff
-- The open-source community
 
 ---
 
@@ -890,7 +565,7 @@ MIT License - Use it however you want!
 
 - **GitHub**: [@Mohabsmar](https://github.com/Mohabsmar)
 - **Project**: [VoiceDev](https://github.com/Mohabsmar/voicedev)
-- **Issues**: [Report a Bug](https://github.com/Mohabsmar/voicedev/issues)
+- **Issues**: [Report Bug](https://github.com/Mohabsmar/voicedev/issues)
 
 ---
 
@@ -900,8 +575,10 @@ MIT License - Use it however you want!
 
 ### ⭐ Star this repo if you think it's cool! ⭐
 
-**Works on Windows (PowerShell) + Linux + macOS!**
+**Cross-Platform: Windows (PowerShell) + Linux + macOS**
 
-**All 250 tools + 100 skills have REAL working implementations!**
+**Desktop App: Tauri v2**
+
+**250 Tools + 100 Skills + 15 AI Providers + 6 Channels**
 
 </div>
