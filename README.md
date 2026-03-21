@@ -2,7 +2,7 @@
 
 # 🎤 VoiceDev
 
-### The Ultimate AI Agent Debugger Platform
+### The Ultimate AI Agent Platform with 250+ Tools
 
 **Cross-Platform Desktop App + Web Interface**
 
@@ -15,21 +15,22 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 [![Tools](https://img.shields.io/badge/Tools-250+-orange?style=flat-square)](src/tools/)
-[![Skills](https://img.shields.io/badge/Skills-105+-blue?style=flat-square)](src/skills/)
+[![Skills](https://img.shields.io/badge/Skills-50+-blue?style=flat-square)](src/skills/)
 [![Providers](https://img.shields.io/badge/AI_Providers-15-informational?style=flat-square)](src/providers/)
-[![Channels](https://img.shields.io/badge/Channels-6-success?style=flat-square)](src/channels/)
+[![Models](https://img.shields.io/badge/AI_Models-92+-success?style=flat-square)](src/providers/)
 
 </div>
 
 ---
 
-## ⚡ One-Liner Install (Recommended)
+## ⚡ One-Liner Install
 
+**Linux/macOS:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
 ```
 
-**Or on Windows PowerShell:**
+**Windows PowerShell:**
 ```powershell
 irm https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.ps1 | iex
 ```
@@ -38,481 +39,89 @@ irm https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.ps1 | iex
 
 ## 🎯 What is VoiceDev?
 
-VoiceDev is a comprehensive AI Agent Debugger Platform that combines:
+VoiceDev is a comprehensive AI Agent Platform that includes:
 
-- **250+ Real Working Tools** - File system, shell, web, git, npm, database, cloud, security
-- **105+ Real Skills** - Multi-tool workflows for complex tasks including Browser Automation
-- **15 AI Providers** - OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together AI, ElevenLabs, Qwen
-- **6 Messaging Channels** - Telegram, WhatsApp, Discord, Slack, Email, MCP
-- **Voice Support** - TTS, ASR, Voice Cloning with newest 2026 models
-- **Remote Computer Control** - SSH, RDP, VNC, WinRM, Wake-on-LAN
-- **Browser Use Skill** - Web automation, scraping, screenshots
-- **Security Tools** - Port scanning, vulnerability testing, password tools
-- **Setup Wizard** - Interactive first-time setup experience
-- **Cross-Platform** - Windows (PowerShell), Linux, macOS (Bash)
-- **Desktop App** - Tauri-based native app
-
----
-
-## 🚀 Quick Start
-
-### Option 1: One-Liner (Recommended)
-```bash
-curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
-```
-
-### Option 2: Manual Install
-```bash
-git clone https://github.com/Mohabsmar/voicedev.git
-cd voicedev
-npm install
-npm run dev
-```
-
-### Option 3: Desktop App
-```bash
-npm run tauri:dev    # Development
-npm run tauri:build  # Build desktop app
-```
-
----
-
-## 🖥️ Setup Wizard (NEW!)
-
-VoiceDev includes an interactive setup wizard that runs on first launch:
-
-1. **Welcome** - Introduction to VoiceDev features
-2. **AI Providers** - Select and configure your AI providers
-3. **API Keys** - Enter and validate your API keys
-4. **Features** - Enable Voice, Remote Control, Browser Use
-5. **Channels** - Configure Telegram, WhatsApp, Discord
-6. **Install** - Automated dependency installation
-
-The wizard guides you through the entire setup process with a beautiful UI!
+| Feature | Description |
+|---------|-------------|
+| **250+ Tools** | FileSystem, Shell, Git, NPM, HTTP, Crypto, Archives, Process Management |
+| **50+ Skills** | Multi-tool workflows for development, data, automation |
+| **15 AI Providers** | OpenAI, Anthropic, Google, Z.ai, Moonshot, MiniMax, Groq, DeepSeek, Mistral, xAI, Cohere, Replicate, Together, ElevenLabs, Qwen |
+| **92+ AI Models** | Newest March 2026 models including GPT-5.2, Claude 4.6, Gemini 3.1 |
+| **Remote Control** | SSH, RDP, VNC, WinRM, Wake-on-LAN |
+| **6 Channels** | Telegram, WhatsApp, Discord, Slack, Email, MCP |
+| **Voice Support** | TTS-3, Whisper 3, ElevenLabs V3 |
+| **Browser Automation** | Navigate, screenshot, extract, automate |
+| **Security Tools** | Port scanning, vulnerability testing, password tools |
+| **Setup Wizard** | Interactive first-time configuration |
+| **Cross-Platform** | Windows (PowerShell) + Linux + macOS |
+| **Desktop App** | Tauri v2 native application |
 
 ---
 
 ## 🤖 15 AI Providers with Newest Models (March 21, 2026)
 
-### Large Language Models (LLMs)
+### Latest Flagship Models
 
-| Provider | Newest Models (March 2026) |
-|----------|---------------------------|
-| **OpenAI** | GPT-4.5 Turbo ⭐, GPT-4.5, o3, o4-mini ⭐ |
-| **Anthropic** | Claude 4 Opus ⭐, Claude 4 Sonnet, Claude 3.7 Sonnet |
-| **Google** | Gemini 2.5 Pro ⭐, Gemini 2.5 Flash ⭐, Gemma 3 |
-| **Z.ai** | Z-2 Ultra ⭐, Z-2 Pro, Z-2 Mini |
-| **Moonshot AI** | Kimi K2 ⭐, Moonshot V1 128K |
-| **MiniMax** | ABAB 7 Chat ⭐, ABAB 6.5 Chat |
-| **Groq** | Llama 4 70B ⭐, Llama 4 8B ⭐ |
-| **DeepSeek** | DeepSeek R2 ⭐, DeepSeek V3 |
-| **Mistral** | Mistral Large 2 ⭐, Codestral |
-| **xAI** | Grok 3 ⭐, Grok 3 Mini ⭐ |
-| **Cohere** | Command R+, Embed V4 |
-| **Replicate** | Llama 4 70B ⭐, Flux 2 ⭐ |
-| **Together AI** | Llama 4 70B Turbo ⭐ |
-| **Qwen** | Qwen 3 Max ⭐, Qwen Long (10M context) |
-
-⭐ = Released in 2026
+| Provider | Newest Model | Key Features |
+|----------|--------------|--------------|
+| **OpenAI** | GPT-5.2 Pro | 512K context, agentic, reasoning |
+| **Anthropic** | Claude Opus 4.6 | Coding, computer use, 200K context |
+| **Google** | Gemini 3.1 Pro | 2M context, multimodal, agentic |
+| **DeepSeek** | DeepSeek V4 | Trillion-param MoE, open weights |
+| **xAI** | Grok 4 | Real-time X integration, witty |
+| **Meta** | Llama 4 Behemoth | Open weights, powerful |
+| **Mistral** | Mistral Large 3 | 41B active params, efficient |
+| **Qwen** | Qwen 3 235B | MoE, multilingual, reasoning |
+| **Moonshot** | Kimi K3 | 1M context, multimodal |
+| **Z.ai** | Z-3 Ultra | Agentic, vision, reasoning |
+| **MiniMax** | ABAB 8 Chat | Multilingual, voice support |
 
 ### Voice Models (TTS/ASR) - March 2026
 
 | Provider | TTS Models | ASR Models |
 |----------|-----------|------------|
-| **OpenAI** | TTS-2 ⭐, GPT-4o Mini TTS | Whisper 2 ⭐ |
-| **ElevenLabs** | Eleven V3 ⭐, Multilingual V2 | Scribe V2 ⭐ |
-| **MiniMax** | Speech-02 Turbo ⭐ | - |
-| **Groq** | - | Whisper Large V3 Turbo |
-| **Qwen** | - | Qwen Audio Turbo |
+| **OpenAI** | TTS-3, GPT-5 TTS | Whisper 3 |
+| **ElevenLabs** | Eleven V3 ⭐ | Scribe V3 |
+| **MiniMax** | Speech-03 Turbo | - |
+| **Groq** | - | Whisper 3 Turbo (ultra-fast) |
 
 ### Image Generation
 
 | Provider | Models |
 |----------|--------|
-| **OpenAI** | DALL-E 4 ⭐, DALL-E 3 |
-| **Replicate** | Flux 2 ⭐, Flux Schnell, SDXL |
+| **OpenAI** | DALL-E 4, Sora (video) |
+| **Replicate** | Flux 3, Flux Schnell |
+| **xAI** | Grok Aurora |
 
 ### Reasoning Models
 
 | Provider | Models |
 |----------|--------|
-| **OpenAI** | o4-mini ⭐, o3 ⭐, o3-mini |
-| **DeepSeek** | DeepSeek R2 ⭐ |
+| **OpenAI** | o4, o4-mini |
+| **DeepSeek** | R3, R2 |
+| **Google** | Gemini 3 Deep Think |
 
 ---
 
-## 🎛️ Features
-
-### 🔧 250+ Real Tools
-
-| Category | Count | Examples |
-|----------|-------|----------|
-| **FileSystem** | 50 | Read, write, copy, move, compress, hash |
-| **Shell** | 40 | Execute commands, manage processes |
-| **Web/HTTP** | 50 | GET, POST, DNS, webhooks, JWT |
-| **Git** | 30 | Clone, commit, push, merge, rebase |
-| **NPM/Packages** | 30 | Install, build, test, publish |
-| **Database** | 20 | SQLite, PostgreSQL, MySQL, Redis, MongoDB |
-| **Cloud** | 20 | Docker, Kubernetes, AWS, GCP, Azure |
-| **Security** | 20 | Encrypt, hash, port scan, vulnerability test |
-| **Remote** | 25 | SSH, RDP, VNC, WinRM, Wake-on-LAN |
-| **Browser** | 13 | Navigate, screenshot, extract, automate |
-| **Pentest** | 15 | Nmap, DNS enum, SQL injection, XSS test |
-
-### 🎨 105+ Real Skills
-
-Skills combine multiple tools for complex workflows:
-
-| Category | Count | Examples |
-|----------|-------|----------|
-| **Development** | 20 | Project init, API test, git workflow |
-| **Data** | 15 | JSON transform, CSV convert, aggregation |
-| **Automation** | 15 | Batch rename, cleanup, sync |
-| **Security** | 15 | Port scan, SSL check, audit |
-| **Voice** | 10 | TTS speak, ASR transcribe |
-| **Channels** | 10 | Send messages, notifications |
-| **Remote** | 15 | SSH exec, file transfer, remote control |
-| **Browser** | 5 | Navigate, screenshot, extract, search, automate |
-
----
-
-## 🌐 Browser Use Skill (NEW!)
-
-VoiceDev includes a powerful browser automation skill for web scraping and testing:
-
-### Navigate to URLs
-```typescript
-await executeSkill('browser-navigate', {
-  url: 'https://example.com'
-});
-```
-
-### Take Screenshots
-```typescript
-await executeSkill('browser-screenshot', {
-  url: 'https://example.com',
-  outputPath: '/screenshots/page.png'
-});
-```
-
-### Extract Data
-```typescript
-await executeSkill('browser-extract', {
-  url: 'https://example.com',
-  selectors: {
-    title: 'h1',
-    description: '.description',
-    links: 'a[href]'
-  }
-});
-```
-
-### Web Search
-```typescript
-await executeSkill('browser-search', {
-  query: 'VoiceDev AI platform',
-  engine: 'google'  // or 'bing', 'duckduckgo'
-});
-```
-
-### Full Browser Automation
-```typescript
-await executeSkill('browser-automate', {
-  url: 'https://example.com/login',
-  actions: [
-    { type: 'type', selector: '#email', value: 'user@example.com' },
-    { type: 'type', selector: '#password', value: 'password123' },
-    { type: 'click', selector: '#submit' }
-  ]
-});
-```
-
-### Available Browser Tools
-
-| Tool | Description |
-|------|-------------|
-| `browser_navigate` | Open a URL in browser |
-| `browser_screenshot` | Take full page screenshot |
-| `browser_extract` | Extract data with CSS selectors |
-| `browser_click` | Click elements |
-| `browser_type` | Type into input fields |
-| `browser_scroll` | Scroll page (up/down/top/bottom) |
-| `browser_wait` | Wait for element |
-| `browser_evaluate` | Execute JavaScript |
-| `browser_fill_form` | Fill multiple form fields |
-| `browser_get_content` | Get full HTML |
-| `browser_get_text` | Get visible text |
-| `browser_download` | Download files |
-| `browser_search` | Web search |
-
----
-
-## 🖥️ Remote Computer Control (ENHANCED!)
-
-### SSH Tools
-```typescript
-// Execute command
-await executeTool('ssh_exec', {
-  host: '192.168.1.100',
-  user: 'admin',
-  command: 'ls -la'
-});
-
-// Copy files via SCP
-await executeTool('ssh_copy_file', {
-  source: '/local/file.txt',
-  destination: '/remote/file.txt',
-  direction: 'upload'
-});
-
-// Create SSH tunnel
-await executeTool('ssh_tunnel', {
-  host: '192.168.1.100',
-  user: 'admin',
-  localPort: 8080,
-  remotePort: 80
-});
-
-// Generate SSH keys
-await executeTool('ssh_keygen', {
-  type: 'ed25519',
-  path: '~/.ssh/my_key'
-});
-```
-
-### RDP (Windows Remote Desktop)
-```typescript
-// Connect to RDP
-await executeTool('rdp_connect', {
-  host: '192.168.1.100',
-  user: 'admin',
-  password: 'password'
-});
-
-// List RDP sessions
-await executeTool('rdp_session_list', {
-  server: '192.168.1.100'
-});
-
-// Enable RDP
-await executeTool('rdp_enable', {});
-```
-
-### VNC
-```typescript
-// Connect to VNC
-await executeTool('vnc_connect', {
-  host: '192.168.1.100',
-  port: 5900
-});
-
-// Start VNC server (Linux)
-await executeTool('vnc_server_start', {
-  display: 1,
-  geometry: '1920x1080'
-});
-```
-
-### WinRM (Windows Remote Management)
-```typescript
-await executeTool('winrm_exec', {
-  host: '192.168.1.100',
-  user: 'admin',
-  password: 'password',
-  command: 'Get-Process'
-});
-```
-
-### Remote Monitoring
-```typescript
-// Ping
-await executeTool('ping', { host: 'example.com', count: 10 });
-
-// Port scan
-await executeTool('port_scan', { 
-  host: '192.168.1.100',
-  ports: '22,80,443,3389,5900'
-});
-
-// DNS lookup
-await executeTool('dns_lookup', { 
-  host: 'example.com',
-  type: 'MX'
-});
-
-// HTTP check
-await executeTool('http_check', { url: 'https://example.com' });
-
-// Remote shutdown
-await executeTool('remote_shutdown', {
-  host: '192.168.1.100',
-  action: 'restart',
-  message: 'System maintenance',
-  timeout: 60
-});
-
-// Wake-on-LAN
-await executeTool('wake_on_lan', {
-  mac: 'AA:BB:CC:DD:EE:FF'
-});
-```
-
----
-
-## 📱 Messaging Channels (MCP)
-
-VoiceDev supports multiple messaging platforms:
-
-### Telegram
-```typescript
-await executeTool('telegram_send_message', {
-  botToken: 'YOUR_BOT_TOKEN',
-  chatId: 'CHAT_ID',
-  message: 'Hello from VoiceDev!'
-});
-```
-
-### WhatsApp Business API
-```typescript
-await executeTool('whatsapp_send_message', {
-  accessToken: 'YOUR_TOKEN',
-  phoneNumberId: 'YOUR_PHONE_ID',
-  to: '+1234567890',
-  message: 'Hello!'
-});
-```
-
-### Discord
-```typescript
-await executeTool('discord_send_embed', {
-  webhookUrl: 'YOUR_WEBHOOK',
-  title: 'Alert',
-  description: 'Task completed!'
-});
-```
-
-### Slack
-```typescript
-await executeTool('slack_send_message', {
-  webhookUrl: 'YOUR_WEBHOOK',
-  text: 'Build completed!'
-});
-```
-
----
-
-## 🎤 Voice Support
-
-### Text-to-Speech (TTS)
-```typescript
-// OpenAI TTS-2 (New!)
-await executeTool('tts_speak', {
-  text: 'Hello, World!',
-  provider: 'openai',
-  voice: 'alloy',
-  model: 'tts-2'
-});
-
-// ElevenLabs V3 (New!)
-await executeTool('tts_speak', {
-  text: 'Hello, World!',
-  provider: 'elevenlabs',
-  voice: 'rachel',
-  model: 'eleven_v3'
-});
-
-// MiniMax TTS
-await executeTool('tts_speak', {
-  text: '你好世界',
-  provider: 'minimax',
-  voice: 'female-shaonv'
-});
-```
-
-### Speech-to-Text (ASR)
-```typescript
-// OpenAI Whisper 2 (New!)
-await executeTool('asr_transcribe', {
-  audioPath: '/path/to/audio.mp3',
-  provider: 'openai',
-  model: 'whisper-2'
-});
-
-// Groq Whisper (Ultra-fast)
-await executeTool('asr_transcribe', {
-  audioPath: '/path/to/audio.mp3',
-  provider: 'groq'
-});
-
-// ElevenLabs Scribe V2 (New!)
-await executeTool('asr_transcribe', {
-  audioPath: '/path/to/audio.mp3',
-  provider: 'elevenlabs',
-  model: 'scribe_v2'
-});
-```
-
----
-
-## 🔒 Security & Penetration Testing
-
-### Port Scanning
-```typescript
-await executeTool('port_scan', {
-  host: 'example.com',
-  ports: '22,80,443,3389'
-});
-
-await executeTool('nmap_scan', {
-  target: '192.168.1.0/24',
-  scanType: '-sV'
-});
-```
-
-### Vulnerability Testing
-```typescript
-// SQL Injection test
-await executeTool('sql_injection_test', {
-  url: 'https://example.com/search?q={param}',
-  param: 'q'
-});
-
-// XSS test
-await executeTool('xss_test', {
-  url: 'https://example.com/search?q={param}',
-  param: 'q'
-});
-
-// SSL check
-await executeTool('ssl_check', {
-  hostname: 'example.com'
-});
-```
-
----
-
-## 📦 Project Structure
+## 📁 Project Structure
 
 ```
 voicedev/
 ├── src/
-│   ├── app/              # Next.js App Router
-│   ├── components/       # React Components
-│   │   └── SetupWizard.tsx  # Setup Wizard Component
-│   ├── tools/            # 250+ Real Tools
-│   ├── skills/           # 105+ Real Skills
-│   │   └── browser-use.ts   # Browser Automation Skill
-│   ├── providers/        # 15 AI Providers (March 2026)
+│   ├── app/              # Next.js App Router (15 API routes)
+│   ├── components/       # React Components + Setup Wizard
+│   ├── tools/            # 174+ Core Tools (2019 lines)
+│   ├── skills/           # 50+ Skills + Browser Automation
+│   ├── providers/        # 15 AI Providers, 92+ Models
 │   ├── channels/         # 6 Messaging Channels
 │   ├── voice/            # TTS/ASR Support
 │   ├── remote/           # Remote Control Tools
 │   ├── pentest/          # Security Tools
 │   ├── marketplace/      # Skill Marketplace
 │   ├── security/         # 5 Security Layers
-│   └── lib/              # Utilities
+│   └── lib/              # Utilities + Billing
 ├── src-tauri/            # Tauri Desktop App
-│   └── src/
-│       └── main.rs       # Rust Backend
+│   └── src/main.rs       # Rust Backend
 ├── prisma/               # Database Schema
 ├── install.sh            # Linux/macOS Installer
 ├── install.ps1           # Windows Installer
@@ -521,19 +130,184 @@ voicedev/
 
 ---
 
-## 🖥️ Desktop App (Tauri)
+## 🛠️ 250+ Tools by Category
 
-### Development
-```bash
-npm run tauri:dev
+| Category | Count | Examples |
+|----------|-------|----------|
+| **FileSystem** | 40+ | read, write, copy, move, hash, watch, lock |
+| **Shell** | 30+ | exec, pipe, background, kill, python, node |
+| **Git** | 30+ | clone, commit, push, merge, rebase, stash |
+| **NPM/Package** | 25+ | init, install, build, test, publish |
+| **HTTP/Web** | 20+ | GET, POST, DNS, webhook, JWT |
+| **Archive** | 10+ | zip, tar, gzip, extract |
+| **Remote** | 25+ | SSH, RDP, VNC, WinRM, Wake-on-LAN |
+| **Channel** | 15+ | Telegram, WhatsApp, Discord, Slack |
+| **Voice** | 10+ | TTS speak, ASR transcribe, voice clone |
+| **Browser** | 13 | navigate, screenshot, extract, click, type |
+| **Security** | 25+ | nmap, port scan, SQL injection, XSS test |
+
+---
+
+## 🎨 50+ Skills by Category
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Development** | 20+ | project init, API test, git workflow, build |
+| **Data** | 15+ | JSON transform, CSV convert, aggregation |
+| **Automation** | 10+ | batch rename, cleanup, sync, schedule |
+| **Security** | 10+ | port scan, SSL check, audit |
+| **Voice** | 5+ | TTS speak, ASR transcribe |
+| **Remote** | 5+ | SSH exec, file transfer |
+| **Browser** | 5+ | navigate, screenshot, extract |
+
+---
+
+## 🌐 Browser Automation
+
+```typescript
+// Navigate
+await executeTool('browser_navigate', { url: 'https://example.com' });
+
+// Screenshot
+await executeTool('browser_screenshot', { 
+  url: 'https://example.com',
+  outputPath: '/screenshots/page.png'
+});
+
+// Extract data
+await executeTool('browser_extract', {
+  url: 'https://example.com',
+  selectors: { title: 'h1', links: 'a' }
+});
+
+// Web search
+await executeTool('browser_search', { 
+  query: 'VoiceDev AI',
+  engine: 'google'
+});
 ```
 
-### Build for Production
+**Available:** navigate, screenshot, extract, click, type, scroll, wait, evaluate, fill_form, get_content, get_text, download, search
+
+---
+
+## 🖥️ Remote Computer Control
+
+```typescript
+// SSH
+await executeTool('ssh_exec', { host: '192.168.1.100', user: 'admin', command: 'ls -la' });
+await executeTool('ssh_tunnel', { host: '192.168.1.100', localPort: 8080, remotePort: 80 });
+await executeTool('ssh_copy_file', { source: '/file', destination: '/remote' });
+
+// RDP (Windows)
+await executeTool('rdp_connect', { host: '192.168.1.100', user: 'admin' });
+await executeTool('rdp_enable', {});
+
+// VNC
+await executeTool('vnc_connect', { host: '192.168.1.100' });
+await executeTool('vnc_server_start', { display: 1 });
+
+// Monitoring
+await executeTool('ping', { host: 'example.com' });
+await executeTool('port_scan', { host: '192.168.1.100' });
+await executeTool('remote_shutdown', { host: '192.168.1.100', action: 'restart' });
+await executeTool('wake_on_lan', { mac: 'AA:BB:CC:DD:EE:FF' });
+```
+
+---
+
+## 📱 Messaging Channels
+
+```typescript
+// Telegram
+await executeTool('telegram_send_message', { 
+  botToken: 'TOKEN', chatId: 'ID', message: 'Hello!' 
+});
+
+// WhatsApp
+await executeTool('whatsapp_send_message', { 
+  accessToken: 'TOKEN', phoneNumberId: 'ID', to: '+123456', message: 'Hello!' 
+});
+
+// Discord
+await executeTool('discord_send_embed', { 
+  webhookUrl: 'URL', title: 'Alert', description: 'Done!' 
+});
+
+// Slack
+await executeTool('slack_send_message', { 
+  webhookUrl: 'URL', text: 'Build completed!' 
+});
+
+// MCP (Generic)
+await executeTool('mcp_call', { 
+  config: { baseUrl: 'https://api.example.com', headers: {} },
+  endpoint: '/messages',
+  method: 'POST',
+  body: { text: 'Hello' }
+});
+```
+
+---
+
+## 🎤 Voice Support
+
+```typescript
+// TTS - OpenAI TTS-3
+await executeTool('tts_speak', { 
+  text: 'Hello!', provider: 'openai', model: 'tts-3', voice: 'alloy' 
+});
+
+// TTS - ElevenLabs V3 (Newest!)
+await executeTool('tts_speak', { 
+  text: 'Hello!', provider: 'elevenlabs', model: 'eleven_v3', voice: 'rachel' 
+});
+
+// ASR - Whisper 3
+await executeTool('asr_transcribe', { 
+  audioPath: '/audio.mp3', provider: 'openai', model: 'whisper-3' 
+});
+
+// ASR - Groq Whisper (Ultra-fast)
+await executeTool('asr_transcribe', { 
+  audioPath: '/audio.mp3', provider: 'groq' 
+});
+```
+
+---
+
+## 🔒 Security & Penetration Testing
+
+```typescript
+// Port scanning
+await executeTool('nmap_scan', { target: '192.168.1.0/24', scanType: '-sV' });
+await executeTool('port_scan', { host: 'example.com', ports: '22,80,443' });
+
+// Vulnerability testing
+await executeTool('sql_injection_test', { url: 'https://site.com/search?q={param}', param: 'q' });
+await executeTool('xss_test', { url: 'https://site.com/search?q={param}', param: 'q' });
+await executeTool('ssl_check', { hostname: 'example.com' });
+await executeTool('http_headers_check', { url: 'https://example.com' });
+
+// Password tools
+await executeTool('hash_identify', { hash: '5f4dcc3b5aa765d61d8327deb882cf99' });
+await executeTool('generate_password', { length: 24, includeSymbols: true });
+await executeTool('password_strength', { password: 'MyP@ssw0rd!' });
+```
+
+---
+
+## 🖥️ Desktop App (Tauri v2)
+
 ```bash
+# Development
+npm run tauri:dev
+
+# Build for production
 npm run tauri:build
 ```
 
-This creates native installers:
+Creates native installers:
 - **Windows**: `.msi` and `.exe`
 - **macOS**: `.dmg` and `.app`
 - **Linux**: `.deb`, `.rpm`, `.AppImage`
@@ -552,10 +326,8 @@ This creates native installers:
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file:
-
 ```env
-# AI Providers (March 2026)
+# AI Providers
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=...
@@ -572,7 +344,7 @@ TOGETHER_API_KEY=...
 ELEVENLABS_API_KEY=...
 QWEN_API_KEY=...
 
-# Messaging Channels
+# Channels
 TELEGRAM_BOT_TOKEN=...
 WHATSAPP_ACCESS_TOKEN=...
 DISCORD_WEBHOOK_URL=...
@@ -587,33 +359,41 @@ SMTP_PASS=your-app-password
 
 ---
 
+## 🚀 Quick Start
+
+### Option 1: One-Liner
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mohabsmar/voicedev/main/install.sh | bash
+```
+
+### Option 2: Manual
+```bash
+git clone https://github.com/Mohabsmar/voicedev.git
+cd voicedev
+npm install
+npm run dev
+```
+
+### Option 3: Desktop App
+```bash
+npm run tauri:dev
+```
+
+---
+
 ## 📚 API Reference
 
-### Tools API
 ```
-POST /api/tools/execute
-Body: { "tool": "tool_name", "params": {...} }
-```
-
-### Skills API
-```
-POST /api/skills/execute
-Body: { "skill": "skill_name", "params": {...} }
-```
-
-### Providers API
-```
-GET /api/providers          # List all providers
-GET /api/providers/:id      # Get provider details
-GET /api/models?category=llm  # List models by category
-GET /api/models/newest      # Get newest 2026 models
+POST /api/tools/execute    # Execute a tool
+POST /api/skills/execute   # Execute a skill
+GET  /api/providers        # List providers
+GET  /api/models?category=llm  # List models by category
+GET  /api/models/newest    # Get newest models
 ```
 
 ---
 
 ## 🤝 Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 1. Fork the repo
 2. Create feature branch
@@ -625,7 +405,7 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📄 License
 
-MIT License - Use it however you want!
+MIT License
 
 ---
 
@@ -655,8 +435,8 @@ MIT License - Use it however you want!
 
 **Desktop App: Tauri v2**
 
-**250+ Tools + 105+ Skills + 15 AI Providers + 6 Channels**
+**250+ Tools • 50+ Skills • 15 Providers • 92+ Models • 6 Channels**
 
-**New in March 2026 (Updated March 21): GPT-4.5 Turbo, Claude 4 Opus, o4-mini, Gemini 2.5, DeepSeek R2, Browser Use, Setup Wizard!**
+**Updated March 21, 2026: GPT-5.2, Claude 4.6, Gemini 3.1, DeepSeek V4, Llama 4, Grok 4!**
 
 </div>

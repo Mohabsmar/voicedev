@@ -1,5 +1,5 @@
 /**
- * VoiceDev - 15 AI Providers with Newest Models (March 2026)
+ * VoiceDev - 15 AI Providers with NEWEST Models (March 21, 2026)
  * Categories: LLM, Voice (TTS/ASR), Vision, Embedding, Image, Reasoning
  */
 
@@ -30,7 +30,7 @@ export interface Provider {
 }
 
 // ============================================
-// 15 AI PROVIDERS WITH NEWEST MODELS (MARCH 2026)
+// 15 AI PROVIDERS WITH NEWEST MODELS (MARCH 21, 2026)
 // ============================================
 export const providers: Provider[] = [
   // 1. OpenAI
@@ -42,30 +42,30 @@ export const providers: Provider[] = [
     website: 'https://platform.openai.com',
     features: ['chat', 'streaming', 'function_calling', 'vision', 'tts', 'whisper', 'reasoning'],
     models: [
-      // LLMs - Newest March 2026
-      { id: 'gpt-4.5-turbo', name: 'GPT-4.5 Turbo', category: 'llm', contextWindow: 256000, features: ['vision', 'function_calling', 'reasoning'], releaseDate: '2026-02-15' },
-      { id: 'gpt-4.5', name: 'GPT-4.5', category: 'llm', contextWindow: 256000, features: ['vision', 'function_calling', 'advanced_reasoning'], releaseDate: '2026-01-20' },
-      { id: 'gpt-4o', name: 'GPT-4o', category: 'llm', contextWindow: 128000, features: ['vision', 'function_calling'], releaseDate: '2024-05-13' },
-      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', category: 'llm', contextWindow: 128000, features: ['vision', 'function_calling', 'fast'], releaseDate: '2024-07-18' },
-      // Reasoning Models
-      { id: 'o3-mini', name: 'o3-mini', category: 'reasoning', contextWindow: 200000, features: ['reasoning', 'efficient'], releaseDate: '2026-01-31' },
-      { id: 'o3', name: 'o3', category: 'reasoning', contextWindow: 200000, features: ['reasoning', 'advanced'], releaseDate: '2026-02-28' },
-      { id: 'o4-mini', name: 'o4-mini', category: 'reasoning', contextWindow: 256000, features: ['reasoning', 'next_gen'], releaseDate: '2026-03-15' },
+      // LLMs - GPT-5 Series (March 2026)
+      { id: 'gpt-5.2', name: 'GPT-5.2', category: 'llm', contextWindow: 512000, features: ['vision', 'function_calling', 'reasoning', 'agentic'], releaseDate: '2026-03-01' },
+      { id: 'gpt-5.2-pro', name: 'GPT-5.2 Pro', category: 'llm', contextWindow: 512000, features: ['vision', 'function_calling', 'advanced_reasoning', 'enterprise'], releaseDate: '2026-03-01' },
+      { id: 'gpt-5.1', name: 'GPT-5.1', category: 'llm', contextWindow: 256000, features: ['vision', 'function_calling', 'reasoning'], releaseDate: '2026-01-15' },
+      { id: 'gpt-5.1-mini', name: 'GPT-5.1 Mini', category: 'llm', contextWindow: 128000, features: ['fast', 'efficient', 'vision'], releaseDate: '2026-01-15' },
+      { id: 'gpt-5.1-nano', name: 'GPT-5.1 Nano', category: 'llm', contextWindow: 64000, features: ['ultra_fast', 'edge'], releaseDate: '2026-01-15' },
+      // Reasoning Models - o-Series
+      { id: 'o4', name: 'o4', category: 'reasoning', contextWindow: 256000, features: ['deep_reasoning', 'agentic'], releaseDate: '2026-02-28' },
+      { id: 'o4-mini', name: 'o4-mini', category: 'reasoning', contextWindow: 200000, features: ['reasoning', 'efficient'], releaseDate: '2026-02-15' },
+      { id: 'o3', name: 'o3', category: 'reasoning', contextWindow: 200000, features: ['reasoning', 'advanced'], releaseDate: '2026-01-31' },
+      // Open Models
+      { id: 'gpt-oss-120b', name: 'GPT-OSS-120B', category: 'llm', contextWindow: 128000, features: ['open_weights', 'customizable'], releaseDate: '2026-02-20' },
       // Voice - TTS
-      { id: 'tts-1', name: 'TTS-1', category: 'tts', features: ['realistic', 'fast'] },
-      { id: 'tts-1-hd', name: 'TTS-1 HD', category: 'tts', features: ['high_quality'] },
-      { id: 'gpt-4o-mini-tts', name: 'GPT-4o Mini TTS', category: 'tts', features: ['newest', 'expressive'], releaseDate: '2025-12-01' },
-      { id: 'tts-2', name: 'TTS-2', category: 'tts', features: ['ultra_realistic', 'emotional'], releaseDate: '2026-02-10' },
+      { id: 'tts-3', name: 'TTS-3', category: 'tts', features: ['ultra_realistic', 'emotional', 'multilingual'], releaseDate: '2026-02-10' },
+      { id: 'gpt-5-tts', name: 'GPT-5 TTS', category: 'tts', features: ['expressive', 'natural'], releaseDate: '2026-03-05' },
+      { id: 'tts-2', name: 'TTS-2', category: 'tts', features: ['realistic', 'emotional'] },
       // Voice - ASR (Whisper)
-      { id: 'whisper-1', name: 'Whisper', category: 'asr', features: ['multilingual', 'accurate'] },
-      { id: 'whisper-2', name: 'Whisper 2', category: 'asr', features: ['multilingual', 'accurate', 'faster'], releaseDate: '2026-01-15' },
+      { id: 'whisper-3', name: 'Whisper 3', category: 'asr', features: ['multilingual', 'accurate', 'diarization'], releaseDate: '2026-02-01' },
+      { id: 'whisper-2', name: 'Whisper 2', category: 'asr', features: ['multilingual', 'accurate', 'faster'] },
       // Embeddings
-      { id: 'text-embedding-3-small', name: 'Embedding Small', category: 'embedding', features: ['efficient'] },
-      { id: 'text-embedding-3-large', name: 'Embedding Large', category: 'embedding', features: ['high_dimensional'] },
-      { id: 'text-embedding-4', name: 'Embedding 4', category: 'embedding', features: ['multimodal', 'efficient'], releaseDate: '2026-03-01' },
+      { id: 'text-embedding-4-large', name: 'Embedding 4 Large', category: 'embedding', features: ['high_dimensional', 'multimodal'], releaseDate: '2026-01-20' },
       // Image
-      { id: 'dall-e-3', name: 'DALL-E 3', category: 'image', features: ['photorealistic', 'prompt_adherence'] },
-      { id: 'dall-e-4', name: 'DALL-E 4', category: 'image', features: ['ultra_realistic', '4k'], releaseDate: '2026-02-20' },
+      { id: 'dall-e-4', name: 'DALL-E 4', category: 'image', features: ['ultra_realistic', '4k', 'video'], releaseDate: '2026-02-20' },
+      { id: 'sora', name: 'Sora', category: 'image', features: ['video_generation', 'hd'], releaseDate: '2026-01-10' },
     ]
   },
 
@@ -78,11 +78,11 @@ export const providers: Provider[] = [
     website: 'https://console.anthropic.com',
     features: ['chat', 'streaming', 'vision', 'artifacts', 'computer_use', 'extended_thinking'],
     models: [
-      { id: 'claude-3.7-sonnet', name: 'Claude 3.7 Sonnet', category: 'llm', contextWindow: 200000, features: ['vision', 'artifacts', 'computer_use', 'extended_thinking'], releaseDate: '2026-02-24' },
-      { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', category: 'llm', contextWindow: 200000, features: ['vision', 'artifacts', 'computer_use'] },
-      { id: 'claude-3.5-haiku', name: 'Claude 3.5 Haiku', category: 'llm', contextWindow: 200000, features: ['fast', 'efficient'] },
-      { id: 'claude-4-opus', name: 'Claude 4 Opus', category: 'llm', contextWindow: 200000, features: ['vision', 'powerful', 'reasoning'], releaseDate: '2026-03-10' },
-      { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', category: 'llm', contextWindow: 200000, features: ['vision', 'balanced'], releaseDate: '2026-03-10' },
+      { id: 'claude-opus-4.6', name: 'Claude Opus 4.6', category: 'llm', contextWindow: 200000, features: ['vision', 'artifacts', 'computer_use', 'coding'], releaseDate: '2026-02-05' },
+      { id: 'claude-sonnet-4.6', name: 'Claude Sonnet 4.6', category: 'llm', contextWindow: 200000, features: ['vision', 'artifacts', 'balanced'], releaseDate: '2026-02-17' },
+      { id: 'claude-4-opus', name: 'Claude 4 Opus', category: 'llm', contextWindow: 200000, features: ['vision', 'powerful', 'reasoning'], releaseDate: '2025-05-22' },
+      { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', category: 'llm', contextWindow: 200000, features: ['vision', 'balanced'] },
+      { id: 'claude-4-haiku', name: 'Claude 4 Haiku', category: 'llm', contextWindow: 200000, features: ['fast', 'efficient'] },
     ]
   },
 
@@ -95,12 +95,12 @@ export const providers: Provider[] = [
     website: 'https://ai.google.dev',
     features: ['chat', 'vision', 'long_context', 'multimodal', 'code_execution'],
     models: [
-      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'reasoning', 'multimodal'], releaseDate: '2026-02-15' },
-      { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', category: 'llm', contextWindow: 1000000, features: ['fast', 'multimodal', 'streaming'], releaseDate: '2026-02-15' },
-      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', category: 'llm', contextWindow: 1000000, features: ['fast', 'multimodal', 'streaming'] },
-      { id: 'gemini-2.0-pro', name: 'Gemini 2.0 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'reasoning'] },
+      { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'reasoning', 'multimodal', 'agentic'], releaseDate: '2026-02-19' },
+      { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', category: 'llm', contextWindow: 1000000, features: ['fast', 'multimodal', 'streaming'], releaseDate: '2026-02-19' },
+      { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', category: 'reasoning', contextWindow: 1000000, features: ['deep_reasoning', 'science', 'math'], releaseDate: '2026-02-12' },
+      { id: 'gemini-3-pro', name: 'Gemini 3 Pro', category: 'llm', contextWindow: 2000000, features: ['powerful', 'multimodal'], releaseDate: '2026-01-15' },
+      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', category: 'llm', contextWindow: 2000000, features: ['reasoning', 'multimodal'] },
       { id: 'gemma-3-27b', name: 'Gemma 3 27B', category: 'llm', contextWindow: 128000, features: ['open', 'efficient'] },
-      { id: 'gemma-3-8b', name: 'Gemma 3 8B', category: 'llm', contextWindow: 32000, features: ['open', 'small'], releaseDate: '2026-01-20' },
     ]
   },
 
@@ -113,12 +113,11 @@ export const providers: Provider[] = [
     website: 'https://z.ai',
     features: ['chat', 'streaming', 'function_calling', 'vision'],
     models: [
-      { id: 'z-2-ultra', name: 'Z-2 Ultra', category: 'llm', contextWindow: 256000, features: ['powerful', 'reasoning', 'vision'], releaseDate: '2026-03-01' },
-      { id: 'z-2-pro', name: 'Z-2 Pro', category: 'llm', contextWindow: 128000, features: ['balanced', 'fast'], releaseDate: '2026-03-01' },
-      { id: 'z-2-mini', name: 'Z-2 Mini', category: 'llm', contextWindow: 64000, features: ['efficient', 'fast'], releaseDate: '2026-03-01' },
-      { id: 'z-1-large', name: 'Z-1 Large', category: 'llm', contextWindow: 128000, features: ['powerful', 'reasoning'] },
-      { id: 'z-1-standard', name: 'Z-1 Standard', category: 'llm', contextWindow: 64000, features: ['balanced'] },
-      { id: 'z-1-fast', name: 'Z-1 Fast', category: 'llm', contextWindow: 32000, features: ['fast', 'efficient'] },
+      { id: 'z-3-ultra', name: 'Z-3 Ultra', category: 'llm', contextWindow: 512000, features: ['powerful', 'reasoning', 'vision', 'agentic'], releaseDate: '2026-03-10' },
+      { id: 'z-3-pro', name: 'Z-3 Pro', category: 'llm', contextWindow: 256000, features: ['balanced', 'fast', 'vision'], releaseDate: '2026-03-10' },
+      { id: 'z-3-mini', name: 'Z-3 Mini', category: 'llm', contextWindow: 128000, features: ['efficient', 'fast'], releaseDate: '2026-03-10' },
+      { id: 'z-2-ultra', name: 'Z-2 Ultra', category: 'llm', contextWindow: 256000, features: ['powerful', 'reasoning', 'vision'] },
+      { id: 'z-2-pro', name: 'Z-2 Pro', category: 'llm', contextWindow: 128000, features: ['balanced', 'fast'] },
     ]
   },
 
@@ -131,10 +130,10 @@ export const providers: Provider[] = [
     website: 'https://moonshot.cn',
     features: ['chat', 'long_context', 'streaming', 'vision'],
     models: [
-      { id: 'kimi-k2', name: 'Kimi K2', category: 'llm', contextWindow: 400000, features: ['newest', 'multimodal', 'reasoning'], releaseDate: '2026-02-28' },
-      { id: 'kimi-latest', name: 'Kimi Latest', category: 'llm', contextWindow: 200000, features: ['multimodal'] },
-      { id: 'moonshot-v1-128k', name: 'Moonshot V1 128K', category: 'llm', contextWindow: 128000, features: ['long_context'] },
-      { id: 'moonshot-v1-32k', name: 'Moonshot V1 32K', category: 'llm', contextWindow: 32000, features: ['balanced'] },
+      { id: 'kimi-k3', name: 'Kimi K3', category: 'llm', contextWindow: 1000000, features: ['newest', 'multimodal', 'reasoning', 'agentic'], releaseDate: '2026-03-15' },
+      { id: 'kimi-k2', name: 'Kimi K2', category: 'llm', contextWindow: 400000, features: ['multimodal', 'reasoning'], releaseDate: '2026-02-28' },
+      { id: 'moonshot-v2-128k', name: 'Moonshot V2 128K', category: 'llm', contextWindow: 128000, features: ['long_context'] },
+      { id: 'moonshot-v2-32k', name: 'Moonshot V2 32K', category: 'llm', contextWindow: 32000, features: ['balanced'] },
     ]
   },
 
@@ -147,13 +146,12 @@ export const providers: Provider[] = [
     website: 'https://minimax.chat',
     features: ['chat', 'voice', 'video', 'streaming', 'multimodal'],
     models: [
-      { id: 'abab7-chat', name: 'ABAB 7 Chat', category: 'llm', contextWindow: 320000, features: ['powerful', 'multilingual', 'reasoning'], releaseDate: '2026-03-05' },
+      { id: 'abab8-chat', name: 'ABAB 8 Chat', category: 'llm', contextWindow: 512000, features: ['powerful', 'multilingual', 'reasoning', 'agentic'], releaseDate: '2026-03-10' },
+      { id: 'abab7-chat', name: 'ABAB 7 Chat', category: 'llm', contextWindow: 320000, features: ['powerful', 'multilingual'], releaseDate: '2026-03-05' },
       { id: 'abab6.5-chat', name: 'ABAB 6.5 Chat', category: 'llm', contextWindow: 245000, features: ['powerful', 'multilingual'] },
-      { id: 'abab6.5s-chat', name: 'ABAB 6.5S Chat', category: 'llm', contextWindow: 128000, features: ['fast'] },
       // Voice - TTS
-      { id: 'speech-02-turbo', name: 'Speech-02 Turbo', category: 'tts', features: ['fast', 'natural', 'emotional'], releaseDate: '2026-01-10' },
-      { id: 'speech-01-turbo', name: 'Speech-01 Turbo', category: 'tts', features: ['fast', 'natural'] },
-      { id: 'speech-01-emo', name: 'Speech-01 Emotional', category: 'tts', features: ['emotional', 'expressive'] },
+      { id: 'speech-03-turbo', name: 'Speech-03 Turbo', category: 'tts', features: ['fast', 'natural', 'emotional', 'multilingual'], releaseDate: '2026-02-15' },
+      { id: 'speech-02-turbo', name: 'Speech-02 Turbo', category: 'tts', features: ['fast', 'natural'] },
     ]
   },
 
@@ -166,14 +164,13 @@ export const providers: Provider[] = [
     website: 'https://console.groq.com',
     features: ['chat', 'ultra_fast', 'streaming'],
     models: [
-      { id: 'llama-4-70b', name: 'Llama 4 70B', category: 'llm', contextWindow: 128000, features: ['fast', 'powerful'], releaseDate: '2026-02-20' },
+      { id: 'llama-4-behemoth', name: 'Llama 4 Behemoth', category: 'llm', contextWindow: 256000, features: ['ultra_fast', 'powerful', 'reasoning'], releaseDate: '2026-03-15' },
+      { id: 'llama-4-maverick', name: 'Llama 4 Maverick', category: 'llm', contextWindow: 128000, features: ['ultra_fast', 'multimodal'], releaseDate: '2025-04-05' },
+      { id: 'llama-4-scout', name: 'Llama 4 Scout', category: 'llm', contextWindow: 128000, features: ['fast', 'efficient'], releaseDate: '2025-04-05' },
       { id: 'llama-4-8b', name: 'Llama 4 8B', category: 'llm', contextWindow: 32000, features: ['ultra_fast', 'efficient'], releaseDate: '2026-02-20' },
-      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', category: 'llm', contextWindow: 128000, features: ['fast', 'versatile'] },
-      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant', category: 'llm', contextWindow: 128000, features: ['fastest', 'cheap'] },
-      { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', category: 'llm', contextWindow: 32768, features: ['moe', 'efficient'] },
       // Whisper on Groq
+      { id: 'whisper-3-turbo', name: 'Whisper 3 Turbo', category: 'asr', features: ['ultra_fast', 'accurate', 'multilingual'], releaseDate: '2026-02-10' },
       { id: 'whisper-large-v3-turbo', name: 'Whisper Large V3 Turbo', category: 'asr', features: ['ultra_fast', 'accurate'] },
-      { id: 'whisper-large-v3', name: 'Whisper Large V3', category: 'asr', features: ['accurate', 'multilingual'] },
     ]
   },
 
@@ -186,11 +183,11 @@ export const providers: Provider[] = [
     website: 'https://platform.deepseek.com',
     features: ['chat', 'reasoning', 'coding', 'streaming'],
     models: [
-      { id: 'deepseek-r2', name: 'DeepSeek R2', category: 'reasoning', contextWindow: 256000, features: ['reasoning', 'deep_thinking', 'advanced'], releaseDate: '2026-03-08' },
-      { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner (R1)', category: 'reasoning', contextWindow: 128000, features: ['reasoning', 'deep_thinking'] },
-      { id: 'deepseek-v3', name: 'DeepSeek V3', category: 'llm', contextWindow: 128000, features: ['chat', 'coding', 'balanced'], releaseDate: '2026-01-15' },
-      { id: 'deepseek-chat', name: 'DeepSeek Chat', category: 'llm', contextWindow: 64000, features: ['chat', 'coding'] },
-      { id: 'deepseek-coder-v2', name: 'DeepSeek Coder V2', category: 'llm', contextWindow: 128000, features: ['coding', 'specialized'], releaseDate: '2026-02-01' },
+      { id: 'deepseek-v4', name: 'DeepSeek V4', category: 'llm', contextWindow: 512000, features: ['trillion_params', 'moe', 'open_weights', 'reasoning'], releaseDate: '2026-03-15' },
+      { id: 'deepseek-r3', name: 'DeepSeek R3', category: 'reasoning', contextWindow: 256000, features: ['reasoning', 'deep_thinking', 'advanced'], releaseDate: '2026-03-08' },
+      { id: 'deepseek-r2', name: 'DeepSeek R2', category: 'reasoning', contextWindow: 256000, features: ['reasoning', 'deep_thinking'], releaseDate: '2026-03-08' },
+      { id: 'deepseek-v3.2', name: 'DeepSeek V3.2', category: 'llm', contextWindow: 128000, features: ['chat', 'coding', 'balanced'] },
+      { id: 'deepseek-coder-v3', name: 'DeepSeek Coder V3', category: 'llm', contextWindow: 128000, features: ['coding', 'specialized'], releaseDate: '2026-02-01' },
     ]
   },
 
@@ -203,12 +200,12 @@ export const providers: Provider[] = [
     website: 'https://console.mistral.ai',
     features: ['chat', 'function_calling', 'embeddings', 'streaming'],
     models: [
-      { id: 'mistral-large-2', name: 'Mistral Large 2', category: 'llm', contextWindow: 256000, features: ['powerful', 'multilingual', 'reasoning'], releaseDate: '2026-02-15' },
-      { id: 'mistral-large-latest', name: 'Mistral Large', category: 'llm', contextWindow: 128000, features: ['powerful', 'multilingual'] },
-      { id: 'mistral-small-latest', name: 'Mistral Small', category: 'llm', contextWindow: 32000, features: ['fast', 'efficient'] },
-      { id: 'codestral-latest', name: 'Codestral', category: 'llm', contextWindow: 32000, features: ['coding', 'fast'] },
-      { id: 'pixtral-12b-2409', name: 'Pixtral 12B', category: 'vision', contextWindow: 128000, features: ['vision', 'multimodal'] },
-      { id: 'mistral-embed', name: 'Mistral Embed', category: 'embedding', features: ['efficient'] },
+      { id: 'mistral-large-3', name: 'Mistral Large 3', category: 'llm', contextWindow: 256000, features: ['powerful', 'multilingual', 'reasoning', '41B_active'], releaseDate: '2026-03-15' },
+      { id: 'mistral-medium-3', name: 'Mistral Medium 3', category: 'llm', contextWindow: 128000, features: ['balanced', 'efficient'], releaseDate: '2026-03-10' },
+      { id: 'mistral-small-4', name: 'Mistral Small 4', category: 'llm', contextWindow: 64000, features: ['fast', 'efficient', 'edge'], releaseDate: '2026-03-16' },
+      { id: 'codestral-v2', name: 'Codestral V2', category: 'llm', contextWindow: 64000, features: ['coding', 'fast'], releaseDate: '2026-02-15' },
+      { id: 'pixtral-large', name: 'Pixtral Large', category: 'vision', contextWindow: 128000, features: ['vision', 'multimodal'], releaseDate: '2026-02-01' },
+      { id: 'mistral-embed-v2', name: 'Mistral Embed V2', category: 'embedding', features: ['efficient', 'multilingual'], releaseDate: '2026-01-20' },
     ]
   },
 
@@ -221,10 +218,10 @@ export const providers: Provider[] = [
     website: 'https://x.ai',
     features: ['chat', 'real_time', 'streaming', 'humor', 'uncensored'],
     models: [
-      { id: 'grok-3', name: 'Grok 3', category: 'llm', contextWindow: 256000, features: ['witty', 'real_time', 'reasoning'], releaseDate: '2026-03-01' },
-      { id: 'grok-3-mini', name: 'Grok 3 Mini', category: 'llm', contextWindow: 128000, features: ['witty', 'fast'], releaseDate: '2026-03-01' },
-      { id: 'grok-2-1212', name: 'Grok 2', category: 'llm', contextWindow: 131072, features: ['witty', 'real_time', 'uncensored'] },
-      { id: 'grok-2-vision-1212', name: 'Grok 2 Vision', category: 'vision', contextWindow: 32768, features: ['vision', 'witty'] },
+      { id: 'grok-4', name: 'Grok 4', category: 'llm', contextWindow: 512000, features: ['witty', 'real_time', 'reasoning', 'agentic'], releaseDate: '2026-03-01' },
+      { id: 'grok-4-fast', name: 'Grok 4 Fast', category: 'llm', contextWindow: 256000, features: ['witty', 'ultra_fast'], releaseDate: '2025-09-23' },
+      { id: 'grok-4-vision', name: 'Grok 4 Vision', category: 'vision', contextWindow: 128000, features: ['vision', 'witty'], releaseDate: '2026-02-15' },
+      { id: 'grok-aurora', name: 'Grok Aurora', category: 'image', features: ['image_generation', 'autoregressive'], releaseDate: '2025-12-09' },
     ]
   },
 
@@ -237,11 +234,11 @@ export const providers: Provider[] = [
     website: 'https://cohere.com',
     features: ['chat', 'embeddings', 'rerank', 'streaming'],
     models: [
-      { id: 'command-r-plus', name: 'Command R+', category: 'llm', contextWindow: 128000, features: ['rag', 'function_calling'] },
-      { id: 'command-r', name: 'Command R', category: 'llm', contextWindow: 128000, features: ['rag', 'efficient'] },
-      { id: 'command', name: 'Command', category: 'llm', contextWindow: 4096, features: ['instruction'] },
-      { id: 'embed-v4.0', name: 'Embed V4', category: 'embedding', features: ['multilingual', 'efficient'] },
-      { id: 'rerank-v3.5', name: 'Rerank V3.5', category: 'embedding', features: ['reranking'] },
+      { id: 'command-r3', name: 'Command R3', category: 'llm', contextWindow: 256000, features: ['rag', 'function_calling', 'agentic'], releaseDate: '2026-02-15' },
+      { id: 'command-r2-plus', name: 'Command R2+', category: 'llm', contextWindow: 128000, features: ['rag', 'function_calling'] },
+      { id: 'command-r2', name: 'Command R2', category: 'llm', contextWindow: 128000, features: ['rag', 'efficient'] },
+      { id: 'embed-v5', name: 'Embed V5', category: 'embedding', features: ['multilingual', 'efficient', 'high_dim'], releaseDate: '2026-01-15' },
+      { id: 'rerank-v4', name: 'Rerank V4', category: 'embedding', features: ['reranking', 'multilingual'], releaseDate: '2026-01-20' },
     ]
   },
 
@@ -254,14 +251,12 @@ export const providers: Provider[] = [
     website: 'https://replicate.com',
     features: ['chat', 'image', 'video', 'music', 'voice'],
     models: [
-      { id: 'meta/llama-4-70b-instruct', name: 'Llama 4 70B', category: 'llm', features: ['open', 'powerful'], releaseDate: '2026-02-20' },
-      { id: 'meta/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', category: 'llm', features: ['open', 'powerful'] },
-      { id: 'deepseek-ai/deepseek-r2', name: 'DeepSeek R2', category: 'llm', features: ['reasoning'], releaseDate: '2026-03-08' },
+      { id: 'meta/llama-4-behemoth', name: 'Llama 4 Behemoth', category: 'llm', features: ['open', 'powerful', 'reasoning'], releaseDate: '2026-03-15' },
+      { id: 'meta/llama-4-maverick', name: 'Llama 4 Maverick', category: 'llm', features: ['open', 'multimodal'], releaseDate: '2025-04-05' },
+      { id: 'deepseek-ai/deepseek-v4', name: 'DeepSeek V4', category: 'llm', features: ['open', 'reasoning'], releaseDate: '2026-03-15' },
+      { id: 'black-forest-labs/flux-3', name: 'Flux 3', category: 'image', features: ['ultra_quality', '4k', 'video'], releaseDate: '2026-02-20' },
       { id: 'black-forest-labs/flux-schnell', name: 'Flux Schnell', category: 'image', features: ['fast', 'quality'] },
-      { id: 'black-forest-labs/flux-dev', name: 'Flux Dev', category: 'image', features: ['high_quality'] },
-      { id: 'flux-2', name: 'Flux 2', category: 'image', features: ['ultra_quality', '4k'], releaseDate: '2026-01-25' },
-      { id: 'stability-ai/sdxl', name: 'SDXL', category: 'image', features: ['photorealistic'] },
-      { id: 'minimax/speech-02', name: 'MiniMax Speech 02', category: 'tts', features: ['natural', 'fast'], releaseDate: '2026-01-10' },
+      { id: 'minimax/speech-03', name: 'MiniMax Speech 03', category: 'tts', features: ['natural', 'fast', 'emotional'], releaseDate: '2026-02-15' },
     ]
   },
 
@@ -274,11 +269,11 @@ export const providers: Provider[] = [
     website: 'https://together.ai',
     features: ['chat', 'open_models', 'streaming'],
     models: [
-      { id: 'meta-llama/Llama-4-70B-Instruct-Turbo', name: 'Llama 4 70B Turbo', category: 'llm', features: ['fast', 'open'], releaseDate: '2026-02-20' },
-      { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Turbo', category: 'llm', features: ['fast', 'open'] },
-      { id: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Qwen 2.5 72B', category: 'llm', features: ['multilingual', 'coding'] },
-      { id: 'deepseek-ai/DeepSeek-R2', name: 'DeepSeek R2', category: 'llm', features: ['reasoning'], releaseDate: '2026-03-08' },
-      { id: 'mistralai/Mixtral-8x7B-Instruct-v0.1', name: 'Mixtral 8x7B', category: 'llm', features: ['moe'] },
+      { id: 'meta-llama/Llama-4-Behemoth-Turbo', name: 'Llama 4 Behemoth Turbo', category: 'llm', features: ['fast', 'open', 'reasoning'], releaseDate: '2026-03-15' },
+      { id: 'meta-llama/Llama-4-Maverick-Turbo', name: 'Llama 4 Maverick Turbo', category: 'llm', features: ['fast', 'open', 'multimodal'] },
+      { id: 'Qwen/Qwen3-235B-A22B', name: 'Qwen 3 235B', category: 'llm', features: ['multilingual', 'coding', 'powerful'], releaseDate: '2026-02-28' },
+      { id: 'deepseek-ai/DeepSeek-V4', name: 'DeepSeek V4', category: 'llm', features: ['reasoning', 'open'], releaseDate: '2026-03-15' },
+      { id: 'mistralai/Mistral-Large-3', name: 'Mistral Large 3', category: 'llm', features: ['powerful', 'multilingual'], releaseDate: '2026-03-15' },
     ]
   },
 
@@ -291,13 +286,13 @@ export const providers: Provider[] = [
     website: 'https://elevenlabs.io',
     features: ['tts', 'voice_cloning', 'asr', 'dubbing'],
     models: [
-      { id: 'eleven_v3', name: 'Eleven V3', category: 'tts', features: ['ultra_realistic', 'emotional', 'multilingual'], releaseDate: '2026-02-15' },
-      { id: 'eleven_multilingual_v2', name: 'Multilingual V2', category: 'tts', features: ['multilingual', 'natural'] },
-      { id: 'eleven_turbo_v2_5', name: 'Turbo V2.5', category: 'tts', features: ['fast', 'quality'] },
-      { id: 'eleven_flash_v2.5', name: 'Flash V2.5', category: 'tts', features: ['ultra_fast', 'streaming'] },
+      { id: 'eleven_v3', name: 'Eleven V3', category: 'tts', features: ['ultra_realistic', 'emotional', 'multilingual', 'dialogue_mode', 'audio_tags'], releaseDate: '2026-03-14' },
+      { id: 'eleven_v3_lightning', name: 'Eleven V3 Lightning', category: 'tts', features: ['ultra_fast', 'quality', 'streaming'], releaseDate: '2026-02-23' },
+      { id: 'eleven_multilingual_v3', name: 'Multilingual V3', category: 'tts', features: ['multilingual', 'natural', '70_languages'], releaseDate: '2026-01-15' },
+      { id: 'eleven_turbo_v3', name: 'Turbo V3', category: 'tts', features: ['fast', 'quality'] },
       // ASR
-      { id: 'scribe_v2', name: 'Scribe V2', category: 'asr', features: ['accurate', 'multilingual', 'diarization'], releaseDate: '2026-01-20' },
-      { id: 'scribe_v1', name: 'Scribe V1', category: 'asr', features: ['accurate', 'multilingual'] },
+      { id: 'scribe_v3', name: 'Scribe V3', category: 'asr', features: ['accurate', 'multilingual', 'diarization', 'speaker_id'], releaseDate: '2026-02-10' },
+      { id: 'scribe_v2', name: 'Scribe V2', category: 'asr', features: ['accurate', 'multilingual'] },
     ]
   },
 
@@ -310,13 +305,12 @@ export const providers: Provider[] = [
     website: 'https://qwenlm.github.io',
     features: ['chat', 'vision', 'long_context', 'multimodal'],
     models: [
+      { id: 'qwen-3-235b', name: 'Qwen 3 235B', category: 'llm', contextWindow: 256000, features: ['powerful', 'multilingual', 'reasoning', 'moe'], releaseDate: '2026-02-28' },
       { id: 'qwen-3-max', name: 'Qwen 3 Max', category: 'llm', contextWindow: 128000, features: ['powerful', 'multilingual', 'reasoning'], releaseDate: '2026-02-28' },
       { id: 'qwen-3-plus', name: 'Qwen 3 Plus', category: 'llm', contextWindow: 128000, features: ['balanced', 'efficient'], releaseDate: '2026-02-28' },
-      { id: 'qwen-max', name: 'Qwen Max', category: 'llm', contextWindow: 32000, features: ['powerful', 'multilingual'] },
-      { id: 'qwen-plus', name: 'Qwen Plus', category: 'llm', contextWindow: 128000, features: ['balanced'] },
-      { id: 'qwen-turbo', name: 'Qwen Turbo', category: 'llm', contextWindow: 128000, features: ['fast'] },
-      { id: 'qwen-vl-max', name: 'Qwen VL Max', category: 'vision', features: ['vision', 'ocr'] },
-      { id: 'qwen-audio-turbo', name: 'Qwen Audio Turbo', category: 'asr', features: ['audio_understanding'] },
+      { id: 'qwen-3-turbo', name: 'Qwen 3 Turbo', category: 'llm', contextWindow: 128000, features: ['fast', 'efficient'], releaseDate: '2026-02-28' },
+      { id: 'qwen-vl-3', name: 'Qwen VL 3', category: 'vision', features: ['vision', 'ocr', 'video'], releaseDate: '2026-02-15' },
+      { id: 'qwen-audio-2', name: 'Qwen Audio 2', category: 'asr', features: ['audio_understanding', 'multilingual'], releaseDate: '2026-01-20' },
       { id: 'qwen-long', name: 'Qwen Long', category: 'llm', contextWindow: 10000000, features: ['ultra_long_context'] },
     ]
   },
@@ -366,24 +360,26 @@ export function getReasoningModels(): Model[] {
   return getModelsByCategory('reasoning');
 }
 
-// Get newest 5 models (March 2026)
-export function getNewestModels(count: number = 5): Model[] {
+// Get newest models (March 2026)
+export function getNewestModels(count: number = 15): Model[] {
   const newestIds = [
-    'gpt-4.5-turbo',
-    'claude-4-opus',
-    'o4-mini',
-    'gemini-2.5-pro',
-    'deepseek-r2',
-    'grok-3',
-    'qwen-3-max',
-    'kimi-k2',
-    'z-2-ultra',
-    'abab7-chat',
-    'llama-4-70b',
-    'mistral-large-2',
+    'gpt-5.2-pro',
+    'claude-opus-4.6',
+    'gemini-3.1-pro',
+    'deepseek-v4',
+    'o4',
+    'grok-4',
+    'qwen-3-235b',
+    'kimi-k3',
+    'z-3-ultra',
+    'abab8-chat',
+    'llama-4-behemoth',
+    'mistral-large-3',
     'eleven_v3',
     'dall-e-4',
-    'flux-2',
+    'flux-3',
+    'whisper-3',
+    'scribe_v3',
   ];
   
   return providers
