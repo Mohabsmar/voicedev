@@ -91,6 +91,16 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 
 VoiceDev now integrates **Smithery** (MCP Tools) and **ClawHub** (Skills) marketplaces with unified commands:
 
+### Quick Start
+
+```bash
+# Search for tools/skills
+curl "http://localhost:3000/api/marketplace?action=search&query=filesystem"
+
+# Check marketplace status
+curl "http://localhost:3000/api/marketplace?action=status"
+```
+
 ### Marketplace Commands
 
 | Command | Smithery (MCP Tools) | ClawHub (Skills) |
@@ -100,19 +110,49 @@ VoiceDev now integrates **Smithery** (MCP Tools) and **ClawHub** (Skills) market
 | **Install** | `npx @smithery/cli mcp add <server>` | `npx clawhub install <slug>` |
 | **Vet** | Built-in security scanner | Built-in security scanner |
 
+### CLI Integration
+
+```typescript
+// Programmatic marketplace access
+import { 
+  UnifiedMarketplace, 
+  SmitheryMarketplace, 
+  ClawHubMarketplace 
+} from '@/marketplace/unified-marketplace';
+
+// Search both marketplaces
+const results = await UnifiedMarketplace.search('filesystem');
+
+// Search specific marketplace
+const smitheryResults = await SmitheryMarketplace.search('git');
+const clawhubResults = await ClawHubMarketplace.search('browser');
+
+// List installed items
+const installed = await UnifiedMarketplace.listInstalled();
+
+// Install from marketplace
+const result = await UnifiedMarketplace.install(
+  '@anthropic/mcp-server',
+  'smithery'
+);
+```
+
 ### Marketplace API
 
 ```bash
 # Search both marketplaces
-GET /api/marketplace?action=search&query=filesystem
+GET /api/marketplace?action=search&query=filesystem&source=all
 
-# List installed items
+# Search specific marketplace
+GET /api/marketplace?action=search&query=git&source=smithery
+
+# List installed items from both
 GET /api/marketplace?action=list
 
-# Get featured items
+# Get featured/trending items
 GET /api/marketplace?action=explore
 
-# Security vet scan
+# Security vet scan before install
 GET /api/marketplace?action=vet&itemId=@anthropic/mcp-server&itemSource=smithery
 
 # Install from marketplace
@@ -121,6 +161,53 @@ POST /api/marketplace
   "action": "install",
   "itemId": "@anthropic/mcp-server",
   "source": "smithery"
+}
+
+# Uninstall
+POST /api/marketplace
+{
+  "action": "uninstall",
+  "itemId": "@anthropic/mcp-server",
+  "source": "smithery"
+}
+```
+
+### Response Format
+
+```json
+// Search response
+{
+  "success": true,
+  "action": "search",
+  "query": "filesystem",
+  "source": "all",
+  "results": [
+    {
+      "id": "@anthropic/filesystem",
+      "name": "Filesystem MCP Server",
+      "description": "Complete file system operations",
+      "source": "smithery",
+      "type": "mcp-server",
+      "downloads": 50000,
+      "stars": 1200,
+      "verified": true
+    }
+  ],
+  "count": 15
+}
+
+// Vet scan response
+{
+  "success": true,
+  "action": "vet",
+  "result": {
+    "itemId": "@anthropic/mcp-server",
+    "status": "safe",
+    "score": 100,
+    "findings": [],
+    "recommendations": [],
+    "scannedAt": "2026-03-23T12:00:00.000Z"
+  }
 }
 ```
 
@@ -559,6 +646,42 @@ Creates native installers:
 3. **Permission System** - Granular permissions per tool and skill
 4. **Rate Limiting** - Prevent abuse and API spam
 5. **Audit Logging** - Complete operation trail for compliance
+
+---
+
+## ❓ Troubleshooting
+
+### Rate Limit Error
+
+If you see `您的账户已达到速率限制，请您控制请求频率`:
+
+```bash
+# Wait a few seconds between API calls
+# Or reduce concurrent requests
+
+# For marketplace search, cache results
+const results = await UnifiedMarketplace.search('query');
+// Store results locally instead of re-fetching
+```
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| **CLI not found** | Run `npx @smithery/cli` or `npx clawhub` - NPX auto-installs |
+| **Permission denied** | Run with appropriate permissions or check file ownership |
+| **Timeout errors** | Increase timeout in tool parameters |
+| **Rate limits** | Add delays between requests, implement caching |
+
+### Debug Mode
+
+```bash
+# Enable verbose logging
+DEBUG=voicedev:* npm run dev
+
+# Check marketplace status
+curl "http://localhost:3000/api/marketplace?action=status"
+```
 
 ---
 
