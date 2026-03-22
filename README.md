@@ -20,6 +20,11 @@
 [![Models](https://img.shields.io/badge/AI_Models-80+-success?style=flat-square)](src/providers/)
 [![Custom Endpoints](https://img.shields.io/badge/Custom_Endpoints-✓-9cf?style=flat-square)](src/providers/)
 
+[![Smithery](https://img.shields.io/badge/Smithery-MCP_Tools-ff6b6b?style=flat-square)](https://smithery.ai)
+[![ClawHub](https://img.shields.io/badge/ClawHub-Skills-4ecdc4?style=flat-square)](https://clawhub.dev)
+[![Core Tools](https://img.shields.io/badge/Extreme_Core-20_Tools-gold?style=flat-square)](src/tools/extreme-core.ts)
+[![Local Toolboxes](https://img.shields.io/badge/Local_Toolboxes-55_Tools-9b59b6?style=flat-square)](src/tools/local-toolboxes.ts)
+
 </div>
 
 ---
@@ -67,6 +72,10 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 | **15 AI Providers** | OpenAI, Anthropic, Google, DeepSeek, Groq, Mistral, xAI, Z.ai/GLM, Moonshot, MiniMax, Cohere, Together, Qwen, ElevenLabs, Replicate |
 | **95+ AI Models** | Verified newest March 2026 models including GPT-5.4, Claude 4.6, Gemini 3.1 |
 | **Custom Endpoints** | Add your own AI models and endpoints with full configuration |
+| **🆕 Unified Marketplace** | Smithery (MCP Tools) + ClawHub (Skills) integration |
+| **🆕 Extreme Core 20** | Pre-installed essential tools for every AI agent |
+| **🆕 Local MCP Toolboxes** | 55 local tools that run without external connections |
+| **🆕 Vet Scanner** | Comprehensive security analysis for marketplace items |
 | **Remote Control** | SSH, RDP, VNC, WinRM, Wake-on-LAN |
 | **6 Channels** | Telegram, WhatsApp, Discord, Slack, Email, MCP |
 | **Voice Support** | GPT-4o Mini TTS, Whisper Large V3 Turbo, ElevenLabs V3 |
@@ -75,6 +84,137 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 | **Setup Wizard** | Interactive first-time configuration |
 | **Cross-Platform** | Windows (PowerShell) + Linux + macOS |
 | **Desktop App** | Tauri v2 native application |
+
+---
+
+## 🏪 Unified Marketplace Integration
+
+VoiceDev now integrates **Smithery** (MCP Tools) and **ClawHub** (Skills) marketplaces with unified commands:
+
+### Marketplace Commands
+
+| Command | Smithery (MCP Tools) | ClawHub (Skills) |
+|---------|---------------------|------------------|
+| **Search** | `npx @smithery/cli mcp search <query>` | `npx clawhub search <query>` |
+| **List** | `npx @smithery/cli mcp list` | `npx clawhub list` |
+| **Install** | `npx @smithery/cli mcp add <server>` | `npx clawhub install <slug>` |
+| **Vet** | Built-in security scanner | Built-in security scanner |
+
+### Marketplace API
+
+```bash
+# Search both marketplaces
+GET /api/marketplace?action=search&query=filesystem
+
+# List installed items
+GET /api/marketplace?action=list
+
+# Get featured items
+GET /api/marketplace?action=explore
+
+# Security vet scan
+GET /api/marketplace?action=vet&itemId=@anthropic/mcp-server&itemSource=smithery
+
+# Install from marketplace
+POST /api/marketplace
+{
+  "action": "install",
+  "itemId": "@anthropic/mcp-server",
+  "source": "smithery"
+}
+```
+
+---
+
+## ⚡ Extreme Core 20 Tools
+
+Pre-installed essential tools for every AI agent - always available without installation:
+
+| Category | Tools |
+|----------|-------|
+| **AI & LLM** | `ai_chat`, `ai_embed`, `ai_complete`, `ai_vision` |
+| **File System** | `fs_read`, `fs_write`, `fs_list`, `fs_delete`, `fs_copy` |
+| **Shell & Process** | `shell_exec`, `process_list`, `process_kill` |
+| **Web & HTTP** | `http_get`, `http_post`, `web_scrape` |
+| **Data & JSON** | `json_parse`, `json_stringify`, `data_transform` |
+| **Code** | `code_exec`, `code_format` |
+
+```typescript
+// Use core tools directly
+import { CoreToolsExecutor } from '@/tools/extreme-core';
+
+// Check if tool is core tool
+CoreToolsExecutor.isCoreTool('fs_read'); // true
+
+// Get OpenAI function format
+const functions = CoreToolsExecutor.toOpenAIFunctions();
+
+// Get Anthropic tool format
+const tools = CoreToolsExecutor.toAnthropicTools();
+```
+
+---
+
+## 🔧 Local MCP Toolboxes
+
+8 local toolboxes with 55 tools that run without external connections:
+
+| Toolbox | Tools | Description |
+|---------|-------|-------------|
+| **Shell Executor** | 7 | Execute shell commands locally |
+| **File System** | 13 | Complete file system operations |
+| **Process Manager** | 5 | Manage system processes |
+| **Network Tools** | 6 | HTTP requests, DNS, ping, port check |
+| **Archive Tools** | 6 | ZIP, TAR, GZIP operations |
+| **Crypto Tools** | 6 | Hash, encrypt, decrypt, UUID |
+| **Code Runner** | 6 | Execute JS, Python, Bash, PowerShell |
+| **Database** | 6 | Local SQLite/JSON operations |
+
+```typescript
+// Execute local toolbox tools
+import { LocalToolboxExecutor } from '@/tools/local-toolboxes';
+
+// List all toolboxes
+const toolboxes = LocalToolboxExecutor.getAllToolboxes();
+
+// Execute a tool
+const result = await LocalToolboxExecutor.execute('fs_read', {
+  path: '/home/user/file.txt'
+});
+```
+
+---
+
+## 🔒 Vet Scanner - Security Analysis
+
+Comprehensive malware detection for marketplace items:
+
+```typescript
+import { VetScanner } from '@/marketplace/unified-marketplace';
+
+// Full security scan
+const result = await VetScanner.scan('@anthropic/mcp-server', 'smithery');
+// {
+//   itemId: '@anthropic/mcp-server',
+//   status: 'safe',           // safe | low-risk | medium-risk | high-risk | critical
+//   score: 100,               // 0-100
+//   findings: [],             // List of security issues found
+//   recommendations: []       // Security recommendations
+// }
+
+// Quick scan
+const quick = await VetScanner.quickScan('skill-slug', 'clawhub');
+// { safe: true, score: 95 }
+```
+
+### Security Checks
+
+- ✅ Dangerous code patterns (eval, exec, rm -rf)
+- ✅ Remote code execution detection
+- ✅ Path traversal vulnerability scan
+- ✅ Hardcoded credentials check
+- ✅ Obfuscated code detection
+- ✅ Suspicious dependency analysis
 
 ---
 
@@ -494,14 +634,29 @@ npm run tauri:dev
 ## 📚 API Reference
 
 ```
+# Tool & Skill Execution
 POST /api/tools/execute    # Execute a tool
 POST /api/skills/execute   # Execute a skill
+
+# Providers & Models
 GET  /api/providers        # List all providers
 GET  /api/providers/:id    # Get provider details
 GET  /api/models?category=llm  # List models by category
 GET  /api/models/newest    # Get newest models
 POST /api/custom/endpoint  # Add custom endpoint
 POST /api/custom/model     # Add custom model
+
+# Unified Marketplace (NEW!)
+GET  /api/marketplace?action=status           # Marketplace status
+GET  /api/marketplace&action=search&query=... # Search Smithery + ClawHub
+GET  /api/marketplace&action=list             # List installed items
+GET  /api/marketplace&action=explore          # Get featured items
+GET  /api/marketplace?action=core-tools       # Extreme Core 20 tools
+GET  /api/marketplace?action=local-toolboxes  # Local MCP toolboxes
+GET  /api/marketplace?action=vet&itemId=...   # Security vet scan
+POST /api/marketplace                         # Install/Execute
+  {"action": "install", "itemId": "...", "source": "smithery|clawhub"}
+  {"action": "execute-tool", "toolId": "...", "params": {...}}
 ```
 
 ---
@@ -553,7 +708,9 @@ MIT License - Use it however you want!
 
 **250+ Tools • 123+ Skills • 15 Providers • 80+ Models • 6 Channels • Custom Endpoints**
 
-**Updated March 21, 2026: GPT-5.4, Claude 4.6, Gemini 3.1, GLM-5, Grok 4.20 Beta!**
+**🆕 Smithery + ClawHub Marketplaces • Extreme Core 20 • Local MCP Toolboxes • Vet Scanner**
+
+**Updated March 23, 2026: GPT-5.4, Claude 4.6, Gemini 3.1, GLM-5, Grok 4.20 Beta!**
 
 *All models verified - no fabricated entries!*
 
