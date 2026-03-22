@@ -89,6 +89,7 @@ const PROVIDERS = [
     name: 'OpenAI', 
     models: [
       { id: 'gpt-5.4', name: 'GPT-5.4', contextWindow: 1000000 },
+      { id: 'gpt-5.4-turbo', name: 'GPT-5.4 Turbo', contextWindow: 1000000 },
       { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini', contextWindow: 256000 },
       { id: 'gpt-5.3-codex', name: 'GPT-5.3 Codex', contextWindow: 512000 },
       { id: 'o4', name: 'o4', contextWindow: 256000 },
@@ -100,6 +101,7 @@ const PROVIDERS = [
     name: 'Anthropic', 
     models: [
       { id: 'claude-sonnet-4.6', name: 'Claude Sonnet 4.6', contextWindow: 1000000 },
+      { id: 'claude-sonnet-4.6-turbo', name: 'Claude Sonnet 4.6 Turbo', contextWindow: 1000000 },
       { id: 'claude-opus-4.6', name: 'Claude Opus 4.6', contextWindow: 1000000 },
       { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', contextWindow: 200000 },
       { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', contextWindow: 200000 },
@@ -109,16 +111,19 @@ const PROVIDERS = [
     id: 'google', 
     name: 'Google AI', 
     models: [
+      { id: 'gemini-3.1-ultra', name: 'Gemini 3.1 Ultra', contextWindow: 4000000 },
       { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', contextWindow: 2000000 },
+      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', contextWindow: 2000000 },
+      { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', contextWindow: 1000000 },
+      { id: 'gemini-3.1-ultra-long', name: 'Gemini 3.1 Ultra Long', contextWindow: 10000000 },
       { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', contextWindow: 1000000 },
-      { id: 'gemini-3-pro', name: 'Gemini 3 Pro', contextWindow: 2000000 },
-      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', contextWindow: 2000000 },
     ]
   },
   { 
     id: 'deepseek', 
     name: 'DeepSeek', 
     models: [
+      { id: 'deepseek-v3.5', name: 'DeepSeek V3.5', contextWindow: 512000 },
       { id: 'deepseek-v3.2-exp', name: 'DeepSeek V3.2-Exp', contextWindow: 256000 },
       { id: 'deepseek-v3.1', name: 'DeepSeek V3.1', contextWindow: 128000 },
       { id: 'deepseek-r1-0528', name: 'DeepSeek R1', contextWindow: 128000 },
@@ -128,6 +133,7 @@ const PROVIDERS = [
     id: 'xai', 
     name: 'xAI (Grok)', 
     models: [
+      { id: 'grok-4.5', name: 'Grok 4.5', contextWindow: 1000000 },
       { id: 'grok-4.20-beta', name: 'Grok 4.20 Beta', contextWindow: 512000 },
       { id: 'grok-4.1-fast', name: 'Grok 4.1 Fast', contextWindow: 256000 },
       { id: 'grok-4.1', name: 'Grok 4.1', contextWindow: 256000 },
@@ -154,6 +160,7 @@ const PROVIDERS = [
     id: 'mistral', 
     name: 'Mistral AI', 
     models: [
+      { id: 'mistral-large-4', name: 'Mistral Large 4', contextWindow: 512000 },
       { id: 'mistral-small-4', name: 'Mistral Small 4', contextWindow: 128000 },
       { id: 'mistral-large-3', name: 'Mistral Large 3', contextWindow: 256000 },
     ]
@@ -162,6 +169,7 @@ const PROVIDERS = [
     id: 'qwen', 
     name: 'Alibaba Qwen', 
     models: [
+      { id: 'qwen-4.0', name: 'Qwen 4.0', contextWindow: 1000000 },
       { id: 'qwen-3.5', name: 'Qwen 3.5', contextWindow: 256000 },
       { id: 'qwen-3-next', name: 'Qwen 3-Next', contextWindow: 128000 },
     ]
@@ -172,6 +180,14 @@ const PROVIDERS = [
     models: [
       { id: 'llama-4-maverick', name: 'Llama 4 Maverick', contextWindow: 128000 },
       { id: 'llama-4-scout', name: 'Llama 4 Scout', contextWindow: 128000 },
+    ]
+  },
+  {
+    id: 'elevenlabs',
+    name: 'ElevenLabs',
+    models: [
+      { id: 'eleven_v3', name: 'Eleven V3', contextWindow: 32000 },
+      { id: 'eleven_flash_v2.5', name: 'Eleven Flash V2.5', contextWindow: 32000 },
     ]
   },
 ]
@@ -192,7 +208,7 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
   const currentProvider = PROVIDERS.find(p => p.id === config.provider)
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1)
     } else {
       // Save config to localStorage
@@ -244,10 +260,10 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
                   setConfig({ ...config, provider: provider.id, model: provider.models[0].id })
                 }}
                 className={cn(
-                  'p-4 rounded-lg border text-left transition-all',
+                  'p-5 rounded-2xl border text-left transition-all duration-300',
                   config.provider === provider.id
-                    ? 'bg-violet-600/20 border-violet-500'
-                    : 'bg-zinc-800/50 border-zinc-700 hover:border-zinc-600'
+                    ? 'bg-violet-600/20 border-violet-500/50 shadow-[0_0_20px_rgba(139,92,246,0.2)]'
+                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                 )}
               >
                 <div className="font-semibold">{provider.name}</div>
@@ -272,10 +288,10 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
                 key={model.id}
                 onClick={() => setConfig({ ...config, model: model.id })}
                 className={cn(
-                  'w-full p-4 rounded-lg border text-left transition-all',
+                  'w-full p-5 rounded-2xl border text-left transition-all duration-300',
                   config.model === model.id
-                    ? 'bg-violet-600/20 border-violet-500'
-                    : 'bg-zinc-800/50 border-zinc-700 hover:border-zinc-600'
+                    ? 'bg-violet-600/20 border-violet-500/50 shadow-[0_0_20px_rgba(139,92,246,0.2)]'
+                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                 )}
               >
                 <div className="flex justify-between items-center">
@@ -349,10 +365,17 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
   ]
 
   return (
-    <div className="fixed inset-0 bg-zinc-950 flex items-center justify-center p-4 z-50">
-      <div className="w-full max-w-lg bg-zinc-900 rounded-2xl border border-zinc-800 shadow-2xl">
+    <div className="fixed inset-0 bg-zinc-950 flex items-center justify-center p-4 z-50 overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 rounded-full blur-[120px] animate-blob" />
+        <div className="absolute top-[20%] right-[-5%] w-[35%] h-[35%] bg-fuchsia-600/20 rounded-full blur-[120px] animate-blob animation-delay-2000" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
+      </div>
+
+      <div className="w-full max-w-xl glass-morphism rounded-[2.5rem] border-white/10 shadow-2xl overflow-hidden relative z-10 animate-in fade-in zoom-in duration-500">
         {/* Progress */}
-        <div className="flex gap-1 p-4">
+        <div className="flex gap-1.5 p-6 pb-0">
           {steps.map((_, i) => (
             <div
               key={i}
@@ -365,13 +388,17 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-6">{steps[step].title}</h3>
-          {steps[step].content}
+        <div className="p-10">
+          <h3 className="text-3xl font-black mb-8 tracking-tight bg-gradient-to-br from-white to-zinc-500 bg-clip-text text-transparent">
+            {steps[step].title}
+          </h3>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {steps[step].content}
+          </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between p-6 border-t border-zinc-800">
+        <div className="flex justify-between p-8 border-t border-white/5 bg-white/5">
           <button
             onClick={() => setStep(Math.max(0, step - 1))}
             disabled={step === 0}
@@ -515,13 +542,17 @@ export default function VoiceDevApp() {
 
       const data = await response.json()
 
+      if (!response.ok) {
+        throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: data.response || data.error || 'Sorry, I could not generate a response.',
+        content: data.content || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
         model: config.model,
-        tokens: data.usage?.total_tokens,
+        tokens: data.usage?.totalTokens,
       }
 
       const finalSession = {
@@ -530,12 +561,12 @@ export default function VoiceDevApp() {
       }
       setCurrentSession(finalSession)
       setSessions(sessions.map(s => s.id === currentSession.id ? finalSession : s))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chat error:', error)
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'Sorry, there was an error connecting to the AI. Please check your API key.',
+        content: `Error: ${error.message || 'There was an error connecting to the AI. Please check your API key and connection.'}`,
         timestamp: new Date(),
       }
       const finalSession = {
@@ -562,28 +593,37 @@ export default function VoiceDevApp() {
   }
 
   return (
-    <div className="h-screen flex bg-zinc-950 text-zinc-100">
+    <div className="h-screen flex bg-zinc-950 text-zinc-100 overflow-hidden relative">
+      {/* Animated Background Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 rounded-full blur-[120px] animate-blob" />
+        <div className="absolute top-[20%] right-[-5%] w-[35%] h-[35%] bg-fuchsia-600/20 rounded-full blur-[120px] animate-blob animation-delay-2000" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
+      </div>
+
       {/* Sidebar */}
       <div className={cn(
-        'bg-zinc-900 border-r border-zinc-800 flex flex-col transition-all duration-300',
-        sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
+        'glass-morphism border-r border-white/10 flex flex-col transition-all duration-500 ease-in-out relative z-10',
+        sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
       )}>
         {/* Header */}
-        <div className="p-4 border-b border-zinc-800">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+        <div className="p-6 border-b border-white/5">
+          <h1 className="text-2xl font-black bg-gradient-to-r from-white via-violet-200 to-fuchsia-300 bg-clip-text text-transparent tracking-tight">
             VoiceDev
           </h1>
-          <p className="text-xs text-zinc-500">Ultimate AI Agent Platform</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold mt-1">Intelligence Redefined</p>
         </div>
 
         {/* New Chat Button */}
-        <div className="p-3">
+        <div className="p-4">
           <button
             onClick={createNewSession}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg transition-all shadow-lg shadow-violet-500/20 font-medium"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all duration-300 group shadow-xl shadow-black/20"
           >
-            <Icons.Plus />
-            New Chat
+            <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
+              <Icons.Plus />
+            </div>
+            <span className="font-semibold text-sm">New Session</span>
           </button>
         </div>
 
@@ -660,40 +700,41 @@ export default function VoiceDevApp() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
           {!currentSession ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🎤</div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  Welcome{config?.userName ? `, ${config.userName}` : ''}!
+            <div className="h-full flex items-center justify-center p-8">
+              <div className="max-w-2xl w-full glass-morphism rounded-3xl p-12 text-center shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="text-7xl mb-6 relative">🚀</div>
+                <h2 className="text-4xl font-black mb-4 tracking-tight">
+                  Welcome to <span className="text-violet-400">VoiceDev</span>
                 </h2>
-                <p className="text-zinc-400 mt-2">Click &quot;New Chat&quot; to start a conversation</p>
+                <p className="text-zinc-400 text-lg mb-8 leading-relaxed">
+                  The world&apos;s most advanced AI orchestration platform. Powered by 95+ frontier models and 250+ autonomous tools.
+                </p>
                 <button
                   onClick={createNewSession}
-                  className="mt-6 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-semibold transition-all shadow-lg shadow-violet-500/20"
+                  className="px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:scale-105 active:scale-95 rounded-2xl font-bold transition-all shadow-2xl shadow-violet-600/40 flex items-center gap-3 mx-auto"
                 >
-                  <span className="flex items-center gap-2">
-                    <Icons.Terminal />
-                    Start New Chat
-                  </span>
+                  <Icons.Terminal />
+                  Initialize Neural Link
                 </button>
               </div>
             </div>
           ) : currentSession.messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center max-w-md">
-                <div className="text-4xl mb-4">✨</div>
-                <h3 className="text-xl font-semibold mb-2">Start a conversation</h3>
-                <p className="text-zinc-400 text-sm mb-4">
-                  Using {config?.model} from {PROVIDERS.find(p => p.id === config?.provider)?.name}
+            <div className="h-full flex flex-col items-center justify-center p-8">
+              <div className="glass-morphism rounded-3xl p-10 max-w-xl w-full text-center relative overflow-hidden">
+                <div className="text-5xl mb-6">⚡</div>
+                <h3 className="text-2xl font-bold mb-2">Neural Connection Established</h3>
+                <p className="text-zinc-400 text-sm mb-8">
+                  Active Model: <span className="text-violet-400 font-mono">{config?.model}</span>
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {['Write a poem', 'Explain quantum computing', 'Help me code', 'Tell a joke'].map(prompt => (
+                <div className="grid grid-cols-2 gap-3">
+                  {['Architect a scalable API', 'Perform a security audit', 'Analyze market trends', 'Debug legacy code'].map(prompt => (
                     <button
                       key={prompt}
                       onClick={() => setInput(prompt)}
-                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
+                      className="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-medium transition-all text-zinc-300 hover:text-white text-left truncate"
                     >
                       {prompt}
                     </button>
@@ -702,38 +743,46 @@ export default function VoiceDevApp() {
               </div>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto p-4 space-y-4">
+            <div className="max-w-5xl mx-auto p-6 space-y-8">
               {currentSession.messages.map(message => (
                 <div
                   key={message.id}
                   className={cn(
-                    'flex gap-3',
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                    'flex gap-4 group animate-in fade-in slide-in-from-bottom-4 duration-300',
+                    message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                   )}
                 >
-                  {message.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold shrink-0">
-                      V
-                    </div>
-                  )}
+                  <div className={cn(
+                    'w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-black shrink-0 shadow-lg',
+                    message.role === 'user'
+                      ? 'bg-zinc-800 text-zinc-400 border border-white/10'
+                      : 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-violet-600/20'
+                  )}>
+                    {message.role === 'user' ? (config?.userName?.[0]?.toUpperCase() || 'U') : 'V'}
+                  </div>
                   <div
                     className={cn(
-                      'max-w-[80%] rounded-2xl px-4 py-3',
+                      'max-w-[85%] rounded-3xl px-6 py-4 relative group-hover:shadow-2xl transition-all duration-300',
                       message.role === 'user'
-                        ? 'bg-violet-600 text-white'
-                        : 'bg-zinc-800 text-zinc-100'
+                        ? 'bg-violet-600/90 text-white rounded-tr-none'
+                        : 'glass-morphism text-zinc-100 rounded-tl-none border-white/5'
                     )}
                   >
-                    <div className="whitespace-pre-wrap">{message.content}</div>
-                    {message.tokens && (
-                      <div className="text-xs text-zinc-400 mt-1">{message.tokens} tokens</div>
-                    )}
-                  </div>
-                  {message.role === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold shrink-0">
-                      {config?.userName?.[0]?.toUpperCase() || 'U'}
+                    <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.content}</div>
+                    <div className={cn(
+                      'flex items-center gap-3 mt-3 opacity-0 group-hover:opacity-100 transition-opacity',
+                      message.role === 'user' ? 'justify-end' : 'justify-start'
+                    )}>
+                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-tighter">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {message.tokens && (
+                        <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-zinc-500 border border-white/5">
+                          {message.tokens} tokens
+                        </span>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
               {isLoading && (
@@ -757,29 +806,30 @@ export default function VoiceDevApp() {
 
         {/* Input Area */}
         {currentSession && (
-          <div className="border-t border-zinc-800 p-4 bg-zinc-900/50 backdrop-blur-sm">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex gap-3">
+          <div className="p-6 relative z-10">
+            <div className="max-w-5xl mx-auto relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-[2rem] blur opacity-25 group-focus-within:opacity-50 transition duration-500" />
+              <div className="relative glass-morphism rounded-[1.8rem] border-white/10 p-2 flex items-end gap-3 shadow-2xl">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={`Message ${config?.model}...`}
+                  placeholder={`Instruct the agent... (${config?.model})`}
                   rows={1}
-                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                  style={{ minHeight: '48px', maxHeight: '200px' }}
+                  className="flex-1 bg-transparent border-none rounded-2xl px-6 py-4 resize-none focus:ring-0 text-[15px] placeholder:text-zinc-500 max-h-[300px] scrollbar-hide"
+                  style={{ minHeight: '56px' }}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  className="px-4 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mb-1.5 mr-1.5 p-3.5 bg-white text-zinc-950 hover:bg-violet-400 hover:text-white rounded-2xl transition-all duration-300 disabled:opacity-20 disabled:grayscale shadow-xl shadow-white/5 active:scale-95"
                 >
                   <Icons.Send />
                 </button>
               </div>
-              <div className="text-xs text-zinc-500 mt-2 text-center">
-                Press Enter to send • Shift+Enter for new line
-              </div>
+              <p className="text-[10px] text-center mt-3 text-zinc-500 font-medium uppercase tracking-widest opacity-50">
+                Cognitive processing active • Secure neural link
+              </p>
             </div>
           </div>
         )}

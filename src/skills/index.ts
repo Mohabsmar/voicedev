@@ -10,7 +10,7 @@ import { browserUseSkill, browserTools } from './browser-use';
 // ============================================
 // SKILL TYPES
 // ============================================
-interface SkillResult<T = any> {
+export interface SkillResult<T = any> {
   success: boolean;
   data?: T;
   error?: string;

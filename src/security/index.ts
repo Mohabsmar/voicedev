@@ -257,10 +257,11 @@ export class SandboxExecutor {
       
       const { stdout, stderr } = await execAsync(command, {
         cwd: options.cwd || '/tmp',
-        env: safeEnv,
+        env: safeEnv as any,
         timeout,
-        maxBuffer: this.limits.maxFileSize
-      });
+        maxBuffer: this.limits.maxFileSize,
+        encoding: 'utf8'
+      }) as unknown as { stdout: string, stderr: string };
       
       return {
         success: true,
@@ -686,10 +687,12 @@ export class AuditLogger {
       filtered = filtered.filter(l => l.success === filters.success);
     }
     if (filters.startDate) {
-      filtered = filtered.filter(l => l.timestamp >= filters.startDate);
+      const startDate = filters.startDate;
+      filtered = filtered.filter(l => l.timestamp >= startDate);
     }
     if (filters.endDate) {
-      filtered = filtered.filter(l => l.timestamp <= filters.endDate);
+      const endDate = filters.endDate;
+      filtered = filtered.filter(l => l.timestamp <= endDate);
     }
     if (filters.riskLevel) {
       filtered = filtered.filter(l => l.riskLevel === filters.riskLevel);
@@ -745,7 +748,7 @@ export class AuditLogger {
       topUsers: Object.entries(userCounts)
         .map(([userId, count]) => ({ userId, count }))
         .sort((a, b) => b.count - a.count)
-        .slice(0: 10),
+        .slice(0, 10),
       riskDistribution: riskCounts
     };
   }

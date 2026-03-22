@@ -185,37 +185,51 @@ export const asrTools = {
     description: 'Transcribe and translate audio to English',
     parameters: { audioPath: 'string', provider: 'string?' },
     execute: async (p: { audioPath: string; provider?: string }) => {
-      try {
-        // Use Whisper's translation capability
-        const provider = p.provider || 'openai';
-        
-        if (provider === 'openai') {
-          const fs = require('fs');
-          const https = require('https');
-          
-          return new Promise((resolve) => {
-            const formData = `--boundary\r\nContent-Disposition: form-data; name="file"; filename="audio.mp3"\r\nContent-Type: audio/mpeg\r\n\r\n`;
-            const audioData = fs.readFileSync(p.audioPath);
-            
-            const options = {
-              hostname: 'api.openai.com',
-              path: '/v1/audio/translations',
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'multipart/form-data'
-              }
-            };
-            
-            // Simplified - actual implementation would use proper multipart
-            resolve({ success: true, data: { text: 'Translation would appear here', provider } });
+      const provider = p.provider || 'openai';
+      const fs = require('fs');
+      const path = require('path');
+
+      if (provider === 'openai') {
+        if (!process.env.OPENAI_API_KEY) return { success: false, error: 'OPENAI_API_KEY not set' };
+        try {
+          const audioBuffer = fs.readFileSync(p.audioPath);
+          const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+          const formData = new FormData();
+          formData.append('file', blob, path.basename(p.audioPath));
+          formData.append('model', 'whisper-1');
+
+          const response = await fetch('https://api.openai.com/v1/audio/translations', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+            body: formData
           });
-        }
-        
-        return { success: false, error: 'Translation not supported for this provider' };
-      } catch (e: any) {
-        return { success: false, error: e.message };
+
+          const json = await response.json();
+          return json.error ? { success: false, error: json.error.message } : { success: true, data: { text: json.text, provider } };
+        } catch (e: any) { return { success: false, error: e.message }; }
       }
+
+      if (provider === 'groq') {
+        if (!process.env.GROQ_API_KEY) return { success: false, error: 'GROQ_API_KEY not set' };
+        try {
+          const audioBuffer = fs.readFileSync(p.audioPath);
+          const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+          const formData = new FormData();
+          formData.append('file', blob, path.basename(p.audioPath));
+          formData.append('model', 'whisper-large-v3');
+
+          const response = await fetch('https://api.groq.com/openai/v1/audio/translations', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
+            body: formData
+          });
+
+          const json = await response.json();
+          return json.error ? { success: false, error: json.error.message } : { success: true, data: { text: json.text, provider } };
+        } catch (e: any) { return { success: false, error: e.message }; }
+      }
+
+      return { success: false, error: 'Translation not supported for this provider' };
     }
   },
 };
@@ -226,30 +240,52 @@ export const asrTools = {
 export const voiceCloningTools = {
   voice_clone: {
     name: 'voice_clone',
-    description: 'Clone a voice from audio samples',
+    description: 'Clone a voice from audio samples using ElevenLabs',
     parameters: { 
       audioPaths: 'array', 
       name: 'string',
-      provider: 'string?'
+      description: 'string?'
     },
-    execute: async (p: { audioPaths: string[]; name: string; provider?: string }) => {
+    execute: async (p: { audioPaths: string[]; name: string; description?: string }) => {
+      const fs = require('fs');
+      const path = require('path');
+
+      if (!process.env.ELEVENLABS_API_KEY) {
+        return { success: false, error: 'ELEVENLABS_API_KEY is not set' };
+      }
+
       try {
-        const provider = p.provider || 'elevenlabs';
+        const formData = new FormData();
+        formData.append('name', p.name);
+        if (p.description) formData.append('description', p.description);
         
-        if (provider === 'elevenlabs') {
-          // ElevenLabs voice cloning
-          return { 
-            success: true, 
-            data: { 
-              voiceId: `clone_${Date.now()}`,
-              name: p.name,
-              provider,
-              samples: p.audioPaths.length
-            }
-          };
+        for (const audioPath of p.audioPaths) {
+          const buffer = fs.readFileSync(audioPath);
+          const blob = new Blob([buffer], { type: 'audio/mpeg' });
+          formData.append('files', blob, path.basename(audioPath));
         }
-        
-        return { success: false, error: `Voice cloning not supported for ${provider}` };
+
+        const response = await fetch('https://api.elevenlabs.io/v1/voices/add', {
+          method: 'POST',
+          headers: {
+            'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          },
+          body: formData
+        });
+
+        const json = await response.json();
+        if (json.error || !json.voice_id) {
+          return { success: false, error: json.error?.message || 'Failed to clone voice' };
+        }
+        return {
+          success: true,
+          data: {
+            voiceId: json.voice_id,
+            name: p.name,
+            provider: 'elevenlabs',
+            samples: p.audioPaths.length
+          }
+        };
       } catch (e: any) {
         return { success: false, error: e.message };
       }
@@ -379,18 +415,104 @@ async function minimaxTTS(text: string, voice: string, output?: string): Promise
 }
 
 async function openaiWhisper(audioPath: string, model: string, language?: string): Promise<any> {
-  // Simplified Whisper implementation
-  return { success: true, data: { text: 'Transcription would appear here', language: language || 'auto' } };
+  const fs = require('fs');
+  const path = require('path');
+
+  if (!process.env.OPENAI_API_KEY) {
+    return { success: false, error: 'OPENAI_API_KEY is not set' };
+  }
+
+  try {
+    const audioBuffer = fs.readFileSync(audioPath);
+    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+    const formData = new FormData();
+    formData.append('file', blob, path.basename(audioPath));
+    formData.append('model', model || 'whisper-1');
+    if (language) formData.append('language', language);
+
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: formData
+    });
+
+    const json = await response.json();
+    if (json.error) {
+      return { success: false, error: json.error.message };
+    }
+    return { success: true, data: { text: json.text, language: language || 'auto' } };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
 async function groqWhisper(audioPath: string, language?: string): Promise<any> {
-  // Groq Whisper (ultra fast)
-  return { success: true, data: { text: 'Transcription would appear here', language: language || 'auto', speed: 'ultra_fast' } };
+  const fs = require('fs');
+  const path = require('path');
+
+  if (!process.env.GROQ_API_KEY) {
+    return { success: false, error: 'GROQ_API_KEY is not set' };
+  }
+
+  try {
+    const audioBuffer = fs.readFileSync(audioPath);
+    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+    const formData = new FormData();
+    formData.append('file', blob, path.basename(audioPath));
+    formData.append('model', 'whisper-large-v3-turbo');
+    if (language) formData.append('language', language);
+
+    const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: formData
+    });
+
+    const json = await response.json();
+    if (json.error) {
+      return { success: false, error: json.error.message };
+    }
+    return { success: true, data: { text: json.text, language: language || 'auto', speed: 'ultra_fast' } };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
 async function elevenLabsScribe(audioPath: string): Promise<any> {
-  // ElevenLabs Scribe ASR
-  return { success: true, data: { text: 'Transcription would appear here', provider: 'elevenlabs' } };
+  const fs = require('fs');
+  const path = require('path');
+
+  if (!process.env.ELEVENLABS_API_KEY) {
+    return { success: false, error: 'ELEVENLABS_API_KEY is not set' };
+  }
+
+  try {
+    const audioBuffer = fs.readFileSync(audioPath);
+    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+    const formData = new FormData();
+    formData.append('file', blob, path.basename(audioPath));
+    formData.append('model_id', 'scribe_v1');
+
+    const response = await fetch('https://api.elevenlabs.io/v1/scribe', {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY,
+      },
+      body: formData
+    });
+
+    const json = await response.json();
+    if (json.error) {
+      return { success: false, error: json.error.message };
+    }
+    return { success: true, data: { text: json.text, provider: 'elevenlabs' } };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
 // Export all voice tools

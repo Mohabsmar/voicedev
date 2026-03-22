@@ -108,6 +108,15 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
 export interface ChatOptions {
   provider: string;
   model: string;
@@ -116,10 +125,13 @@ export interface ChatOptions {
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
+  tools?: any[];
+  toolChoice?: any;
 }
 
 export interface ChatResponse {
-  content: string;
+  content: string | null;
+  toolCalls?: ToolCall[];
   usage?: {
     promptTokens: number;
     completionTokens: number;
@@ -148,6 +160,8 @@ async function callOpenAI(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
+      tool_choice: options.toolChoice,
     }),
   });
 
@@ -157,8 +171,11 @@ async function callOpenAI(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -181,6 +198,13 @@ async function callAnthropic(options: ChatOptions): Promise<ChatResponse> {
   const systemMessage = options.messages.find(m => m.role === 'system');
   const otherMessages = options.messages.filter(m => m.role !== 'system');
 
+  // Map tools to Anthropic format
+  const anthropicTools = options.tools?.map(t => ({
+    name: t.function.name,
+    description: t.function.description,
+    input_schema: t.function.parameters
+  }));
+
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -196,6 +220,7 @@ async function callAnthropic(options: ChatOptions): Promise<ChatResponse> {
         role: m.role,
         content: m.content,
       })),
+      tools: anthropicTools,
     }),
   });
 
@@ -205,8 +230,21 @@ async function callAnthropic(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const textContent = data.content.find((c: any) => c.type === 'text')?.text || null;
+  const toolUseBlocks = data.content.filter((c: any) => c.type === 'tool_use');
+
+  const toolCalls: ToolCall[] = toolUseBlocks.map((b: any) => ({
+    id: b.id,
+    type: 'function',
+    function: {
+      name: b.name,
+      arguments: JSON.stringify(b.input)
+    }
+  }));
+
   return {
-    content: data.content[0]?.text || '',
+    content: textContent,
+    toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
     usage: {
       promptTokens: data.usage?.input_tokens || 0,
       completionTokens: data.usage?.output_tokens || 0,
@@ -230,10 +268,19 @@ async function callGoogle(options: ChatOptions): Promise<ChatResponse> {
     .filter(m => m.role !== 'system')
     .map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
+      parts: m.content ? [{ text: m.content }] : [],
     }));
 
   const systemInstruction = options.messages.find(m => m.role === 'system');
+
+  // Map tools to Gemini format
+  const geminiTools = options.tools ? [{
+    function_declarations: options.tools.map(t => ({
+      name: t.function.name,
+      description: t.function.description,
+      parameters: t.function.parameters
+    }))
+  }] : undefined;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${options.model}:generateContent?key=${apiKey}`,
@@ -244,6 +291,7 @@ async function callGoogle(options: ChatOptions): Promise<ChatResponse> {
       },
       body: JSON.stringify({
         contents,
+        tools: geminiTools,
         systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction.content }] } : undefined,
         generationConfig: {
           temperature: options.temperature ?? 0.7,
@@ -259,8 +307,24 @@ async function callGoogle(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const candidate = data.candidates[0];
+  const parts = candidate?.content?.parts || [];
+
+  const textPart = parts.find((p: any) => p.text);
+  const callParts = parts.filter((p: any) => p.functionCall);
+
+  const toolCalls: ToolCall[] = callParts.map((p: any) => ({
+    id: `call_${Math.random().toString(36).substr(2, 9)}`,
+    type: 'function',
+    function: {
+      name: p.functionCall.name,
+      arguments: JSON.stringify(p.functionCall.args)
+    }
+  }));
+
   return {
-    content: data.candidates[0]?.content?.parts[0]?.text || '',
+    content: textPart?.text || null,
+    toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
     usage: {
       promptTokens: data.usageMetadata?.promptTokenCount || 0,
       completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
@@ -268,7 +332,7 @@ async function callGoogle(options: ChatOptions): Promise<ChatResponse> {
     },
     model: options.model,
     provider: 'google',
-    finishReason: data.candidates[0]?.finishReason,
+    finishReason: candidate?.finishReason,
   };
 }
 
@@ -290,6 +354,7 @@ async function callDeepSeek(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -299,8 +364,11 @@ async function callDeepSeek(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -330,6 +398,7 @@ async function callGroq(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -339,8 +408,11 @@ async function callGroq(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -370,6 +442,7 @@ async function callMistral(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -379,8 +452,11 @@ async function callMistral(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -410,6 +486,7 @@ async function callXAI(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -419,8 +496,11 @@ async function callXAI(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -450,6 +530,7 @@ async function callMoonshot(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -459,8 +540,11 @@ async function callMoonshot(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -490,6 +574,7 @@ async function callMiniMax(options: ChatOptions): Promise<ChatResponse> {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -499,8 +584,11 @@ async function callMiniMax(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+  const message = data.choices[0]?.message;
+
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || null,
+    toolCalls: message?.tool_calls,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
@@ -538,6 +626,7 @@ async function callCohere(options: ChatOptions): Promise<ChatResponse> {
       chat_history: chatHistory,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens ?? 4096,
+      tools: options.tools,
     }),
   });
 
@@ -547,8 +636,19 @@ async function callCohere(options: ChatOptions): Promise<ChatResponse> {
   }
 
   const data = await response.json();
+
+  const toolCalls: ToolCall[] = data.tool_calls?.map((tc: any) => ({
+    id: tc.id,
+    type: 'function',
+    function: {
+      name: tc.function.name,
+      arguments: tc.function.arguments
+    }
+  }));
+
   return {
-    content: data.text || '',
+    content: data.text || null,
+    toolCalls: toolCalls?.length > 0 ? toolCalls : undefined,
     usage: {
       promptTokens: data.meta?.tokens?.input_tokens || 0,
       completionTokens: data.meta?.tokens?.output_tokens || 0,

@@ -1,46 +1,143 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { callAI, ChatMessage } from '@/lib/ai-providers'
+import { callAI, ChatMessage, ChatResponse } from '@/lib/ai-providers'
+import { executeTool, allTools } from '@/tools'
+import { executeSkill, allSkills } from '@/skills'
+
+// Helper to map registry to AI tool format
+const getToolDefinitions = () => {
+  const toolDefs: any[] = []
+
+  // Map standard tools
+  Object.entries(allTools).forEach(([name, tool]) => {
+    toolDefs.push({
+      type: 'function',
+      function: {
+        name,
+        description: tool.description,
+        parameters: {
+          type: 'object',
+          properties: Object.entries(tool.parameters).reduce((acc: any, [pName, pType]: any) => {
+            const isOptional = pType.endsWith('?')
+            const cleanType = isOptional ? pType.slice(0, -1) : pType
+            let jsonType = 'string'
+            if (cleanType === 'number') jsonType = 'number'
+            else if (cleanType === 'boolean') jsonType = 'boolean'
+            else if (cleanType === 'array') jsonType = 'array'
+            else if (cleanType === 'object') jsonType = 'object'
+
+            acc[pName] = { type: jsonType }
+            return acc
+          }, {}),
+          required: Object.entries(tool.parameters)
+            .filter(([_, t]: any) => !t.endsWith('?'))
+            .map(([n]) => n)
+        }
+      }
+    })
+  })
+
+  // Map skills as tools too
+  Object.entries(allSkills).forEach(([name, skill]) => {
+    toolDefs.push({
+      type: 'function',
+      function: {
+        name: `skill_${name.replace(/-/g, '_')}`,
+        description: `[SKILL] ${skill.description}`,
+        parameters: { type: 'object', properties: {}, additionalProperties: true }
+      }
+    })
+  })
+
+  return toolDefs
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { 
-      messages, 
-      model = 'gpt-4o', 
+      messages: initialMessages,
+      model = 'gpt-5.4',
       provider = 'openai', 
       apiKey,
       temperature = 0.7,
       maxTokens = 4096 
     } = body
 
-    // Validate messages
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: 'Messages array is required' },
-        { status: 400 }
-      )
+    if (!initialMessages || !Array.isArray(initialMessages)) {
+      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 })
     }
 
-    // Validate API key (check env or provided key)
-    const envKey = getEnvKeyForProvider(provider)
-    const effectiveApiKey = apiKey || envKey
-    
+    const effectiveApiKey = apiKey || getEnvKeyForProvider(provider)
     if (!effectiveApiKey) {
-      return NextResponse.json(
-        { error: `API key required for ${provider}. Set ${getEnvKeyName(provider)} or provide apiKey parameter.` },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: `API key required for ${provider}` }, { status: 400 })
     }
 
-    // Make the real API call
-    const response = await callAI({
-      provider,
-      model,
-      messages: messages as ChatMessage[],
-      apiKey: effectiveApiKey,
-      temperature,
-      maxTokens,
-    })
+    const tools = getToolDefinitions()
+    const messages = [...initialMessages]
+
+    // Inject system prompt if missing or first
+    if (messages[0]?.role !== 'system') {
+      messages.unshift({
+        role: 'system',
+        content: `You are VoiceDev Ultimate AI, a highly capable agent.
+        You have access to 250+ tools and 105+ skills across categories like File System, Shell, Web, Git, NPM, Security, Data, and Browser Automation.
+        When you need to perform an action, use the appropriate tool.
+        Skills are prefixed with 'skill_'.
+        Always explain your reasoning before and after using tools.`
+      })
+    }
+
+    let response: ChatResponse | null = null
+    let turnCount = 0
+    const MAX_TURNS = 5
+
+    while (turnCount < MAX_TURNS) {
+      turnCount++
+
+      response = await callAI({
+        provider,
+        model,
+        messages: messages as ChatMessage[],
+        apiKey: effectiveApiKey,
+        temperature,
+        maxTokens,
+        tools: tools.length > 0 ? tools : undefined
+      })
+
+      if (!response.toolCalls || response.toolCalls.length === 0) {
+        break
+      }
+
+      // Add assistant's tool calls to history
+      messages.push({
+        role: 'assistant',
+        content: response.content || '',
+        tool_calls: response.toolCalls
+      } as any)
+
+      // Execute tools
+      for (const toolCall of response.toolCalls) {
+        const name = toolCall.function.name
+        const args = JSON.parse(toolCall.function.arguments)
+
+        let result
+        if (name.startsWith('skill_')) {
+          const skillName = name.replace('skill_', '').replace(/_/g, '-')
+          result = await executeSkill(skillName, args)
+        } else {
+          result = await executeTool(name, args)
+        }
+
+        messages.push({
+          role: 'tool',
+          tool_call_id: toolCall.id,
+          name: name,
+          content: JSON.stringify(result)
+        } as any)
+      }
+    }
+
+    if (!response) throw new Error('Failed to get response from AI')
 
     return NextResponse.json({
       success: true,
@@ -50,6 +147,7 @@ export async function POST(request: NextRequest) {
       provider: response.provider,
       finishReason: response.finishReason,
       timestamp: new Date().toISOString(),
+      turns: turnCount
     })
 
   } catch (error) {
