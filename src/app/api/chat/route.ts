@@ -56,9 +56,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { 
       messages: initialMessages,
-      model = 'gpt-5.4',
+      model = 'gpt-4o',
       provider = 'openai', 
       apiKey,
+      mode = 'simple',
+      mcpConfigs = '',
       temperature = 0.7,
       maxTokens = 4096 
     } = body
@@ -77,13 +79,24 @@ export async function POST(request: NextRequest) {
 
     // Inject system prompt if missing or first
     if (messages[0]?.role !== 'system') {
+      const modePrompt = mode === 'advanced'
+        ? "EXPERIENCE MODE: ADVANCED. Provide detailed technical logs and explain complex tool usage. Full transparency enabled."
+        : "EXPERIENCE MODE: SIMPLE. Be concise and conversational. Perform tasks seamlessly without over-explaining technical details unless asked.";
+
+      const mcpPrompt = mcpConfigs
+        ? `CUSTOM MCP CONFIGURATION DETECTED: ${mcpConfigs}. You are authorized to use these additional context protocols.`
+        : "";
+
       messages.unshift({
         role: 'system',
         content: `You are VoiceDev Ultimate AI, a highly capable agent.
-        You have access to 250+ tools and 105+ skills across categories like File System, Shell, Web, Git, NPM, Security, Data, and Browser Automation.
+        You have access to 300+ tools and 105+ skills across categories like File System, Shell, Web, Git, NPM, Security, Data, Browser Automation, and Productivity (Office/Docs).
         When you need to perform an action, use the appropriate tool.
         Skills are prefixed with 'skill_'.
-        Always explain your reasoning before and after using tools.`
+        Always explain your reasoning before and after using tools.
+
+        ${modePrompt}
+        ${mcpPrompt}`
       })
     }
 
@@ -188,20 +201,21 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     providers: [
-      { id: 'openai', name: 'OpenAI', models: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-4o', 'o4', 'o4-mini'] },
-      { id: 'anthropic', name: 'Anthropic', models: ['claude-sonnet-4.6', 'claude-opus-4.6', 'claude-4-sonnet'] },
-      { id: 'google', name: 'Google AI', models: ['gemini-3.1-pro', 'gemini-3-pro', 'gemini-2.5-pro'] },
-      { id: 'deepseek', name: 'DeepSeek', models: ['deepseek-v3.2-exp', 'deepseek-v3.1', 'deepseek-r1-0528'] },
-      { id: 'groq', name: 'Groq', models: ['llama-4-maverick', 'llama-4-scout', 'whisper-large-v3-turbo'] },
-      { id: 'mistral', name: 'Mistral AI', models: ['mistral-small-4', 'mistral-large-3', 'codestral-latest'] },
-      { id: 'xai', name: 'xAI (Grok)', models: ['grok-4.20-beta', 'grok-4.1', 'grok-4-vision'] },
-      { id: 'zai', name: 'Z.ai (GLM)', models: ['glm-5', 'glm-4.7', 'glm-4.7-flash'], note: 'Z.ai = GLM = Zhipu AI' },
-      { id: 'moonshot', name: 'Moonshot (Kimi)', models: ['kimi-k2.5', 'kimi-k2', 'moonshot-v1-128k'] },
-      { id: 'minimax', name: 'MiniMax', models: ['minimax-m2.7', 'minimax-m2.5', 'speech-2.6-turbo'] },
-      { id: 'cohere', name: 'Cohere', models: ['command-r3', 'command-r-plus', 'embed-v4'] },
-      { id: 'together', name: 'Together AI', models: ['meta-llama/Llama-4-Maverick-Turbo', 'Qwen/Qwen3.5-397B-A17B'] },
+      { id: 'openai', name: 'OpenAI', models: ['gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini'] },
+      { id: 'anthropic', name: 'Anthropic', models: ['claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest', 'claude-3-opus-latest'] },
+      { id: 'google', name: 'Google AI', models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'] },
+      { id: 'deepseek', name: 'DeepSeek', models: ['deepseek-chat', 'deepseek-reasoner'] },
+      { id: 'xai', name: 'xAI (Grok)', models: ['grok-beta', 'grok-2'] },
+      { id: 'zai', name: 'Z.ai (GLM)', models: ['glm-4', 'glm-4-flash'], note: 'Z.ai = GLM = Zhipu AI' },
+      { id: 'moonshot', name: 'Moonshot (Kimi)', models: ['moonshot-v1-128k'] },
+      { id: 'mistral', name: 'Mistral AI', models: ['mistral-large-latest', 'mistral-small-latest', 'codestral-latest'] },
+      { id: 'qwen', name: 'Alibaba Qwen', models: ['qwen-turbo', 'qwen-max'] },
+      { id: 'groq', name: 'Groq', models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'] },
+      { id: 'elevenlabs', name: 'ElevenLabs', models: ['eleven_multilingual_v2'] },
+      { id: 'cohere', name: 'Cohere', models: ['command-r-plus', 'command-r'] },
+      { id: 'together', name: 'Together AI', models: ['meta-llama/Llama-3.3-70B-Instruct-Turbo', 'Qwen/Qwen2.5-72B-Instruct'] },
     ],
-    note: 'All API calls are REAL - they make actual HTTP requests to each provider.',
+    note: 'All API calls are REAL - they make actual HTTP requests to each provider. Updated February 2025.',
   })
 }
 

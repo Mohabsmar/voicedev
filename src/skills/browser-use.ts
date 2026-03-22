@@ -52,19 +52,15 @@ export const browserUseSkill = {
     screenshot: async (url: string, outputPath?: string): Promise<BrowserResult> => {
       try {
         const output = outputPath || `/tmp/screenshot-${Date.now()}.png`;
-        // This would use Puppeteer in a real implementation
-        const puppeteerScript = `
-          const puppeteer = require('puppeteer');
-          (async () => {
-            const browser = await puppeteer.launch({ headless: true });
-            const page = await browser.newPage();
-            await page.goto('${url}', { waitUntil: 'networkidle2' });
-            await page.screenshot({ path: '${output}', fullPage: true });
-            await browser.close();
-            console.log('${output}');
-          })().catch(console.error);
-        `;
-        const { stdout } = await execCrossPlatform(`node -e "${puppeteerScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`);
+        const puppeteer = require('puppeteer-core');
+        const browser = await puppeteer.launch({
+          headless: true,
+          executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome'
+        });
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
+        await page.screenshot({ path: output, fullPage: true });
+        await browser.close();
         return { success: true, screenshot: output, data: { path: output } };
       } catch (e: any) {
         return { success: false, error: e.message };
@@ -74,31 +70,27 @@ export const browserUseSkill = {
     // Extract data from webpage
     extract: async (url: string, selectors: Record<string, string>): Promise<BrowserResult> => {
       try {
-        const selectorObj = JSON.stringify(selectors);
-        const puppeteerScript = `
-          const puppeteer = require('puppeteer');
-          (async () => {
-            const browser = await puppeteer.launch({ headless: true });
-            const page = await browser.newPage();
-            await page.goto('${url}', { waitUntil: 'networkidle2' });
-            const data = {};
-            const selectors = ${selectorObj};
-            for (const [key, selector] of Object.entries(selectors)) {
-              try {
-                const elements = await page.$$(selector);
-                data[key] = elements.length > 1 
-                  ? await Promise.all(elements.map(el => el.evaluate(e => e.textContent.trim())))
-                  : await page.$eval(selector, el => el.textContent.trim());
-              } catch (e) {
-                data[key] = null;
-              }
-            }
-            await browser.close();
-            console.log(JSON.stringify(data));
-          })().catch(console.error);
-        `;
-        const { stdout } = await execCrossPlatform(`node -e "${puppeteerScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`);
-        return { success: true, data: JSON.parse(stdout) };
+        const puppeteer = require('puppeteer-core');
+        const browser = await puppeteer.launch({
+          headless: true,
+          executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome'
+        });
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
+
+        const data: Record<string, any> = {};
+        for (const [key, selector] of Object.entries(selectors)) {
+          try {
+            data[key] = await page.$$eval(selector, (els: any[]) =>
+              els.length > 1 ? els.map(el => el.textContent?.trim()) : els[0]?.textContent?.trim()
+            );
+          } catch (e) {
+            data[key] = null;
+          }
+        }
+
+        await browser.close();
+        return { success: true, data };
       } catch (e: any) {
         return { success: false, error: e.message };
       }

@@ -8,11 +8,13 @@ import { cn } from '@/lib/utils'
 // ============================================
 interface Message {
   id: string
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant' | 'system' | 'tool'
   content: string
   timestamp: Date
   model?: string
   tokens?: number
+  toolCalls?: any[]
+  toolName?: string
 }
 
 interface ChatSession {
@@ -81,113 +83,98 @@ const Icons = {
 }
 
 // ============================================
-// PROVIDERS WITH LATEST 2026 MODELS
+// PROVIDERS WITH LATEST FLAGSHIP MODELS
 // ============================================
 const PROVIDERS = [
   { 
     id: 'openai', 
     name: 'OpenAI', 
     models: [
-      { id: 'gpt-5.4', name: 'GPT-5.4', contextWindow: 1000000 },
-      { id: 'gpt-5.4-turbo', name: 'GPT-5.4 Turbo', contextWindow: 1000000 },
-      { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini', contextWindow: 256000 },
-      { id: 'gpt-5.3-codex', name: 'GPT-5.3 Codex', contextWindow: 512000 },
-      { id: 'o4', name: 'o4', contextWindow: 256000 },
-      { id: 'o4-mini', name: 'o4 Mini', contextWindow: 200000 },
+      { id: 'gpt-4o', name: 'GPT-4o', contextWindow: 128000 },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextWindow: 128000 },
+      { id: 'o1', name: 'o1', contextWindow: 128000 },
+      { id: 'o1-mini', name: 'o1 Mini', contextWindow: 128000 },
     ]
   },
   { 
     id: 'anthropic', 
     name: 'Anthropic', 
     models: [
-      { id: 'claude-sonnet-4.6', name: 'Claude Sonnet 4.6', contextWindow: 1000000 },
-      { id: 'claude-sonnet-4.6-turbo', name: 'Claude Sonnet 4.6 Turbo', contextWindow: 1000000 },
-      { id: 'claude-opus-4.6', name: 'Claude Opus 4.6', contextWindow: 1000000 },
-      { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', contextWindow: 200000 },
-      { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', contextWindow: 200000 },
+      { id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet', contextWindow: 200000 },
+      { id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', contextWindow: 200000 },
+      { id: 'claude-3-opus-latest', name: 'Claude 3 Opus', contextWindow: 200000 },
     ]
   },
   { 
     id: 'google', 
     name: 'Google AI', 
     models: [
-      { id: 'gemini-3.1-ultra', name: 'Gemini 3.1 Ultra', contextWindow: 4000000 },
-      { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', contextWindow: 2000000 },
-      { id: 'gemini-3.1-pro-turbo', name: 'Gemini 3.1 Pro Turbo', contextWindow: 2000000 },
-      { id: 'gemini-3.1-flash', name: 'Gemini 3.1 Flash', contextWindow: 1000000 },
-      { id: 'gemini-3.1-ultra-long', name: 'Gemini 3.1 Ultra Long', contextWindow: 10000000 },
-      { id: 'gemini-3-deep-think', name: 'Gemini 3 Deep Think', contextWindow: 1000000 },
+      { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', contextWindow: 2000000 },
+      { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', contextWindow: 1000000 },
+      { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash-8B', contextWindow: 1000000 },
     ]
   },
   { 
     id: 'deepseek', 
     name: 'DeepSeek', 
     models: [
-      { id: 'deepseek-v3.5', name: 'DeepSeek V3.5', contextWindow: 512000 },
-      { id: 'deepseek-v3.2-exp', name: 'DeepSeek V3.2-Exp', contextWindow: 256000 },
-      { id: 'deepseek-v3.1', name: 'DeepSeek V3.1', contextWindow: 128000 },
-      { id: 'deepseek-r1-0528', name: 'DeepSeek R1', contextWindow: 128000 },
+      { id: 'deepseek-chat', name: 'DeepSeek-V3', contextWindow: 64000 },
+      { id: 'deepseek-reasoner', name: 'DeepSeek-R1', contextWindow: 64000 },
     ]
   },
   { 
     id: 'xai', 
     name: 'xAI (Grok)', 
     models: [
-      { id: 'grok-4.5', name: 'Grok 4.5', contextWindow: 1000000 },
-      { id: 'grok-4.20-beta', name: 'Grok 4.20 Beta', contextWindow: 512000 },
-      { id: 'grok-4.1-fast', name: 'Grok 4.1 Fast', contextWindow: 256000 },
-      { id: 'grok-4.1', name: 'Grok 4.1', contextWindow: 256000 },
+      { id: 'grok-beta', name: 'Grok Beta', contextWindow: 128000 },
+      { id: 'grok-2', name: 'Grok 2', contextWindow: 128000 },
     ]
   },
   { 
     id: 'zai', 
     name: 'Z.ai (GLM)', 
     models: [
-      { id: 'glm-5', name: 'GLM-5', contextWindow: 512000 },
-      { id: 'glm-4.7', name: 'GLM-4.7', contextWindow: 256000 },
-      { id: 'glm-4.7-flash', name: 'GLM-4.7 Flash', contextWindow: 256000 },
+      { id: 'glm-4', name: 'GLM-4', contextWindow: 128000 },
+      { id: 'glm-4-flash', name: 'GLM-4 Flash', contextWindow: 128000 },
     ]
   },
   { 
     id: 'moonshot', 
     name: 'Moonshot AI', 
     models: [
-      { id: 'kimi-k2.5', name: 'Kimi K2.5', contextWindow: 1000000 },
-      { id: 'kimi-k2-thinking', name: 'Kimi K2 Thinking', contextWindow: 400000 },
+      { id: 'moonshot-v1-128k', name: 'Moonshot V1', contextWindow: 128000 },
     ]
   },
   { 
     id: 'mistral', 
     name: 'Mistral AI', 
     models: [
-      { id: 'mistral-large-4', name: 'Mistral Large 4', contextWindow: 512000 },
-      { id: 'mistral-small-4', name: 'Mistral Small 4', contextWindow: 128000 },
-      { id: 'mistral-large-3', name: 'Mistral Large 3', contextWindow: 256000 },
+      { id: 'mistral-large-latest', name: 'Mistral Large', contextWindow: 128000 },
+      { id: 'mistral-small-latest', name: 'Mistral Small', contextWindow: 32000 },
+      { id: 'codestral-latest', name: 'Codestral', contextWindow: 32000 },
     ]
   },
   { 
     id: 'qwen', 
     name: 'Alibaba Qwen', 
     models: [
-      { id: 'qwen-4.0', name: 'Qwen 4.0', contextWindow: 1000000 },
-      { id: 'qwen-3.5', name: 'Qwen 3.5', contextWindow: 256000 },
-      { id: 'qwen-3-next', name: 'Qwen 3-Next', contextWindow: 128000 },
+      { id: 'qwen-turbo', name: 'Qwen Turbo', contextWindow: 32000 },
+      { id: 'qwen-max', name: 'Qwen Max', contextWindow: 32000 },
     ]
   },
   { 
     id: 'groq', 
     name: 'Groq', 
     models: [
-      { id: 'llama-4-maverick', name: 'Llama 4 Maverick', contextWindow: 128000 },
-      { id: 'llama-4-scout', name: 'Llama 4 Scout', contextWindow: 128000 },
+      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', contextWindow: 128000 },
+      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', contextWindow: 128000 },
     ]
   },
   {
     id: 'elevenlabs',
     name: 'ElevenLabs',
     models: [
-      { id: 'eleven_v3', name: 'Eleven V3', contextWindow: 32000 },
-      { id: 'eleven_flash_v2.5', name: 'Eleven Flash V2.5', contextWindow: 32000 },
+      { id: 'eleven_multilingual_v2', name: 'Eleven V2', contextWindow: 32000 },
     ]
   },
 ]
@@ -199,21 +186,27 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
   const [step, setStep] = useState(0)
   const [config, setConfig] = useState<SetupConfig>({
     provider: 'openai',
-    model: 'gpt-5.4',
+    model: 'gpt-4o',
     apiKey: '',
     userName: '',
+    mode: 'simple',
+    mcpConfigs: '',
   })
   const [showApiKey, setShowApiKey] = useState(false)
 
   const currentProvider = PROVIDERS.find(p => p.id === config.provider)
 
   const handleNext = () => {
-    if (step < 4) {
-      setStep(step + 1)
+    console.log('Wizard handleNext triggered. Current step:', step);
+    const nextStep = step + 1;
+    if (step < 6) {
+      setStep(nextStep);
+      window.dispatchEvent(new CustomEvent('wizard-step-changed', { detail: nextStep }));
+      console.log('Next step set to:', nextStep);
     } else {
-      // Save config to localStorage
-      localStorage.setItem('voicedev_setup', JSON.stringify(config))
-      onComplete(config)
+      console.log('Completing wizard. Config:', config);
+      localStorage.setItem('voicedev_setup', JSON.stringify(config));
+      onComplete(config);
     }
   }
 
@@ -247,7 +240,46 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
         </div>
       )
     },
-    // Step 1: Choose Provider
+    // Step 1: Experience Mode
+    {
+      title: 'Select Experience Mode',
+      content: (
+        <div className="grid grid-cols-1 gap-4">
+          <button
+            onClick={() => setConfig({ ...config, mode: 'simple' })}
+            className={cn(
+              'p-6 rounded-2xl border text-left transition-all duration-300',
+              config.mode === 'simple'
+                ? 'bg-violet-600/20 border-violet-500/50 shadow-[0_0_20px_rgba(139,92,246,0.2)]'
+                : 'bg-white/5 border-white/5 hover:bg-white/10'
+            )}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="text-2xl">⚡</div>
+              <div className="font-bold text-lg">Simple Mode</div>
+            </div>
+            <p className="text-sm text-zinc-400">Clean interface, focused on conversation. AI tools run silently in the background.</p>
+          </button>
+          <button
+            id="mode-advanced-button"
+            onClick={() => setConfig({ ...config, mode: 'advanced' })}
+            className={cn(
+              'p-6 rounded-2xl border text-left transition-all duration-300',
+              config.mode === 'advanced'
+                ? 'bg-fuchsia-600/20 border-fuchsia-500/50 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
+                : 'bg-white/5 border-white/5 hover:bg-white/10'
+            )}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="text-2xl">🛠️</div>
+              <div className="font-bold text-lg">Advanced Mode</div>
+            </div>
+            <p className="text-sm text-zinc-400">Full transparency. See tool calls, logs, and configure custom MCP servers and channels.</p>
+          </button>
+        </div>
+      )
+    },
+    // Step 2: Choose Provider
     {
       title: 'Choose Your AI Provider',
       content: (
@@ -344,7 +376,27 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
         </div>
       )
     },
-    // Step 4: Your Name
+    // Step 5: MCP & Channels
+    {
+      title: 'MCP & Custom Channels',
+      content: (
+        <div className="space-y-4">
+          <p className="text-sm text-zinc-400">
+            Add custom Model Context Protocol (MCP) servers or Channel configurations in JSON format.
+          </p>
+          <textarea
+            value={config.mcpConfigs}
+            onChange={(e) => setConfig({ ...config, mcpConfigs: e.target.value })}
+            placeholder='{ "servers": [{ "name": "my-mcp", "url": "https://..." }] }'
+            className="w-full h-40 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+          <div className="text-xs text-zinc-500">
+            Leave empty to use standard built-in tools.
+          </div>
+        </div>
+      )
+    },
+    // Step 6: Your Name
     {
       title: 'What should I call you?',
       content: (
@@ -373,7 +425,7 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
         <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
       </div>
 
-      <div className="w-full max-w-xl glass-morphism rounded-[2.5rem] border-white/10 shadow-2xl overflow-hidden relative z-10 animate-in fade-in zoom-in duration-500">
+      <div id="wizard-container" data-step={step} className="w-full max-w-xl glass-morphism rounded-[2.5rem] border-white/10 shadow-2xl overflow-hidden relative z-10 animate-in fade-in zoom-in duration-500">
         {/* Progress */}
         <div className="flex gap-1.5 p-6 pb-0">
           {steps.map((_, i) => (
@@ -398,21 +450,28 @@ function SetupWizard({ onComplete }: { onComplete: (config: SetupConfig) => void
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between p-8 border-t border-white/5 bg-white/5">
+        <div className="flex justify-between p-8 border-t border-white/5 bg-white/5 relative z-[100]">
           <button
-            onClick={() => setStep(Math.max(0, step - 1))}
+            onClick={(e) => {
+              console.log('Back button clicked');
+              setStep(Math.max(0, step - 1));
+            }}
             disabled={step === 0}
             className={cn(
-              'px-4 py-2 rounded-lg transition-colors',
+              'px-4 py-2 rounded-lg transition-colors relative z-[110]',
               step === 0 ? 'text-zinc-600 cursor-not-allowed' : 'text-zinc-400 hover:text-white'
             )}
           >
             Back
           </button>
           <button
-            onClick={handleNext}
-            disabled={step === 3 && !config.apiKey}
-            className="px-6 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            id="wizard-next-button"
+            onClick={(e) => {
+              console.log('Next button clicked event');
+              handleNext();
+            }}
+            disabled={step === 4 && !config.apiKey}
+            className="px-6 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed relative z-[110]"
           >
             {step === steps.length - 1 ? 'Start Chatting' : 'Next'}
           </button>
@@ -427,13 +486,20 @@ interface SetupConfig {
   model: string
   apiKey: string
   userName: string
+  mode: 'simple' | 'advanced'
+  mcpConfigs: string
 }
 
 // ============================================
 // MAIN APP
 // ============================================
 export default function VoiceDevApp() {
+  const [isMounted, setIsMounted] = useState(false)
   const [setupComplete, setSetupComplete] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   const [config, setConfig] = useState<SetupConfig | null>(null)
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null)
@@ -484,8 +550,9 @@ export default function VoiceDevApp() {
   }
 
   const createNewSession = () => {
+    const id = typeof window !== 'undefined' ? window.crypto.randomUUID() : Math.random().toString(36).substring(7);
     const newSession: ChatSession = {
-      id: crypto.randomUUID(),
+      id,
       name: `Chat ${sessions.length + 1}`,
       messages: [],
       createdAt: new Date(),
@@ -505,11 +572,13 @@ export default function VoiceDevApp() {
     localStorage.setItem('voicedev_sessions', JSON.stringify(newSessions))
   }
 
+  const [currentTool, setCurrentTool] = useState<string | null>(null)
+
   const sendMessage = async () => {
     if (!input.trim() || !currentSession || !config) return
 
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: window.crypto.randomUUID(),
       role: 'user',
       content: input.trim(),
       timestamp: new Date(),
@@ -533,26 +602,30 @@ export default function VoiceDevApp() {
           messages: [...currentSession.messages, userMessage].map(m => ({
             role: m.role,
             content: m.content,
+            tool_calls: (m as any).toolCalls,
           })),
           model: config.model,
           provider: config.provider,
           apiKey: config.apiKey,
+          mode: config.mode,
+          mcpConfigs: config.mcpConfigs,
         }),
       })
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
       }
 
       const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+        id: window.crypto.randomUUID(),
         role: 'assistant',
         content: data.content || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
         model: config.model,
         tokens: data.usage?.totalTokens,
+        toolCalls: data.toolCalls,
       }
 
       const finalSession = {
@@ -564,7 +637,7 @@ export default function VoiceDevApp() {
     } catch (error: any) {
       console.error('Chat error:', error)
       const errorMessage: Message = {
-        id: crypto.randomUUID(),
+        id: window.crypto.randomUUID(),
         role: 'assistant',
         content: `Error: ${error.message || 'There was an error connecting to the AI. Please check your API key and connection.'}`,
         timestamp: new Date(),
@@ -588,339 +661,380 @@ export default function VoiceDevApp() {
   }
 
   // Show setup wizard if not complete
+  if (!isMounted) return <div className="min-h-screen bg-zinc-950" />
+
   if (!setupComplete) {
-    return <SetupWizard onComplete={handleSetupComplete} />
+    return (
+      <div className="dark">
+        <SetupWizard onComplete={handleSetupComplete} />
+      </div>
+    )
   }
 
   return (
-    <div className="h-screen flex bg-zinc-950 text-zinc-100 overflow-hidden relative">
-      {/* Animated Background Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 rounded-full blur-[120px] animate-blob" />
-        <div className="absolute top-[20%] right-[-5%] w-[35%] h-[35%] bg-fuchsia-600/20 rounded-full blur-[120px] animate-blob animation-delay-2000" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
-      </div>
-
-      {/* Sidebar */}
-      <div className={cn(
-        'glass-morphism border-r border-white/10 flex flex-col transition-all duration-500 ease-in-out relative z-10',
-        sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
-      )}>
-        {/* Header */}
-        <div className="p-6 border-b border-white/5">
-          <h1 className="text-2xl font-black bg-gradient-to-r from-white via-violet-200 to-fuchsia-300 bg-clip-text text-transparent tracking-tight">
-            VoiceDev
-          </h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold mt-1">Intelligence Redefined</p>
+    <div className="dark">
+      <div className="h-screen flex bg-zinc-950 text-zinc-100 overflow-hidden relative selection:bg-violet-500/30">
+        {/* Animated Background Blobs */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 rounded-full blur-[120px] animate-blob" />
+          <div className="absolute top-[20%] right-[-5%] w-[35%] h-[35%] bg-fuchsia-600/20 rounded-full blur-[120px] animate-blob animation-delay-2000" />
+          <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000" />
         </div>
 
-        {/* New Chat Button */}
-        <div className="p-4">
-          <button
-            onClick={createNewSession}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all duration-300 group shadow-xl shadow-black/20"
-          >
-            <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
-              <Icons.Plus />
-            </div>
-            <span className="font-semibold text-sm">New Session</span>
-          </button>
-        </div>
+        {/* Sidebar */}
+        <div className={cn(
+          'glass-morphism border-r border-white/10 flex flex-col transition-all duration-500 ease-in-out relative z-10',
+          sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
+        )}>
+          {/* Header */}
+          <div className="p-6 border-b border-white/5">
+            <h1 className="text-2xl font-black bg-gradient-to-r from-white via-violet-200 to-fuchsia-300 bg-clip-text text-transparent tracking-tight">
+              VoiceDev
+            </h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold mt-1">Intelligence Redefined</p>
+          </div>
 
-        {/* Sessions List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Chats</div>
-          {sessions.map(session => (
-            <div
-              key={session.id}
-              className={cn(
-                'group p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between',
-                currentSession?.id === session.id 
-                  ? 'bg-violet-600/20 border border-violet-500/30' 
-                  : 'hover:bg-zinc-800 border border-transparent'
-              )}
-              onClick={() => setCurrentSession(session)}
+          {/* New Chat Button */}
+          <div className="p-4">
+            <button
+              onClick={createNewSession}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-all duration-300 group shadow-xl shadow-black/20"
             >
-              <div className="flex-1 min-w-0">
-                <div className="truncate font-medium text-sm">{session.name}</div>
-                <div className="text-xs text-zinc-500">
-                  {session.messages.length} messages
-                </div>
+              <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
+                <Icons.Plus />
               </div>
-              <button
-                onClick={(e) => { e.stopPropagation(); deleteSession(session.id); }}
-                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-opacity"
+              <span className="font-semibold text-sm">New Session</span>
+            </button>
+          </div>
+
+          {/* Sessions List */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Chats</div>
+            {sessions.map(session => (
+              <div
+                key={session.id}
+                className={cn(
+                  'group p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between',
+                  currentSession?.id === session.id
+                    ? 'bg-violet-600/20 border border-violet-500/30'
+                    : 'hover:bg-zinc-800 border border-transparent'
+                )}
+                onClick={() => setCurrentSession(session)}
               >
-                <Icons.Trash />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Current Model */}
-        <div className="p-3 border-t border-zinc-800">
-          <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Current Model</div>
-          <div className="bg-zinc-800 rounded-lg p-3">
-            <div className="font-medium text-sm">{config?.model}</div>
-            <div className="text-xs text-zinc-500">{PROVIDERS.find(p => p.id === config?.provider)?.name}</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-900/50 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-            >
-              <Icons.Menu />
-            </button>
-            <div>
-              <h2 className="font-semibold">
-                {currentSession?.name || 'VoiceDev Chat'}
-              </h2>
-              {currentSession && (
-                <div className="text-xs text-zinc-500">
-                  {currentSession.model}
+                <div className="flex-1 min-w-0">
+                  <div className="truncate font-medium text-sm">{session.name}</div>
+                  <div className="text-xs text-zinc-500">
+                    {session.messages.length} messages
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSettingsOpen(!settingsOpen)}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-            >
-              <Icons.Settings />
-            </button>
-          </div>
-        </div>
-
-        {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {!currentSession ? (
-            <div className="h-full flex items-center justify-center p-8">
-              <div className="max-w-2xl w-full glass-morphism rounded-3xl p-12 text-center shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="text-7xl mb-6 relative">🚀</div>
-                <h2 className="text-4xl font-black mb-4 tracking-tight">
-                  Welcome to <span className="text-violet-400">VoiceDev</span>
-                </h2>
-                <p className="text-zinc-400 text-lg mb-8 leading-relaxed">
-                  The world&apos;s most advanced AI orchestration platform. Powered by 95+ frontier models and 250+ autonomous tools.
-                </p>
                 <button
-                  onClick={createNewSession}
-                  className="px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:scale-105 active:scale-95 rounded-2xl font-bold transition-all shadow-2xl shadow-violet-600/40 flex items-center gap-3 mx-auto"
+                  onClick={(e) => { e.stopPropagation(); deleteSession(session.id); }}
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-opacity"
                 >
-                  <Icons.Terminal />
-                  Initialize Neural Link
+                  <Icons.Trash />
                 </button>
               </div>
+            ))}
+          </div>
+
+          {/* Current Model */}
+          <div className="p-3 border-t border-zinc-800">
+            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Current Model</div>
+            <div className="bg-zinc-800 rounded-lg p-3">
+              <div className="font-medium text-sm">{config?.model}</div>
+              <div className="text-xs text-zinc-500">{PROVIDERS.find(p => p.id === config?.provider)?.name}</div>
             </div>
-          ) : currentSession.messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center p-8">
-              <div className="glass-morphism rounded-3xl p-10 max-w-xl w-full text-center relative overflow-hidden">
-                <div className="text-5xl mb-6">⚡</div>
-                <h3 className="text-2xl font-bold mb-2">Neural Connection Established</h3>
-                <p className="text-zinc-400 text-sm mb-8">
-                  Active Model: <span className="text-violet-400 font-mono">{config?.model}</span>
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {['Architect a scalable API', 'Perform a security audit', 'Analyze market trends', 'Debug legacy code'].map(prompt => (
-                    <button
-                      key={prompt}
-                      onClick={() => setInput(prompt)}
-                      className="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-medium transition-all text-zinc-300 hover:text-white text-left truncate"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0 relative z-10">
+          {/* Header */}
+          <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-4 bg-zinc-900/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+              >
+                <Icons.Menu />
+              </button>
+              <div>
+                <h2 className="font-semibold">
+                  {currentSession?.name || 'VoiceDev Chat'}
+                </h2>
+                {currentSession && (
+                  <div className="text-xs text-zinc-500">
+                    {currentSession.model}
+                  </div>
+                )}
               </div>
             </div>
-          ) : (
-            <div className="max-w-5xl mx-auto p-6 space-y-8">
-              {currentSession.messages.map(message => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    'flex gap-4 group animate-in fade-in slide-in-from-bottom-4 duration-300',
-                    message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                  )}
-                >
-                  <div className={cn(
-                    'w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-black shrink-0 shadow-lg',
-                    message.role === 'user'
-                      ? 'bg-zinc-800 text-zinc-400 border border-white/10'
-                      : 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-violet-600/20'
-                  )}>
-                    {message.role === 'user' ? (config?.userName?.[0]?.toUpperCase() || 'U') : 'V'}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+              >
+                <Icons.Settings />
+              </button>
+            </div>
+          </div>
+
+          {/* Chat Area */}
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
+            {!currentSession ? (
+              <div className="h-full flex items-center justify-center p-8">
+                <div className="max-w-2xl w-full glass-morphism rounded-3xl p-12 text-center shadow-2xl relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  <div className="text-7xl mb-6 relative">🚀</div>
+                  <h2 className="text-4xl font-black mb-4 tracking-tight">
+                    Welcome to <span className="text-violet-400">VoiceDev</span>
+                  </h2>
+                  <p className="text-zinc-400 text-lg mb-8 leading-relaxed">
+                    The world&apos;s most advanced AI orchestration platform. Powered by 95+ frontier models and 250+ autonomous tools.
+                  </p>
+                  <button
+                    onClick={createNewSession}
+                    className="px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:scale-105 active:scale-95 rounded-2xl font-bold transition-all shadow-2xl shadow-violet-600/40 flex items-center gap-3 mx-auto"
+                  >
+                    <Icons.Terminal />
+                    Initialize Neural Link
+                  </button>
+                </div>
+              </div>
+            ) : currentSession.messages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center p-8">
+                <div className="glass-morphism rounded-3xl p-10 max-w-xl w-full text-center relative overflow-hidden">
+                  <div className="text-5xl mb-6">⚡</div>
+                  <h3 className="text-2xl font-bold mb-2">Neural Connection Established</h3>
+                  <p className="text-zinc-400 text-sm mb-8">
+                    Active Model: <span className="text-violet-400 font-mono">{config?.model}</span>
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {['Architect a scalable API', 'Perform a security audit', 'Analyze market trends', 'Debug legacy code'].map(prompt => (
+                      <button
+                        key={prompt}
+                        onClick={() => setInput(prompt)}
+                        className="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-medium transition-all text-zinc-300 hover:text-white text-left truncate"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
                   </div>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-5xl mx-auto p-6 space-y-8">
+                {currentSession.messages.map(message => (
                   <div
+                    key={message.id}
                     className={cn(
-                      'max-w-[85%] rounded-3xl px-6 py-4 relative group-hover:shadow-2xl transition-all duration-300',
-                      message.role === 'user'
-                        ? 'bg-violet-600/90 text-white rounded-tr-none'
-                        : 'glass-morphism text-zinc-100 rounded-tl-none border-white/5'
+                      'flex gap-4 group animate-in fade-in slide-in-from-bottom-4 duration-300',
+                      message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                     )}
                   >
-                    <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.content}</div>
                     <div className={cn(
-                      'flex items-center gap-3 mt-3 opacity-0 group-hover:opacity-100 transition-opacity',
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
+                      'w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-black shrink-0 shadow-lg',
+                      message.role === 'user'
+                        ? 'bg-zinc-800 text-zinc-400 border border-white/10'
+                        : 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-violet-600/20'
                     )}>
-                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-tighter">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      {message.tokens && (
-                        <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-zinc-500 border border-white/5">
-                          {message.tokens} tokens
-                        </span>
+                      {message.role === 'user' ? (config?.userName?.[0]?.toUpperCase() || 'U') : 'V'}
+                    </div>
+                    <div
+                      className={cn(
+                        'max-w-[85%] rounded-3xl px-6 py-4 relative group-hover:shadow-2xl transition-all duration-300',
+                        message.role === 'user'
+                          ? 'bg-violet-600/90 text-white rounded-tr-none'
+                          : message.role === 'tool'
+                          ? 'bg-zinc-800/50 border-zinc-700 border text-zinc-400 text-xs rounded-tl-none'
+                          : 'glass-morphism text-zinc-100 rounded-tl-none border-white/5'
                       )}
+                    >
+                      {message.role === 'tool' && (
+                        <div className="flex items-center gap-2 mb-1 font-mono uppercase tracking-widest text-[10px] text-zinc-500">
+                          <Icons.Terminal />
+                          {message.toolName || 'Tool Result'}
+                        </div>
+                      )}
+                      <div className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.content}</div>
+
+                      {config.mode === 'advanced' && message.toolCalls && (
+                        <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                          {message.toolCalls.map((tc: any, i: number) => (
+                            <div key={i} className="bg-black/20 p-3 rounded-xl border border-white/5 font-mono text-[11px]">
+                              <div className="text-violet-400 flex items-center gap-2 mb-1">
+                                <Icons.Check /> {tc.function.name}
+                              </div>
+                              <div className="text-zinc-500 overflow-x-auto whitespace-pre">
+                                {JSON.stringify(JSON.parse(tc.function.arguments), null, 2)}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className={cn(
+                        'flex items-center gap-3 mt-3 opacity-0 group-hover:opacity-100 transition-opacity',
+                        message.role === 'user' ? 'justify-end' : 'justify-start'
+                      )}>
+                        <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-tighter">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {message.tokens && (
+                          <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-zinc-500 border border-white/5">
+                            {message.tokens} tokens
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold shrink-0 animate-pulse">
-                    V
-                  </div>
-                  <div className="bg-zinc-800 rounded-2xl px-4 py-3">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                ))}
+                {isLoading && (
+                  <div className="flex flex-col gap-4">
+                    {currentTool && (
+                      <div className="flex gap-3 items-center animate-pulse self-center bg-violet-500/10 border border-violet-500/20 px-4 py-2 rounded-full">
+                        <div className="w-2 h-2 bg-violet-500 rounded-full animate-ping" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-violet-400">
+                          Executing: {currentTool}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold shrink-0 animate-pulse">
+                        V
+                      </div>
+                      <div className="bg-zinc-800 rounded-2xl px-4 py-3">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
                     </div>
                   </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
+
+          {/* Input Area */}
+          {currentSession && (
+            <div className="p-6 relative z-10">
+              <div className="max-w-5xl mx-auto relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-[2rem] blur opacity-25 group-focus-within:opacity-50 transition duration-500" />
+                <div className="relative glass-morphism rounded-[1.8rem] border-white/10 p-2 flex items-end gap-3 shadow-2xl">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={`Instruct the agent... (${config?.model})`}
+                    rows={1}
+                    className="flex-1 bg-transparent border-none rounded-2xl px-6 py-4 resize-none focus:ring-0 text-[15px] placeholder:text-zinc-500 max-h-[300px] scrollbar-hide"
+                    style={{ minHeight: '56px' }}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || isLoading}
+                    className="mb-1.5 mr-1.5 p-3.5 bg-white text-zinc-950 hover:bg-violet-400 hover:text-white rounded-2xl transition-all duration-300 disabled:opacity-20 disabled:grayscale shadow-xl shadow-white/5 active:scale-95"
+                  >
+                    <Icons.Send />
+                  </button>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
+                <p className="text-[10px] text-center mt-3 text-zinc-500 font-medium uppercase tracking-widest opacity-50">
+                  Cognitive processing active • Secure neural link
+                </p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Input Area */}
-        {currentSession && (
-          <div className="p-6 relative z-10">
-            <div className="max-w-5xl mx-auto relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-[2rem] blur opacity-25 group-focus-within:opacity-50 transition duration-500" />
-              <div className="relative glass-morphism rounded-[1.8rem] border-white/10 p-2 flex items-end gap-3 shadow-2xl">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={`Instruct the agent... (${config?.model})`}
-                  rows={1}
-                  className="flex-1 bg-transparent border-none rounded-2xl px-6 py-4 resize-none focus:ring-0 text-[15px] placeholder:text-zinc-500 max-h-[300px] scrollbar-hide"
-                  style={{ minHeight: '56px' }}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="mb-1.5 mr-1.5 p-3.5 bg-white text-zinc-950 hover:bg-violet-400 hover:text-white rounded-2xl transition-all duration-300 disabled:opacity-20 disabled:grayscale shadow-xl shadow-white/5 active:scale-95"
-                >
-                  <Icons.Send />
+        {/* Settings Panel */}
+        {settingsOpen && (
+          <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={() => setSettingsOpen(false)}>
+            <div className="bg-zinc-900 rounded-2xl border border-zinc-800 w-full max-w-md" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+                <h3 className="font-bold text-lg">Settings</h3>
+                <button onClick={() => setSettingsOpen(false)} className="p-2 hover:bg-zinc-800 rounded-lg">
+                  <Icons.X />
                 </button>
               </div>
-              <p className="text-[10px] text-center mt-3 text-zinc-500 font-medium uppercase tracking-widest opacity-50">
-                Cognitive processing active • Secure neural link
-              </p>
+              <div className="p-4 space-y-4">
+                {/* Provider Select */}
+                <div>
+                  <label className="text-sm text-zinc-400 mb-2 block">Provider</label>
+                  <select
+                    value={config?.provider}
+                    onChange={(e) => {
+                      const newProvider = PROVIDERS.find(p => p.id === e.target.value)
+                      if (newProvider && config) {
+                        setConfig({ ...config, provider: newProvider.id, model: newProvider.models[0].id })
+                        localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, provider: newProvider.id, model: newProvider.models[0].id }))
+                      }
+                    }}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                    {PROVIDERS.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Model Select */}
+                <div>
+                  <label className="text-sm text-zinc-400 mb-2 block">Model</label>
+                  <select
+                    value={config?.model}
+                    onChange={(e) => {
+                      if (config) {
+                        setConfig({ ...config, model: e.target.value })
+                        localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, model: e.target.value }))
+                      }
+                    }}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                    {PROVIDERS.find(p => p.id === config?.provider)?.models.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* API Key */}
+                <div>
+                  <label className="text-sm text-zinc-400 mb-2 block">API Key</label>
+                  <input
+                    type="password"
+                    value={config?.apiKey || ''}
+                    onChange={(e) => {
+                      if (config) {
+                        setConfig({ ...config, apiKey: e.target.value })
+                        localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, apiKey: e.target.value }))
+                      }
+                    }}
+                    placeholder="Enter your API key"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  />
+                </div>
+
+                {/* Reset Setup */}
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('voicedev_setup')
+                    localStorage.removeItem('voicedev_sessions')
+                    setSetupComplete(false)
+                    setConfig(null)
+                    setSessions([])
+                    setCurrentSession(null)
+                    setSettingsOpen(false)
+                  }}
+                  className="w-full px-4 py-2.5 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg transition-colors"
+                >
+                  Reset All Settings
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Settings Panel */}
-      {settingsOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSettingsOpen(false)}>
-          <div className="bg-zinc-900 rounded-2xl border border-zinc-800 w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-              <h3 className="font-bold text-lg">Settings</h3>
-              <button onClick={() => setSettingsOpen(false)} className="p-2 hover:bg-zinc-800 rounded-lg">
-                <Icons.X />
-              </button>
-            </div>
-            <div className="p-4 space-y-4">
-              {/* Provider Select */}
-              <div>
-                <label className="text-sm text-zinc-400 mb-2 block">Provider</label>
-                <select
-                  value={config?.provider}
-                  onChange={(e) => {
-                    const newProvider = PROVIDERS.find(p => p.id === e.target.value)
-                    if (newProvider && config) {
-                      setConfig({ ...config, provider: newProvider.id, model: newProvider.models[0].id })
-                      localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, provider: newProvider.id, model: newProvider.models[0].id }))
-                    }
-                  }}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                >
-                  {PROVIDERS.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Model Select */}
-              <div>
-                <label className="text-sm text-zinc-400 mb-2 block">Model</label>
-                <select
-                  value={config?.model}
-                  onChange={(e) => {
-                    if (config) {
-                      setConfig({ ...config, model: e.target.value })
-                      localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, model: e.target.value }))
-                    }
-                  }}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                >
-                  {PROVIDERS.find(p => p.id === config?.provider)?.models.map(m => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* API Key */}
-              <div>
-                <label className="text-sm text-zinc-400 mb-2 block">API Key</label>
-                <input
-                  type="password"
-                  value={config?.apiKey || ''}
-                  onChange={(e) => {
-                    if (config) {
-                      setConfig({ ...config, apiKey: e.target.value })
-                      localStorage.setItem('voicedev_setup', JSON.stringify({ ...config, apiKey: e.target.value }))
-                    }
-                  }}
-                  placeholder="Enter your API key"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                />
-              </div>
-
-              {/* Reset Setup */}
-              <button
-                onClick={() => {
-                  localStorage.removeItem('voicedev_setup')
-                  localStorage.removeItem('voicedev_sessions')
-                  setSetupComplete(false)
-                  setConfig(null)
-                  setSessions([])
-                  setCurrentSession(null)
-                  setSettingsOpen(false)
-                }}
-                className="w-full px-4 py-2.5 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg transition-colors"
-              >
-                Reset All Settings
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

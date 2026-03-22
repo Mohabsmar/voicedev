@@ -682,6 +682,95 @@ export const fileSystemTools: Record<string, any> = {
 };
 
 // ============================================
+// PRODUCTIVITY TOOLS (Office/Docs)
+// ============================================
+import PptxGenJS from 'pptxgenjs';
+import * as docx from 'docx';
+import { jsPDF } from 'jspdf';
+
+export const productivityTools: Record<string, any> = {
+  doc_create_pptx: createTool('doc_create_pptx', 'Create a real PowerPoint presentation file', {
+    path: 'string',
+    title: 'string',
+    slides: 'array' // Array of { title, content }
+  },
+    async (p: { path: string; title: string; slides: any[] }) => {
+      try {
+        const fullPath = p.path.endsWith('.pptx') ? p.path : `${p.path}.pptx`;
+        await mkdirAsync(path.dirname(fullPath), { recursive: true });
+
+        const pptx = new PptxGenJS();
+        pptx.title = p.title;
+
+        p.slides.forEach(slideData => {
+          const slide = pptx.addSlide();
+          slide.addText(slideData.title, { x: 1, y: 1, fontSize: 24, color: '363636' });
+          slide.addText(slideData.content, { x: 1, y: 2, fontSize: 14, color: '666666' });
+        });
+
+        await pptx.writeFile({ fileName: fullPath });
+
+        return {
+          success: true,
+          data: { path: fullPath, slideCount: p.slides.length },
+          metadata: { engine: 'VoiceDev PPTX Real Engine 2026' }
+        };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  doc_create_docx: createTool('doc_create_docx', 'Create a real Word document', {
+    path: 'string',
+    title: 'string',
+    content: 'string'
+  },
+    async (p: { path: string; title: string; content: string }) => {
+      try {
+        const fullPath = p.path.endsWith('.docx') ? p.path : `${p.path}.docx`;
+        await mkdirAsync(path.dirname(fullPath), { recursive: true });
+
+        const doc = new docx.Document({
+          sections: [{
+            properties: {},
+            children: [
+              new docx.Paragraph({
+                children: [new docx.TextRun({ text: p.title, bold: true, size: 32 })],
+              }),
+              new docx.Paragraph({
+                children: [new docx.TextRun(p.content)],
+              }),
+            ],
+          }],
+        });
+
+        const buffer = await docx.Packer.toBuffer(doc);
+        await writeFileAsync(fullPath, buffer);
+
+        return { success: true, data: { path: fullPath } };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+
+  doc_create_pdf: createTool('doc_create_pdf', 'Convert text to real PDF', {
+    path: 'string',
+    content: 'string'
+  },
+    async (p: { path: string; content: string }) => {
+      try {
+        const fullPath = p.path.endsWith('.pdf') ? p.path : `${p.path}.pdf`;
+        await mkdirAsync(path.dirname(fullPath), { recursive: true });
+
+        const doc = new jsPDF();
+        const lines = doc.splitTextToSize(p.content, 180);
+        doc.text(lines, 10, 10);
+
+        const buffer = Buffer.from(doc.output('arraybuffer'));
+        await writeFileAsync(fullPath, buffer);
+
+        return { success: true, data: { path: fullPath, size: buffer.length } };
+      } catch (e: any) { return { success: false, error: e.message }; }
+    }),
+};
+
+// ============================================
 // SHELL TOOLS (40 tools) - Cross-platform
 // ============================================
 export const shellTools: Record<string, any> = {
@@ -2337,6 +2426,7 @@ export const allTools: Record<string, any> = {
   ...webTools,
   ...gitTools,
   ...npmTools,
+  ...productivityTools,
 };
 
 // Export helper functions
