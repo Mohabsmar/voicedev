@@ -90,84 +90,120 @@ const PROVIDERS = [
     id: 'openai', 
     name: 'OpenAI', 
     models: [
+      { id: 'gpt-5-preview-2026-02-22', name: 'GPT-5 (Feb 2026)', contextWindow: 1000000 },
       { id: 'gpt-4o', name: 'GPT-4o', contextWindow: 128000 },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextWindow: 128000 },
       { id: 'o1', name: 'o1', contextWindow: 128000 },
       { id: 'o1-mini', name: 'o1 Mini', contextWindow: 128000 },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', contextWindow: 128000 },
     ]
   },
   { 
     id: 'anthropic', 
     name: 'Anthropic', 
     models: [
+      { id: 'claude-4-sonnet-2026-02-22', name: 'Claude 4 Sonnet (Feb 2026)', contextWindow: 500000 },
       { id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet', contextWindow: 200000 },
       { id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', contextWindow: 200000 },
       { id: 'claude-3-opus-latest', name: 'Claude 3 Opus', contextWindow: 200000 },
+      { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet', contextWindow: 200000 },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', contextWindow: 200000 },
     ]
   },
   { 
     id: 'google', 
     name: 'Google AI', 
     models: [
+      { id: 'gemini-2.0-pro-exp-0222', name: 'Gemini 2.0 Pro (Feb 2026)', contextWindow: 4000000 },
       { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', contextWindow: 2000000 },
       { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', contextWindow: 1000000 },
       { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash-8B', contextWindow: 1000000 },
+      { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro', contextWindow: 32000 },
+      { id: 'gemini-ultro-2.0', name: 'Gemini Ultra 2.0', contextWindow: 2000000 },
     ]
   },
   { 
     id: 'deepseek', 
     name: 'DeepSeek', 
     models: [
+      { id: 'deepseek-v4-preview', name: 'DeepSeek-V4 (Feb 2026)', contextWindow: 256000 },
       { id: 'deepseek-chat', name: 'DeepSeek-V3', contextWindow: 64000 },
       { id: 'deepseek-reasoner', name: 'DeepSeek-R1', contextWindow: 64000 },
+      { id: 'deepseek-coder', name: 'DeepSeek Coder V2', contextWindow: 128000 },
+      { id: 'deepseek-llm-67b-chat', name: 'DeepSeek 67B', contextWindow: 32000 },
+      { id: 'deepseek-moe-16b-chat', name: 'DeepSeek MoE', contextWindow: 32000 },
     ]
   },
   { 
     id: 'xai', 
     name: 'xAI (Grok)', 
     models: [
-      { id: 'grok-beta', name: 'Grok Beta', contextWindow: 128000 },
+      { id: 'grok-3-preview-2026', name: 'Grok-3 (Feb 2026)', contextWindow: 1000000 },
       { id: 'grok-2', name: 'Grok 2', contextWindow: 128000 },
+      { id: 'grok-2-vision', name: 'Grok 2 Vision', contextWindow: 128000 },
+      { id: 'grok-beta', name: 'Grok Beta', contextWindow: 128000 },
+      { id: 'grok-1.5', name: 'Grok 1.5', contextWindow: 128000 },
+      { id: 'grok-1.5-vision', name: 'Grok 1.5 Vision', contextWindow: 128000 },
     ]
   },
   { 
     id: 'zai', 
     name: 'Z.ai (GLM)', 
     models: [
+      { id: 'glm-5-ultra', name: 'GLM-5 Ultra (Feb 2026)', contextWindow: 256000 },
       { id: 'glm-4', name: 'GLM-4', contextWindow: 128000 },
       { id: 'glm-4-flash', name: 'GLM-4 Flash', contextWindow: 128000 },
+      { id: 'glm-4-plus', name: 'GLM-4 Plus', contextWindow: 128000 },
+      { id: 'cogview-3-plus', name: 'CogView-3 Plus', contextWindow: 32000 },
+      { id: 'cogvlm-2', name: 'CogVLM-2', contextWindow: 32000 },
     ]
   },
   { 
     id: 'moonshot', 
     name: 'Moonshot AI', 
     models: [
-      { id: 'moonshot-v1-128k', name: 'Moonshot V1', contextWindow: 128000 },
+      { id: 'moonshot-v2-preview', name: 'Moonshot-V2 (Feb 2026)', contextWindow: 1000000 },
+      { id: 'moonshot-v1-128k', name: 'Moonshot V1 128k', contextWindow: 128000 },
+      { id: 'moonshot-v1-32k', name: 'Moonshot V1 32k', contextWindow: 32000 },
+      { id: 'moonshot-v1-8k', name: 'Moonshot V1 8k', contextWindow: 8000 },
+      { id: 'kimi-moe-v1', name: 'Kimi MoE V1', contextWindow: 128000 },
+      { id: 'kimi-web-search', name: 'Kimi Web Search', contextWindow: 128000 },
     ]
   },
   { 
     id: 'mistral', 
     name: 'Mistral AI', 
     models: [
+      { id: 'pixtral-large-2026', name: 'Pixtral Large (Feb 2026)', contextWindow: 128000 },
       { id: 'mistral-large-latest', name: 'Mistral Large', contextWindow: 128000 },
       { id: 'mistral-small-latest', name: 'Mistral Small', contextWindow: 32000 },
       { id: 'codestral-latest', name: 'Codestral', contextWindow: 32000 },
+      { id: 'mistral-medium-latest', name: 'Mistral Medium', contextWindow: 32000 },
+      { id: 'mistral-embed', name: 'Mistral Embed', contextWindow: 32000 },
     ]
   },
   { 
     id: 'qwen', 
     name: 'Alibaba Qwen', 
     models: [
-      { id: 'qwen-turbo', name: 'Qwen Turbo', contextWindow: 32000 },
+      { id: 'qwen-3-ultra', name: 'Qwen-3 Ultra (Feb 2026)', contextWindow: 1000000 },
       { id: 'qwen-max', name: 'Qwen Max', contextWindow: 32000 },
+      { id: 'qwen-plus', name: 'Qwen Plus', contextWindow: 32000 },
+      { id: 'qwen-turbo', name: 'Qwen Turbo', contextWindow: 32000 },
+      { id: 'qwen-coder-plus', name: 'Qwen Coder Plus', contextWindow: 128000 },
+      { id: 'qwen-vl-max', name: 'Qwen-VL Max', contextWindow: 32000 },
     ]
   },
   { 
     id: 'groq', 
     name: 'Groq', 
     models: [
+      { id: 'llama-4-alpha-groq', name: 'Llama-4 Alpha (Feb 2026)', contextWindow: 256000 },
       { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', contextWindow: 128000 },
       { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', contextWindow: 128000 },
+      { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', contextWindow: 32000 },
+      { id: 'gemma2-9b-it', name: 'Gemma 2 9B', contextWindow: 8192 },
+      { id: 'whisper-large-v3-turbo', name: 'Whisper V3 Turbo', contextWindow: 8192 },
     ]
   },
   {
@@ -595,27 +631,84 @@ export default function VoiceDevApp() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...currentSession.messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content,
-            tool_calls: (m as any).toolCalls,
-          })),
-          model: config.model,
-          provider: config.provider,
-          apiKey: config.apiKey,
-          mode: config.mode,
-          mcpConfigs: config.mcpConfigs,
-        }),
-      })
+      let data: any;
 
-      const data = await response.json();
+      // Check if running in Tauri for 10x faster Rust Engine execution
+      if ((window as any).__TAURI_INTERNALS__) {
+        const { invoke } = await import('@tauri-apps/api/core');
+        const messages = [...currentSession.messages, userMessage].map(m => ({
+          role: m.role,
+          content: m.content,
+          tool_calls: (m as any).toolCalls,
+          tool_call_id: (m as any).toolCallId,
+          name: (m as any).toolName,
+        }));
 
-      if (!response.ok) {
-        throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
+        let turnCount = 0;
+        const MAX_TURNS = 5;
+        let lastResponse: any;
+
+        while (turnCount < MAX_TURNS) {
+          turnCount++;
+          lastResponse = await invoke('chat', {
+            provider: config.provider,
+            model: config.model,
+            apiKey: config.apiKey,
+            messages: messages,
+          });
+
+          if (!lastResponse.tool_calls || lastResponse.tool_calls.length === 0) {
+            break;
+          }
+
+          // Add assistant message with tool calls
+          messages.push({
+            role: 'assistant',
+            content: lastResponse.content || '',
+            tool_calls: lastResponse.tool_calls,
+          });
+
+          // Execute tools via Rust Engine
+          for (const tc of lastResponse.tool_calls) {
+            setCurrentTool(tc.function.name);
+            const result = await invoke('execute_tool', {
+              name: tc.function.name,
+              arguments: tc.function.arguments,
+            });
+
+            messages.push({
+              role: 'tool',
+              tool_call_id: tc.id,
+              name: tc.function.name,
+              content: JSON.stringify(result),
+            });
+          }
+          setCurrentTool(null);
+        }
+        data = lastResponse;
+      } else {
+        // Fallback to Next.js API
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [...currentSession.messages, userMessage].map(m => ({
+              role: m.role,
+              content: m.content,
+              tool_calls: (m as any).toolCalls,
+            })),
+            model: config.model,
+            provider: config.provider,
+            apiKey: config.apiKey,
+            mode: config.mode,
+            mcpConfigs: config.mcpConfigs,
+          }),
+        })
+
+        data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
+        }
       }
 
       const assistantMessage: Message = {
@@ -624,8 +717,8 @@ export default function VoiceDevApp() {
         content: data.content || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
         model: config.model,
-        tokens: data.usage?.totalTokens,
-        toolCalls: data.toolCalls,
+        tokens: data.usage?.total_tokens || data.usage?.totalTokens,
+        toolCalls: data.tool_calls || data.toolCalls,
       }
 
       const finalSession = {
