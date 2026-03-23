@@ -21,7 +21,7 @@
 [![Custom Endpoints](https://img.shields.io/badge/Custom_Endpoints-✓-9cf?style=flat-square)](src/providers/)
 
 [![Smithery](https://img.shields.io/badge/Smithery-MCP_Tools-ff6b6b?style=flat-square)](https://smithery.ai)
-[![ClawHub](https://img.shields.io/badge/ClawHub-Skills-4ecdc4?style=flat-square)](https://clawhub.dev)
+[![ClawHub](https://img.shields.io/badge/ClawHub-33K+_Skills-4ecdc4?style=flat-square)](https://clawhub.dev)
 [![Core Tools](https://img.shields.io/badge/Extreme_Core-20_Tools-gold?style=flat-square)](src/tools/extreme-core.ts)
 [![Local Toolboxes](https://img.shields.io/badge/Local_Toolboxes-55_Tools-9b59b6?style=flat-square)](src/tools/local-toolboxes.ts)
 
@@ -89,7 +89,12 @@ VoiceDev is a comprehensive AI Agent Platform that includes:
 
 ## 🏪 Unified Marketplace Integration
 
-VoiceDev now integrates **Smithery** (MCP Tools) and **ClawHub** (Skills) marketplaces with unified commands:
+VoiceDev integrates **Smithery** (MCP Tools) and **ClawHub** (Skills) marketplaces with unified commands:
+
+| Marketplace | Items | Description |
+|-------------|-------|-------------|
+| **Smithery** | 150+ MCP Servers | 1,000+ tools for file system, git, databases, APIs |
+| **ClawHub** | 33,000+ Skills | Agent skills for automation, coding, data, browsers |
 
 ### Quick Start
 
@@ -829,9 +834,9 @@ MIT License - Use it however you want!
 
 **Desktop App: Tauri v2**
 
-**250+ Tools • 123+ Skills • 15 Providers • 80+ Models • 6 Channels • Custom Endpoints**
+**250+ Tools • 123+ Skills • 15 Providers • 80+ Models • 6 Channels**
 
-**🆕 Smithery + ClawHub Marketplaces • Extreme Core 20 • Local MCP Toolboxes • Vet Scanner**
+**🆕 Smithery (150+ MCPs) • ClawHub (33K+ Skills) • Extreme Core 20 • Local Toolboxes (55)**
 
 **Updated March 23, 2026: GPT-5.4, Claude 4.6, Gemini 3.1, GLM-5, Grok 4.20 Beta!**
 
